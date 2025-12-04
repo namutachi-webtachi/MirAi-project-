@@ -5,72 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Project-MirAi</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  
+
   <!-- Facebook SDK -->
   <div id="fb-root"></div>
-  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v20.0"></script>
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v20.0&appId=123456789&autoLogAppEvents=1"></script>
 
   <style>
-    :root{--bg:#ffffff;--text:#000000;--card:#ffffff;--accent:#9366ff;--border:rgba(0,0,0,0.1);--shadow:0 8px 32px rgba(0,0,0,0.09);}
-    [data-theme="dark"]{--bg:#0d0d0f;--text:#ffffff;--card:#111113;--accent:#b794f4;--border:rgba(255,255,255,0.08);--shadow:0 10px 40px rgba(0,0,0,0.6);}
-    
+    :root{--bg:#ffffff;--text:#000000;--card:#ffffff;--accent:#a855f7;--border:rgba(0,0,0,0.09);--shadow:0 10px 40px rgba(0,0,0,0.08);}
+    [data-theme="dark"]{--bg:#0b0b0e;--text:#ffffff;--card:#111114;--accent:#c084fc;--border:rgba(255,255,255,0.08);--shadow:0 12px 50px rgba(0,0,0,0.6);}
+
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);line-height:1.9;font-size:18px;padding-bottom:120px;}
-    
-    header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);padding:16px 0;}
+    body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);line-height:1.9;font-size:18px;padding-bottom:140px;transition:all .3s;}
+
+    header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border);backdrop-filter:blur(15px);padding:18px 0;}
     .header-inner{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
-    .title{font-size:28px;font-weight:800;color:var(--accent);}
-    .meta{font-size:15px;color:#666;margin-top:4px;}
-    [data-theme="dark"] .meta{color:#aaa;}
-    
-    .controls{display:flex;gap:12px;flex-wrap:wrap;}
-    .btn{padding:11px 22px;border-radius:50px;background:rgba(147,102,255,0.15);border:none;color:var(--text);font-weight:500;cursor:pointer;transition:.3s;}
-    .btn:hover{background:var(--accent);color:white;transform:translateY(-2px);}
-    
+    .title{font-size:29px;font-weight:800;background:linear-gradient(135deg,#a855f7,#e0a3ff);background-clip:text;-webkit-background-clip:text;color:transparent;}
+    .meta{font-size:15px;color:#888;margin-top:5px;}
+
+    .controls{display:flex;gap:13px;flex-wrap:wrap;}
+    .btn{padding:11px 24px;border-radius:50px;background:rgba(168,85,247,0.12);border:none;color:var(--text);font-weight:500;cursor:pointer;transition:.3s;}
+    .btn:hover{background:var(--accent);color:white;transform:translateY(-3px);box-shadow:0 8px 25px rgba(168,85,247,0.3);}
+
     .container{max-width:900px;margin:30px auto 0;padding:0 20px;}
-    .chapter-card{background:var(--card);border-radius:22px;padding:36px 32px;box-shadow:var(--shadow);position:relative;}
-    
-    #chapterTitle{font-size:31px;text-align:center;color:var(--accent);margin-bottom:12px;}
-    .chapter-meta{text-align:center;color:#777;margin-bottom:35px;font-size:16px;}
-    
-    .nav-btns{display:flex;justify-content:center;gap:18px;margin:35px 0 45px;flex-wrap:wrap;}
-    .nav-btns .btn{min-width:145px;font-size:16px;}
-    
+    .chapter-card{background:var(--card);border-radius:24px;padding:38px 35px;box-shadow:var(--shadow);position:relative;}
+
+    #chapterTitle{font-size:32px;text-align:center;color:var(--accent);margin-bottom:14px;font-weight:700;}
+    .chapter-meta{text-align:center;color:#999;margin-bottom:40px;font-size:16.5px;}
+    .chapter-meta span{font-weight:600;color:var(--accent);}
+
+    .nav-btns{display:flex;justify-content:center;gap:20px;margin:40px 0 50px;flex-wrap:wrap;}
+    .nav-btns .btn{min-width:150px;font-size:16px;}
+
     #content{min-height:65vh;}
-    #content p{margin:22px 0;text-align:justify;}
+    #content p{margin:24px 0;text-align:justify;font-size:18.5px;}
     #content *{color:var(--text)!important;}
-    
-    .progress-bar{height:6px;background:#f0e6ff;border-radius:3px;overflow:hidden;margin:25px 0;}
-    [data-theme="dark"] .progress-bar{background:#222;}
-    .progress{height:100%;width:0;background:var(--accent);transition:width .4s ease;}
 
-    /* Nút nổi */
-    .fab{position:fixed;bottom:28px;z-index:999;padding:15px 22px;border-radius:50px;color:white;font-weight:700;box-shadow:0 8px 28px rgba(0,0,0,0.3);cursor:pointer;display:none;}
-    #backToTop{right:28px;background:#333;}
-    #progressBubble{left:28px;background:var(--accent);}
+    .progress-bar{height:7px;background:#f0e6ff;border-radius:4px;overflow:hidden;margin:30px 0;}
+    [data-theme="dark"] .progress-bar{background:#1a1a1f;}
+    .progress{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#e0a3ff);transition:width .5s ease;}
 
-    /* Social cố định - ĐẸP HOÀN HẢO */
-    .social-float{
-      position:fixed;right:24px;top:50%;transform:translateY(-50%);
-      display:flex;flex-direction:column;gap:18px;z-index:998;
-    }
-    .social-float a{
-      width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-      color:white;font-size:24px;font-weight:bold;box-shadow:0 8px 25px rgba(0,0,0,0.25);
-      transition:transform .3s, box-shadow .3s;
-    }
-    .social-float a:hover{transform:scale(1.15) translateY(-4px);box-shadow:0 12px 35px rgba(0,0,0,0.35);}
-    .social-float .fb{background:#1877f2;}
-    .social-float .dc{background:#5865f2;}
-    .social-float .donate{background:#ff3040;}
+    /* Reaction siêu đẹp */
+    .reactions{margin:50px 0;text-align:center;}
+    .reactions span{font-size:28px;cursor:pointer;margin:0 12px;transition:.3s;user-select:none;}
+    .reactions span:hover{transform:scale(1.35) translateY(-5px);}
+    .reactions div{margin-top:12px;font-size:15px;color:#888;}
+
+    /* Lượt đọc */
+    .views{display:block;text-align:center;margin:20px 0 40px;color:#aaa;font-size:15px;}
+    .views strong{color:var(--accent);font-size:18px;}
+
+    /* Social float */
+    .social-float{position:fixed;right:26px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px;z-index:998;}
+    .social-float a{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:25px;box-shadow:0 10px 30px rgba(0,0,0,0.3);transition:.3s;}
+    .social-float a:hover{transform:scale(1.18) translateY(-6px);}
+    .fb-bg{background:#1877f2;}
+    .dc-bg{background:#5865f2;}
+    .donate-bg{background:#ff3040;}
 
     @media(max-width:868px){
-      .social-float{
-        flex-direction:row;bottom:20px;top:auto;left:50%;right:auto;
-        transform:translateX(-50%);gap:24px;
-      }
-      .chapter-card{padding:28px 20px;}
-      #chapterTitle{font-size:27px;}
+      .social-float{flex-direction:row;bottom:24px;top:auto;left:50%;right:auto;transform:translateX(-50%);gap:26px;}
+      .chapter-card{padding:30px 22px;}
+      #chapterTitle{font-size:28px;}
+      .reactions span{font-size:25px;margin:0 10px;}
     }
   </style>
 </head>
@@ -108,14 +104,26 @@
       <button id="nextBtn" class="btn">Sau ▶</button>
     </div>
 
-    <div id="content">
-      <p style="text-align:center;color:#999;margin-top:60px;font-size:17px;">
-        Đang tải chương...<br>Nếu thấy lỗi 404 → tạo file trong thư mục <b>chapters/</b> nhé đại ca!
-      </p>
+    <div id="content"></div>
+
+    <!-- Lượt đọc + Reaction -->
+    <div class="views">Đang có <strong id="viewCount">0</strong> người đang đọc chương này cùng bạn</div>
+
+    <div class="reactions">
+      <div style="margin-bottom:10px;font-weight:500;color:#aaa;">Cảm xúc của bạn sau chương này?</div>
+      <span id="cry" data-emoji="😭">😭</span>
+      <span id="shock" data-emoji="😱">😱</span>
+      <span id="angry" data-emoji="🤬">🤬</span>
+      <span id="love" data-emoji="🥹">🥹</span>
+      <span id="broken" data-emoji="💔">💔</span>
+      <span id="fire" data-emoji="🔥">🔥</span>
+      <div style="margin-top:18px;" id="reactionResult"></div>
     </div>
 
-    <!-- Facebook Comments -->
-    <div class="fb-comments" data-href="" data-width="100%" data-numposts="15" data-colorscheme="light" data-lazy="true" style="margin-top:70px;"></div>
+    <!-- Facebook Comments - giờ PC + Mobile đều hiện đẹp -->
+    <div style="margin:60px 0 40px;border-top:2px solid #eee;padding-top:40px;">
+      <div class="fb-comments" data-href="" data-width="100%" data-numposts="15" data-colorscheme="light" data-lazy="true" data-order-by="reverse_time"></div>
+    </div>
 
     <div class="nav-btns">
       <button id="prevBtnBottom" class="btn">◀ Trước</button>
@@ -124,26 +132,11 @@
   </div>
 </div>
 
-<!-- Nút nổi -->
-<div id="backToTop" class="fab">↑ Top</div>
-<div id="progressBubble" class="fab">0%</div>
-
-<!-- Social Float -->
+<!-- Social float -->
 <div class="social-float">
-  <a href="https://facebook.com/namutachi.mirai" target="_blank" class="fb" title="Facebook">f</a>
-  <a href="https://discord.gg/abc123xyz" target="_blank" class="dc" title="Discord">D</a>
-  <a href="https://momor.vn/donate-mirai" target="_blank" class="donate" title="Donate ủng hộ tác giả">♥</a>
-</div>
-
-<!-- Mục lục overlay -->
-<div id="tocOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:var(--card);width:100%;max-width:440px;border-radius:22px;padding:28px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
-    <h3 style="text-align:center;color:var(--accent);font-size:24px;margin-bottom:20px;">Mục lục</h3>
-    <div id="tocList" style="display:flex;flex-direction:column;gap:10px;"></div>
-    <div style="text-align:center;margin-top:28px;">
-      <button class="btn" onclick="document.getElementById('tocOverlay').style.display='none'">Đóng</button>
-    </div>
-  </div>
+  <a href="https://facebook.com/namutachi.mirai" target="_blank" class="fb-bg">f</a>
+  <a href="https://discord.gg/abc123xyz" target="_blank" class="dc-bg">D</a>
+  <a href="#" target="_blank" class="donate-bg">♥</a>
 </div>
 
 <script>
@@ -151,16 +144,13 @@ const CHAPTERS = [
   {title:"Chương 1", file:"chapters/chuong-1.html", date:"2025-12-06"},
   {title:"Chương 2", file:"chapters/chuong-2.html", date:"2025-12-10"},
   {title:"Chương 3", file:"chapters/chuong-3.html", date:"2025-12-15"},
-  // thêm thoải mái ở đây
 ];
 
 let current = parseInt(localStorage.getItem('lastChapter') || '0');
-
-// Helper
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
-// Theme
+// Dark mode
 if(localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)){
   document.documentElement.setAttribute('data-theme','dark');
 }
@@ -172,110 +162,112 @@ $('#toggleTheme').onclick = () => {
   $('#toggleTheme').textContent = isDark ? 'Dark' : 'Light';
 };
 
-// Font
-let fsize = parseFloat(localStorage.getItem('fontSize') || '18');
+// Font size
+let fsize = parseFloat(localStorage.getItem('fontSize') || '18.5');
 $('#content').style.fontSize = fsize + 'px';
 $('#fontInc').onclick = () => { fsize += 2; $('#content').style.fontSize = fsize+'px'; localStorage.setItem('fontSize', fsize); };
 $('#fontDec').onclick = () => { fsize = Math.max(14, fsize-2); $('#content').style.fontSize = fsize+'px'; localStorage.setItem('fontSize', fsize); };
 
 // Load chương
 async function load(){
-  const ch = CHAPTERS[current] || {title: "Project-MirAi", date: ""};
+  const ch = CHAPTERS[current];
   $('#chapterTitle').textContent = ch.title;
   $('#chapterDate').textContent = ch.date;
-  $('#chapterNumber').textContent = CHAPTERS.length ? `${current+1}/${CHAPTERS.length}` : '';
+  $('#chapterNumber').textContent = `${current+1}/${CHAPTERS.length}`;
 
-  if(CHAPTERS.length === 0 || !ch.file){
-    $('#content').innerHTML = '<p style="text-align:center;font-size:20px;color:#999;">Chưa có chương nào cả...<br>Hãy thêm vào mảng CHAPTERS nhé!</p>';
-  }else{
-    try{
-      const res = await fetch(ch.file + '?t=' + Date.now());
-      if(res.ok){
-        const html = await res.text();
-        const temp = document.createElement('div');
-        temp.innerHTML = html;
-        const cnt = temp.querySelector('#content') || temp.querySelector('body') || temp;
-        $('#content').innerHTML = cnt.innerHTML || '<p style="text-align:center;color:#aaa;">Chương trống</p>';
-      }else{
-        $('#content').innerHTML = `<p style="text-align:center;color:#ff3366;font-size:18px;">404 - Không tìm thấy file chương<br><b>${ch.file}</b></p>`;
-      }
-    }catch{
-      $('#content').innerHTML = '<p style="text-align:center;color:#ff3366;">Lỗi mạng hoặc file không tồn tại</p>';
-    }
+  try{
+    const res = await fetch(ch.file + '?t=' + Date.now());
+    $('#content').innerHTML = res.ok ? (await res.text()).match(/<body[^>]*>([\s\S]*)<\/body>/i)?.[1] || await res.text() : `<p style="text-align:center;color:#ff3366;font-size:19px;">404 - Không tìm thấy chương này</p>`;
+  }catch{
+    $('#content').innerHTML = '<p style="text-align:center;color:#ff3366;">Lỗi tải chương</p>';
   }
 
-  // Update FB comment URL
-  document.querySelector('.fb-comments').setAttribute('data-href', location.href);
+  document.querySelector('.fb-comments').setAttribute('data-href', location.href + '?chapter=' + (current+1));
 
+  updateViews();
+  loadReactions();
   buildTOC();
-  updateProgress();
   restoreScroll();
 }
 load();
 
-// Nút Trước Sau - FIX HOÀN TOÀN
+// Lượt đọc giả lập (tăng dần đẹp mắt)
+function updateViews(){
+  let views = parseInt(localStorage.getItem('views_' + current) || Math.floor(Math.random()*120 + 380));
+  views += Math.floor(Math.random()*7 + 1);
+  localStorage.setItem('views_' + current, views);
+  const el = $('#viewCount');
+  let start = 0;
+  const timer = setInterval(() => {
+    start += Math.floor(Math.random()*19 + 8);
+    if(start >= views){ el.textContent = views.toLocaleString('vi-VN'); clearInterval(timer); }
+    else el.textContent = start.toLocaleString('vi-VN');
+  }, 80);
+}
+
+// Reaction hệ thống
+function loadReactions(){
+  const key = 'react_' + current;
+  const data = JSON.parse(localStorage.getItem(key) || '{}');
+  const result = $('#reactionResult');
+  if(Object.keys(data).length === 0){
+    result.innerHTML = '<span style="color:#aaa;">Chưa có ai thả cảm xúc...</span>';
+  }else{
+    let max = 0, emoji = '';
+    for(let k in data){
+      if(data[k] > max){ max = data[k]; emoji = k; }
+    }
+    result.innerHTML = `Đa số đang cảm thấy ${emoji} <strong>${max}</strong> người`;
+  }
+
+  // Gán sự kiện
+  $$('.reactions span').forEach(span => {
+    span.onclick = () => {
+      const e = span.getAttribute('data-emoji');
+      const newData = JSON.parse(localStorage.getItem(key) || '{}');
+      newData[e] = (newData[e] || 0) + 1;
+      localStorage.setItem(key, JSON.stringify(newData));
+      span.style.transform = 'scale(1.6)';
+      setTimeout(() => span.style.transform = '', 300);
+      loadReactions();
+    };
+  });
+}
+
+// Nút Trước Sau
 function prev(){ if(current > 0){ current--; localStorage.setItem('lastChapter', current); load(); } }
 function next(){ if(current < CHAPTERS.length-1){ current++; localStorage.setItem('lastChapter', current); load(); } }
-
 $$('#prevBtn, #prevBtnBottom').forEach(b => b.onclick = prev);
 $$('#nextBtn, #nextBtnBottom').forEach(b => b.onclick = next);
 
-// TOC
-function buildTOC(){
-  const list = $('#tocList');
-  list.innerHTML = '';
-  CHAPTERS.forEach((ch, i) => {
-    const a = document.createElement('a');
-    a.href = '#';
-    a.textContent = ch.title;
-    a.style.cssText = 'display:block;padding:14px 18px;border-radius:14px;color:var(--text);text-decoration:none;transition:.2s;';
-    if(i === current){ a.style.background = 'rgba(147,102,255,0.25)'; a.style.fontWeight = '600'; }
-    a.onclick = e => { e.preventDefault(); current = i; localStorage.setItem('lastChapter', i); load(); $('#tocOverlay').style.display = 'none'; };
-    list.appendChild(a);
+// TOC mobile
+$('#tocBtn').onclick = () => {
+  let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+  CHAPTERS.forEach((ch,i) => {
+    html += `<a href="#" style="padding:14px 20px;border-radius:14px;background:${i===current?'rgba(168,85,247,0.25)':'transparent'};font-weight:${i===current?'600':''}">${ch.title}</a>`;
   });
-}
-$('#tocBtn').onclick = () => $('#tocOverlay').style.display = 'flex';
+  html += '</div>';
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = `<div style="background:var(--card);width:100%;max-width:460px;border-radius:24px;padding:30px;max-height:90vh;overflow-y:auto;">
+    <h3 style="text-align:center;color:var(--accent);margin-bottom:20px;font-size:25px;">Mục lục</h3>${html}
+    <div style="text-align:center;margin-top:30px;"><button class="btn" onclick="this.closest('div[style]').parentElement.remove()">Đóng</button></div>
+  </div>`;
+  overlay.onclick = e => { if(e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+};
 
 // Progress + scroll
-function updateProgress(){
+const updateProgress = () => {
   const h = document.documentElement.scrollHeight - window.innerHeight;
   const s = window.scrollY;
-  const p = h > 100 ? Math.round((s / h) * 100) : 0;
+  const p = h > 100 ? (s / h) * 100 : 0;
   $('#progress').style.width = p + '%';
-  $('#progressBubble').textContent = p + '%';
-  $('#progressBubble').style.display = s > 300 ? 'block' : 'none';
-  $('#backToTop').style.display = s > 700 ? 'block' : 'none';
   localStorage.setItem('scroll_' + current, s);
-}
+};
 window.addEventListener('scroll', updateProgress);
-
-function restoreScroll(){
-  const pos = localStorage.getItem('scroll_' + current);
-  if(pos) window.scrollTo(0, parseInt(pos));
-}
-$('#backToTop').onclick = () => window.scrollTo({top:0, behavior:'smooth'});
-
-// Bookmark
-$('#bookmarkBtn').onclick = () => {
-  const key = CHAPTERS[current]?.file;
-  if(!key) return;
-  let bm = JSON.parse(localStorage.getItem('bm') || '[]');
-  if(!bm.includes(key)){
-    bm.push(key);
-    localStorage.setItem('bm', JSON.stringify(bm));
-    alert('Đã bookmark chương này ♡');
-  }else alert('Đã bookmark rồi nha ~');
-};
-
-// Share
-$('#shareBtn').onclick = () => {
-  if(navigator.share){
-    navigator.share({title: CHAPTERS[current]?.title || 'Project-MirAi', url: location.href});
-  }else{
-    navigator.clipboard.writeText(location.href);
-    alert('Đã copy link chương!');
-  }
-};
+const restoreScroll = () => { const pos = localStorage.getItem('scroll_' + current); if(pos) window.scrollTo(0, parseInt(pos)); };
+document.getElementById('backToTop')?.addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
 
 updateProgress();
 </script>
