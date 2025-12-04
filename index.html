@@ -1,283 +1,293 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Project-MirAiMirAi</title></title>
-  <meta name="description" content="Template web truyện: dark mode, TOC, navigation, reading progress, comments placeholder" />
+  <title>Project-MirAi</title>
+  <meta name="description" content="Đọc truyện Project-MirAi - MirAi & NamuTachi" />
+  
+  <!-- Font Google đẹp mượt -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <!-- Basic styles (feel free to replace with Tailwind if desired) -->
   <style>
     :root{
-      --bg:#f7f7f7; --text:#111; --muted:#666; --accent:#7c3aed;
-      --card:#fff; --shadow: 0 6px 18px rgba(18,18,18,0.06);
-      --max-width:780px;
+      --bg:#fdfdfd;
+      --text:#000000;           /* Đen tuyền */
+      --muted:#333333;
+      --accent:#8b5cf6;
+      --card:#ffffff;
+      --shadow:0 8px 25px rgba(0,0,0,0.08);
+      --border:rgba(0,0,0,0.08);
     }
-    [data-theme="dark"]{ --bg:#0b0b0d; --text:#e6e6e9; --muted:#9aa0a6; --card:#0f1113; --accent:#8b5cf6; --shadow: 0 8px 30px rgba(0,0,0,0.6);} 
-
-    html,body{height:100%;}
-    body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
-
-    header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg, rgba(255,255,255,0.6), transparent);backdrop-filter: blur(6px);border-bottom:1px solid rgba(0,0,0,0.04);} 
-    [data-theme="dark"] header{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-bottom:1px solid rgba(255,255,255,0.03);} 
-
-    .container{max-width:1200px;margin:0 auto;padding:18px;display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start}
-    main{max-width:var(--max-width);margin:0 auto;background:transparent}
-    .card{background:var(--card);box-shadow:var(--shadow);border-radius:12px;padding:22px}
-
-    .title{font-size:22px;font-weight:700;margin:6px 0}
-    .meta{color:var(--muted);font-size:13px;margin-bottom:12px}
-
-    /* reading controls */
-    .controls{display:flex;gap:8px;align-items:center;margin-bottom:14px}
-    .btn{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:8px 10px;border-radius:8px;cursor:pointer}
-    [data-theme="dark"] .btn{border:1px solid rgba(255,255,255,0.04)}
-
-    .content{line-height:1.85;font-size:18px;color:var(--text)}
-    .content p{margin:12px 0}
-
-    /* progress bar */
-    .progress-wrap{height:6px;background:rgba(0,0,0,0.06);border-radius:999px;overflow:hidden;margin-top:6px}
-    .progress{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#3b82f6)}
-
-    /* Sidebar */
-    aside{position:relative}
-    .toc{position:sticky;top:88px}
-    .toc h3{margin:0 0 10px 0}
-    .toc ul{list-style:none;padding:0;margin:0}
-    .toc li{margin:8px 0}
-    .toc a{color:var(--text);text-decoration:none}
-
-    /* footer actions */
-    .nav-row{display:flex;justify-content:space-between;margin-top:18px}
-
-    /* small screens */
-    @media (max-width:900px){
-      .container{grid-template-columns:1fr}
-      aside{order:2}
-      header{position:static}
+    [data-theme="dark"]{
+      --bg:#0a0a0a;
+      --text:#ffffff;           /* Trắng tuyền */
+      --muted:#bbbbbb;
+      --accent:#b794f4;
+      --card:#0f0f0f;
+      --shadow:0 10px 35px rgba(0,0,0,0.7);
+      --border:rgba(255,255,255,0.08);
     }
 
-    /* small niceties */
-    .fade{opacity:0;transform:translateY(6px);transition:all .45s cubic-bezier(.2,.9,.3,1)}
-    .fade.in{opacity:1;transform:none}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      font-family:'Roboto','Segoe UI',system-ui,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.85;
+      font-size:18px;
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
+    }
+    header{
+      position:sticky;top:0;z-index:100;
+      background:var(--card);
+      border-bottom:1px solid var(--border);
+      backdrop-filter:blur(12px);
+    }
+    .container{
+      max-width:1260px;margin:0 auto;padding:16px;
+      display:grid;grid-template-columns:1fr 340px;gap:36px;align-items:start;
+    }
+    main{max-width:860px;margin:0 auto;}
+    .card{
+      background:var(--card);
+      border-radius:18px;
+      padding:28px;
+      box-shadow:var(--shadow);
+      margin-bottom:28px;
+    }
+    .title{
+      font-size:28px;font-weight:800;color:var(--accent);margin-bottom:6px;
+    }
+    .meta{font-size:15px;color:var(--muted);margin-bottom:20px;}
+    .controls{
+      display:flex;flex-wrap:wrap;gap:14px;margin:24px 0;
+    }
+    .btn{
+      background:rgba(139,92,246,0.08);
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:11px 18px;border-radius:14px;
+      cursor:pointer;font-weight:500;transition:.25s;
+    }
+    .btn:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(139,92,246,0.25);}
+    .content{
+      color:var(--text) !important;
+      font-size:18.5px;
+    }
+    .content p{
+      margin:18px 0;
+      color:var(--text) !important;
+    }
+    .content *{color:var(--text) !important;}
+    .progress-wrap{
+      height:7px;background:rgba(0,0,0,0.08);border-radius:8px;overflow:hidden;margin-top:14px;
+    }
+    [data-theme="dark"] .progress-wrap{background:rgba(255,255,255,0.08);}
+    .progress{
+      height:100%;width:0;background:linear-gradient(90deg,var(--accent),#a78bfa);transition:width .4s;
+    }
+    .toc{position:sticky;top:96px;}
+    .toc h3{font-size:19px;margin-bottom:14px;}
+    .toc ul{list-style:none;}
+    .toc a{
+      display:block;padding:9px 12px;border-radius:10px;color:var(--text);
+      text-decoration:none;transition:.2s;border-radius:10px;
+    }
+    .toc a:hover{background:rgba(139,92,246,0.15);}
+    .toc a.active{font-weight:700;background:rgba(139,92,246,0.2);}
+    .nav-row{display:flex;justify-content:space-between;margin-top:50px;}
+    #backToTop,#bubble{
+      position:fixed;bottom:24px;padding:14px 18px;border-radius:50px;
+      background:var(--card);box-shadow:var(--shadow);cursor:pointer;
+      font-weight:700;font-size:15px;display:none;z-index:999;
+    }
+    #backToTop{right:24px;}
+    #bubble{left:24px;background:var(--accent);color:white !important;}
 
-    .back-to-top{position:fixed;right:18px;bottom:18px;padding:10px;border-radius:10px;box-shadow:var(--shadow);background:var(--card);cursor:pointer}
-
-    /* reading progress indicator (chapter percent) */
-    .reading-progress-bubble{position:fixed;left:18px;bottom:18px;padding:8px 10px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-weight:600}
+    @media(max-width:960px){
+      .container{grid-template-columns:1fr;padding:12px;}
+      .toc{position:static;margin-top:32px;}
+      #tocCard{display:none;}
+    }
   </style>
 </head>
 <body>
-  <header class="card" style="margin:12px auto 16px;max-width:1200px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+
+  <header class="card" style="margin:12px auto;max-width:1260px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
       <div>
-        <div class="title">Project-MirAi </div>
-        <div class="meta">Tác giả: NamuTachi  / <strong>MirAi</strong></div>
+        <div class="title">Project-MirAi</div>
+        <div class="meta">Tác giả: NamuTachi / <strong>MirAi</strong></div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button id="toggleTheme" class="btn" title="Chuyển giao diện">🌙</button>
-        <div style="display:flex;align-items:center;gap:8px">
-          <button id="fontDec" class="btn">A-</button>
-          <button id="fontInc" class="btn">A+</button>
-        </div>
-        <button id="tocToggle" class="btn">📚 Mục lục</button>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button id="toggleTheme" class="btn">Dark</button>
+        <button id="fontDec" class="btn">A-</button>
+        <button id="fontInc" class="btn">A+</button>
+        <button id="tocToggle" class="btn">Mục lục</button>
       </div>
     </div>
-    <div class="progress-wrap" style="margin-top:12px">
-      <div id="siteProgress" class="progress"></div>
-    </div>
+    <div class="progress-wrap"><div id="siteProgress" class="progress"></div></div>
   </header>
 
   <div class="container">
     <main>
-      <article id="chapter" class="card fade">
-        <div id="chapterHeader">
-          <h1 id="chapterTitle">Chương 1 </h1>
-          <div class="meta">Cập nhật: <span id="chapterDate">2025-12-0606</span> </div>
+      <article class="card">
+        <h1 id="chapterTitle" style="font-size:29px;margin-bottom:10px;color:var(--accent);">Đang tải...</h1>
+        <div class="meta">
+          <span id="chapterNumber"></span> • Cập nhật: <span id="chapterDate"></span>
         </div>
 
-        <div class="controls"06"},
-      
-    ];
+        <div class="controls">
+          <button id="prevBtn" class="btn">◀ Trước</button>
+          <button id="bookmarkBtn" class="btn">Bookmark</button>
+          <button id="shareBtn" class="btn">Share</button>
+          <button id="nextBtn" class="btn">Sau ▶</button>
+        </div>
 
-    // If you prefer to embed chapter content directly in this file, set USE_EXTERNAL_CHAPTERS = false and paste HTML content into the #content element within <article>.
-    const USE_EXTERNAL_CHAPTERS = true;
+        <div id="content" class="content">
+          <!-- Nội dung chương sẽ được load vào đây -->
+        </div>
 
-    /* ---------- Utilities ---------- */
-    const $ = sel => document.querySelector(sel);
-    const $$ = sel => Array.from(document.querySelectorAll(sel));
+        <div class="nav-row">
+          <button id="prevBtnBottom" class="btn">◀ Trước</button>
+          <button id="nextBtnBottom" class="btn">Sau ▶</button>
+        </div>
+      </article>
 
-    /* ---------- Theme (dark/light) ---------- */
-    function applyTheme(theme){
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('theme', theme);
-      $('#toggleTheme').textContent = theme === 'dark' ? '☀️' : '🌙';
+      <div id="backToTop">Top</div>
+      <div id="bubble">0%</div>
+    </main>
+
+    <aside>
+      <div id="tocCard" class="card toc">
+        <h3>Mục lục</h3>
+        <ul id="tocList"></ul>
+      </div>
+    </aside>
+  </div>
+
+<script>
+// === DANH SÁCH CHƯƠNG - thêm thoải mái ===
+const CHAPTERS = [
+  {title:"Chương 1", file:"chapters/chuong-1.html", date:"2025-12-06"},
+  {title:"Chương 2", file:"chapters/chuong-2.html", date:"2025-12-10"},
+  {title:"Chương 3", file:"chapters/chuong-3.html", date:"2025-12-15"},
+  // cứ thêm tiếp...
+];
+
+const USE_EXTERNAL_CHAPTERS = true;
+const $ = s => document.querySelector(s);
+
+let currentChapterIndex = parseInt(localStorage.getItem('lastChapter') || '0');
+
+// Theme
+const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+document.documentElement.setAttribute('data-theme', savedTheme);
+$('#toggleTheme').textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
+$('#toggleTheme').onclick = () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  $('#toggleTheme').textContent = newTheme === 'dark' ? 'Light' : 'Dark';
+};
+
+// Font size
+let fontSize = parseInt(localStorage.getItem('fontSize') || '18.5');
+$('#content').style.fontSize = fontSize + 'px';
+$('#fontInc').onclick = () => { fontSize+=2; $('#content').style.fontSize = fontSize+'px'; localStorage.setItem('fontSize',fontSize); };
+$('#fontDec').onclick = () => { fontSize-=2; if(fontSize<12) fontSize=12; $('#content').style.fontSize = fontSize+'px'; localStorage.setItem('fontSize',fontSize); };
+
+// TOC
+function buildTOC(){
+  const list = $('#tocList'); list.innerHTML = '';
+  CHAPTERS.forEach((ch,i)=>{
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href='#'; a.textContent = ch.title;
+    a.onclick = e => {e.preventDefault(); loadChapter(i);};
+    if(i===currentChapterIndex) a.classList.add('active');
+    li.appendChild(a); list.appendChild(li);
+  });
+}
+
+// Load chương
+async function loadChapter(idx){
+  if(!CHAPTERS[idx]) return;
+  currentChapterIndex = idx;
+  localStorage.setItem('lastChapter', idx);
+
+  const ch = CHAPTERS[idx];
+  $('#chapterTitle').textContent = ch.title;
+  $('#chapterDate').textContent = ch.date;
+  $('#chapterNumber').textContent = `${idx+1}/${CHAPTERS.length}`;
+
+  if(USE_EXTERNAL_CHAPTERS){
+    try{
+      const res = await fetch(ch.file + '?v=' + Date.now());
+      const html = await res.text();
+      const tmp = document.createElement('div'); tmp.innerHTML = html;
+      const inner = tmp.querySelector('#content') || tmp.querySelector('body') || tmp;
+      $('#content').innerHTML = inner.innerHTML;
+    }catch{
+      $('#content').innerHTML = `<p style="text-align:center;color:red;">Không tải được chương<br><b>${ch.file}</b></p>`;
     }
-    const savedTheme = localStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
-    applyTheme(savedTheme);
-    $('#toggleTheme').addEventListener('click', ()=> applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
-    $('#themeMini').addEventListener('click', ()=> $('#toggleTheme').click());
+  }
+  window.scrollTo(0,0);
+  buildTOC();
+  restorePosition();
+  updateProgress();
+}
 
-    /* ---------- Font controls ---------- */
-    const content = $('#content');
-    function setFontSize(size){ content.style.fontSize = size + 'px'; localStorage.setItem('fontSize', size); }
-    const savedFont = localStorage.getItem('fontSize') || 18;
-    setFontSize(Number(savedFont));
-    $('#fontInc').addEventListener('click', ()=> setFontSize(Math.min(28, parseInt(getComputedStyle(content).fontSize) + 2)));
-    $('#fontDec').addEventListener('click', ()=> setFontSize(Math.max(12, parseInt(getComputedStyle(content).fontSize) - 2)));
+function goPrev(){ if(currentChapterIndex>0) loadChapter(currentChapterIndex-1); }
+function goNext(){ if(currentChapterIndex<CHAPTERS.length-1) loadChapter(currentChapterIndex+1); }
 
-    $('#lineHeightSelect').addEventListener('change', (e)=> { content.style.lineHeight = e.target.value; localStorage.setItem('lineHeight', e.target.value); });
-    const savedLine = localStorage.getItem('lineHeight') || '1.85';
-    $('#lineHeightSelect').value = savedLine; content.style.lineHeight = savedLine;
+['prevBtn','prevBtnBottom'].forEach(id=>$(`#${id}`).onclick=goPrev);
+['nextBtn','nextBtnBottom'].forEach(id=>$(`#${id}`).onclick=goNext);
 
-    /* ---------- Table of Contents auto-generate ---------- */
-    function buildTOC(){
-      const toc = $('#tocList'); toc.innerHTML = '';
-      // If content has headings, use them
-      const headings = content.querySelectorAll('h1,h2,h3');
-      if(headings.length){
-        headings.forEach(h=>{
-          const li = document.createElement('li');
-          const a = document.createElement('a');
-          a.href = '#' + (h.id || (h.id = 'id-' + Math.random().toString(36).slice(2,9)));
-          a.textContent = h.textContent;
-          a.addEventListener('click', (ev)=>{
-            ev.preventDefault(); document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth'});
-          });
-          li.appendChild(a); toc.appendChild(li);
-        });
-      } else {
-        // fallback: use CHAPTERS list
-        CHAPTERS.forEach((c,i)=>{
-          const li = document.createElement('li');
-          const a = document.createElement('a'); a.href = '#'; a.textContent = c.title;
-          a.addEventListener('click', (ev)=>{ ev.preventDefault(); loadChapter(i); });
-          li.appendChild(a); toc.appendChild(li);
-        });
-      }
-    }
+// Progress & vị trí đọc
+function updateProgress(){
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const s = window.scrollY;
+  const p = h>0 ? Math.round((s/h)*100) : 0;
+  $('#siteProgress').style.width = p + '%';
+  $('#bubble').textContent = p + '%';
+  $('#bubble').style.display = s>200 ? 'block' : 'none';
+  $('#backToTop').style.display = s>600 ? 'block' : 'none';
+  localStorage.setItem('pos_'+currentChapterIndex, s);
+}
+window.addEventListener('scroll', updateProgress);
+function restorePosition(){
+  const pos = localStorage.getItem('pos_'+currentChapterIndex);
+  if(pos) window.scrollTo(0, parseInt(pos));
+}
+$('#backToTop').onclick = () => window.scrollTo({top:0,behavior:'smooth'});
 
-    /* ---------- Chapter loading & navigation ---------- */
-    let currentChapterIndex = Number(localStorage.getItem('lastChapter') || 0);
-    function renderChapterMeta(){
-      const ch = CHAPTERS[currentChapterIndex];
-      if(ch){
-        $('#chapterTitle').textContent = ch.title;
-        $('#chapterDate').textContent = ch.date || '';
-        $('#chapterNumber').textContent = (currentChapterIndex+1) + '/' + CHAPTERS.length;
-      }
-    }
+// Bookmark & Share
+$('#bookmarkBtn').onclick = () => {
+  let b = JSON.parse(localStorage.getItem('bm')||'[]');
+  const key = CHAPTERS[currentChapterIndex].file;
+  if(!b.includes(key)){ b.push(key); localStorage.setItem('bm',JSON.stringify(b)); alert('Đã bookmark'); }
+  else alert('Đã bookmark rồi');
+};
+$('#shareBtn').onclick = () => {
+  if(navigator.share) navigator.share({title:CHAPTERS[currentChapterIndex].title,url:location.href});
+  else{ navigator.clipboard.writeText(location.href); alert('Đã copy link'); }
+};
 
-    async function loadChapter(index){
-      if(!CHAPTERS[index]) return; currentChapterIndex = index; localStorage.setItem('lastChapter', index);
-      renderChapterMeta();
-      if(USE_EXTERNAL_CHAPTERS){
-        try{
-          const res = await fetch(CHAPTERS[index].file);
-          if(!res.ok) throw new Error('Không thể load chương');
-          const html = await res.text();
-          // Expect the external file to contain only the inner HTML for #content OR a wrapper <article id="chapterContent"> ...</n          // Simple approach: extract body content
-          const tmp = document.createElement('div'); tmp.innerHTML = html;
-          const inner = tmp.querySelector('#content') || tmp.querySelector('article') || tmp;
-          $('#content').innerHTML = inner.innerHTML;
-          window.scrollTo({top:0,behavior:'auto'});
-          buildTOC();
-          window.dispatchEvent(new Event('resize'));
-        }catch(err){
-          console.error(err); $('#content').innerHTML = '<p>Không thể tải chương. Kiểm tra đường dẫn hoặc bật CORS nếu cần.</p>';
-        }
-      } else {
-        // if chapters are embedded in this file, show/hide sections (not implemented in this template)
-      }
-    }
+// Mobile TOC
+$('#tocToggle').onclick = () => {
+  const toc = $('#tocCard');
+  toc.style.display = toc.style.display==='block' ? 'none' : 'block';
+};
 
-    // Prev/Next handlers
-    function goNext(){ if(currentChapterIndex < CHAPTERS.length -1) loadChapter(currentChapterIndex +1); }
-    function goPrev(){ if(currentChapterIndex > 0) loadChapter(currentChapterIndex -1); }
-    $('#nextBtn').addEventListener('click', goNext); $('#nextBtnBottom').addEventListener('click', goNext);
-    $('#prevBtn').addEventListener('click', goPrev); $('#prevBtnBottom').addEventListener('click', goPrev);
+// Khởi động
+loadChapter(currentChapterIndex);
+buildTOC();
+updateProgress();
 
-    /* ---------- Scroll progress and reading position ---------- */
-    const progressEl = $('#siteProgress');
-    const bubble = $('#bubble');
-    function updateProgress(){
-      const rect = content.getBoundingClientRect();
-      const docHeight = content.scrollHeight - window.innerHeight + (rect.top * -1);
-      const scrolled = Math.min(Math.max(window.scrollY - (content.offsetTop - 20), 0), content.scrollHeight);
-      const percent = Math.round((window.scrollY - content.offsetTop + window.innerHeight/10) / (content.scrollHeight) * 100);
-      const p = Math.min(100, Math.max(0, (window.scrollY - content.offsetTop + window.innerHeight/10) / (content.scrollHeight) * 100));
-      progressEl.style.width = p + '%';
-      bubble.textContent = Math.round(p) + '%';
-      // show/hide back-to-top
-      $('#backToTop').style.display = (window.scrollY > 400) ? 'block' : 'none';
-      bubble.style.display = (window.scrollY > 120) ? 'block' : 'none';
-
-      // Save reading position per-chapter
-      const key = 'pos_ch_' + currentChapterIndex;
-      localStorage.setItem(key, window.scrollY);
-    }
-    window.addEventListener('scroll', updateProgress);
-
-    // restore reading position
-    function restorePosition(){
-      const key = 'pos_ch_' + currentChapterIndex; const pos = Number(localStorage.getItem(key) || 0);
-      if(pos){ window.scrollTo({top: pos, behavior: 'auto'}); }
-    }
-
-    $('#backToTop').addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
-
-    /* ---------- Bookmark & share ---------- */
-    $('#bookmarkBtn').addEventListener('click', ()=>{
-      const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
-      const ch = CHAPTERS[currentChapterIndex]; if(!ch) return;
-      if(!bookmarks.find(b=>b.file===ch.file)){ bookmarks.push({file:ch.file,title:ch.title,at:Date.now()}); localStorage.setItem('bookmarks', JSON.stringify(bookmarks)); alert('Đã đánh dấu chương'); } else alert('Đã đánh dấu rồi');
-    });
-    $('#shareBtn').addEventListener('click', ()=>{
-      if(navigator.share){ navigator.share({title: document.title, text: CHAPTERS[currentChapterIndex].title, url: window.location.href}); }
-      else{ navigator.clipboard.writeText(window.location.href).then(()=> alert('Link đã copy')); }
-    });
-
-    /* ---------- small UI effects ---------- */
-    window.addEventListener('load', ()=>{ setTimeout(()=>{ document.querySelectorAll('.fade').forEach(el=>el.classList.add('in')); },60); });
-
-    /* ---------- TOC toggle for small screens ---------- */
-    $('#tocToggle').addEventListener('click', ()=>{
-      const card = $('#tocCard'); card.style.display = (card.style.display === 'none' ? 'block' : 'none');
-    });
-
-    /* ---------- Init ---------- */
-    (async function init(){
-      if(CHAPTERS.length){ renderChapterMeta(); await loadChapter(currentChapterIndex); restorePosition(); }
-      buildTOC();
-      // restore font size
-      const f = localStorage.getItem('fontSize'); if(f) setFontSize(Number(f));
-      updateProgress();
-    })();
-
-    /* ---------- Notes for maintainers ---------- */
-    // - For external chapters (recommended), create files like chapters/chapter-1.html containing only the inner HTML of #content
-    // - If hosting on GitHub Pages, ensure paths are correct and CORS is not an issue (same repo is fine).
-    // - To enable Giscus/Utterances comments, uncomment the respective block and replace OWNER/REPO with your GitHub repo info.
-    // - Accessibility: add proper aria-* attributes and tabindex if you want keyboard navigation.
-
-  </script>
-  <!-- Comment system per chapter using Giscus -->
-  <script src="https://giscus.app/client.js"
-        data-repo="namutachi-webtachi/MirAi-project-"
-        data-repo-id="REPO_ID_HERE"
-        data-category="General"
-        data-category-id="CATEGORY_ID_HERE"
-        data-mapping="pathname"
-        data-strict="1"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="light"
-        data-lang="vi"
-        crossorigin="anonymous"
-        async>
-  </script>
+</script>
 </body>
 </html>
-
