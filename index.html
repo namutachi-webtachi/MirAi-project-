@@ -60,13 +60,24 @@
     .social-float a:hover{transform:scale(1.18) translateY(-6px);}
     .fb-bg{background:#1877f2;}
     .dc-bg{background:#5865f2;}
-    .donate-bg{background:#000000;}
+    .donate-bg{background:#ff4757;}
+
+    /* Scroll to top button */
+    #scrollTop{position:fixed;bottom:30px;left:30px;width:50px;height:50px;border-radius:50%;background:var(--accent);color:var(--bg);border:none;font-size:24px;cursor:pointer;opacity:0;pointer-events:none;transition:.3s;z-index:998;box-shadow:0 8px 25px rgba(0,0,0,0.3);}
+    #scrollTop.show{opacity:1;pointer-events:all;}
+    #scrollTop:hover{transform:translateY(-5px);}
+
+    /* Toast notification */
+    .toast{position:fixed;top:100px;right:30px;background:var(--card);padding:18px 26px;border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--border);z-index:999;opacity:0;transform:translateX(400px);transition:.4s;}
+    .toast.show{opacity:1;transform:translateX(0);}
 
     @media(max-width:868px){
       .social-float{flex-direction:row;bottom:24px;top:auto;left:50%;right:auto;transform:translateX(-50%);gap:26px;}
       .chapter-card{padding:32px 22px;}
       #chapterTitle{font-size:28px;}
       .reactions span{font-size:27px;margin:0 12px;}
+      #scrollTop{left:20px;bottom:90px;}
+      .toast{right:20px;left:20px;top:80px;}
     }
   </style>
 </head>
@@ -94,13 +105,13 @@
   <div class="chapter-card">
     <h1 id="chapterTitle">Đang tải...</h1>
     <div class="chapter-meta">
-      <span id="chapterNumber"></span> • Cập nhật: <span id="chapterDate"></span>
+      <span id="chapterNumber"></span> • Cập nhật: <span id="chapterDate"></span> • <span id="viewCount">👁️ 0 lượt xem</span>
     </div>
 
     <div class="nav-btns">
       <button id="prevBtn" class="btn">◀ Trước</button>
-      <button id="bookmarkBtn" class="btn">Bookmark</button>
-      <button id="shareBtn" class="btn">Share</button>
+      <button id="bookmarkBtn" class="btn">🔖 Bookmark</button>
+      <button id="shareBtn" class="btn">📤 Share</button>
       <button id="nextBtn" class="btn">Sau ▶</button>
     </div>
 
@@ -133,9 +144,12 @@
 <!-- Social float -->
 <div class="social-float">
   <a href="https://facebook.com/namutachi.mirai" target="_blank" class="fb-bg">f</a>
-  <a href="https://discord.gg/abc123xyz" target="_blank" class="dc-bg">D</a>
-  <a href="#" target="_blank" class="donate-bg">♥</a>
+  <a href="https://discord.gg/yourdiscord" target="_blank" class="dc-bg">D</a>
+  <a href="https://ko-fi.com/namutachi" target="_blank" class="donate-bg">♥</a>
 </div>
+
+<!-- Scroll to top button -->
+<button id="scrollTop">↑</button>
 
 <script>
 const CHAPTERS = [
@@ -147,6 +161,19 @@ const CHAPTERS = [
 let current = parseInt(localStorage.getItem('lastChapter') || '0');
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
+
+// Toast notification helper
+function showToast(msg){
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 10);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 400);
+  }, 2500);
+}
 
 // Theme
 if(localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)){
@@ -163,8 +190,40 @@ $('#toggleTheme').onclick = () => {
 // Font
 let fsize = parseFloat(localStorage.getItem('fontSize') || '18.5');
 $('#content').style.fontSize = fsize + 'px';
-$('#fontInc').onclick = () => { fsize += 2; $('#content').style.fontSize = fsize+'px'; localStorage.setItem('fontSize', fsize); };
-$('#fontDec').onclick = () => { fsize = Math.max(14, fsize-2); $('#content').style.fontSize = fsize+'px'; localStorage.setItem('fontSize', fsize); };
+$('#fontInc').onclick = () => { 
+  if(fsize < 26){ 
+    fsize += 2; 
+    $('#content').style.fontSize = fsize+'px'; 
+    localStorage.setItem('fontSize', fsize); 
+    showToast('Đã tăng kích thước chữ');
+  }
+};
+$('#fontDec').onclick = () => { 
+  if(fsize > 14){
+    fsize -= 2; 
+    $('#content').style.fontSize = fsize+'px'; 
+    localStorage.setItem('fontSize', fsize); 
+    showToast('Đã giảm kích thước chữ');
+  }
+};
+
+// View counter - FIXED: Chỉ đếm 1 lần mỗi session
+function updateViewCount(){
+  const key = 'view_' + current;
+  const sessionKey = 'viewed_session_' + current;
+  
+  // Chỉ tăng nếu chưa xem trong session này (chưa đóng tab)
+  if(!sessionStorage.getItem(sessionKey)){
+    let views = parseInt(localStorage.getItem(key) || '0');
+    views++;
+    localStorage.setItem(key, views);
+    sessionStorage.setItem(sessionKey, 'true');
+  }
+  
+  // Hiển thị view count
+  const views = parseInt(localStorage.getItem(key) || '0');
+  $('#viewCount').textContent = '👁️ ' + views + ' lượt xem';
+}
 
 // Load chương
 async function load(){
@@ -172,6 +231,8 @@ async function load(){
   $('#chapterTitle').textContent = ch.title;
   $('#chapterDate').textContent = ch.date;
   $('#chapterNumber').textContent = `${current+1}/${CHAPTERS.length}`;
+  
+  updateViewCount();
 
   try{
     const res = await fetch(ch.file + '?t=' + Date.now());
@@ -189,8 +250,8 @@ async function load(){
 
   document.querySelector('.fb-comments').setAttribute('data-href', location.href);
   loadReactions();
-  buildTOC();
   restoreScroll();
+  updateBookmarkBtn();
 }
 load();
 
@@ -219,29 +280,102 @@ $$('.reactions span').forEach(span => {
     span.style.transform = 'scale(1.6)';
     setTimeout(() => span.style.transform = '', 300);
     loadReactions();
+    showToast('Đã thả cảm xúc ' + e);
   };
 });
 
 // Navigation
-function prev(){ if(current > 0){ current--; localStorage.setItem('lastChapter', current); load(); } }
-function next(){ if(current < CHAPTERS.length-1){ current++; localStorage.setItem('lastChapter', current); load(); } }
+function prev(){ 
+  if(current > 0){ 
+    current--; 
+    localStorage.setItem('lastChapter', current); 
+    load(); 
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }else{
+    showToast('Đây là chương đầu tiên rồi!');
+  }
+}
+function next(){ 
+  if(current < CHAPTERS.length-1){ 
+    current++; 
+    localStorage.setItem('lastChapter', current); 
+    load(); 
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }else{
+    showToast('Đây là chương mới nhất rồi!');
+  }
+}
 $$('#prevBtn, #prevBtnBottom').forEach(b => b.onclick = prev);
 $$('#nextBtn, #nextBtnBottom').forEach(b => b.onclick = next);
 
-// TOC mobile
+// Bookmark functionality
+$('#bookmarkBtn').onclick = () => {
+  localStorage.setItem('bookmark', current);
+  showToast('✓ Đã bookmark chương ' + CHAPTERS[current].title);
+  updateBookmarkBtn();
+};
+
+function updateBookmarkBtn(){
+  const bookmarked = localStorage.getItem('bookmark');
+  if(bookmarked && parseInt(bookmarked) === current){
+    $('#bookmarkBtn').innerHTML = '✓ Bookmarked';
+  }else{
+    $('#bookmarkBtn').innerHTML = '🔖 Bookmark';
+  }
+}
+
+// Share functionality
+$('#shareBtn').onclick = async () => {
+  const url = window.location.href;
+  const title = CHAPTERS[current].title + ' - Project-MirAi';
+  
+  if(navigator.share){
+    try{
+      await navigator.share({title, url});
+      showToast('✓ Đã chia sẻ!');
+    }catch(e){
+      copyToClipboard(url);
+    }
+  }else{
+    copyToClipboard(url);
+  }
+};
+
+function copyToClipboard(text){
+  const temp = document.createElement('textarea');
+  temp.value = text;
+  document.body.appendChild(temp);
+  temp.select();
+  document.execCommand('copy');
+  document.body.removeChild(temp);
+  showToast('✓ Đã copy link vào clipboard!');
+}
+
+// TOC with navigation
 $('#tocBtn').onclick = () => {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;';
   let list = '<div style="display:flex;flex-direction:column;gap:10px;">';
   CHAPTERS.forEach((ch,i) => {
-    list += `<a href="#" style="padding:16px 20px;border-radius:16px;background:${i===current?'rgba(0,0,0,0.15)':'transparent'};font-weight:${i===current?'600':''};color:var(--text);text-align:center;">${ch.title}</a>`;
+    list += `<a href="#" data-chapter="${i}" style="padding:16px 20px;border-radius:16px;background:${i===current?'rgba(0,0,0,0.15)':'transparent'};font-weight:${i===current?'600':''};color:var(--text);text-align:center;text-decoration:none;transition:.2s;" onmouseover="this.style.background='rgba(0,0,0,0.1)'" onmouseout="this.style.background='${i===current?'rgba(0,0,0,0.15)':'transparent'}'">${ch.title}</a>`;
   });
   list += '</div>';
   overlay.innerHTML = `<div style="background:var(--card);width:100%;max-width:460px;border-radius:24px;padding:32px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
     <h3 style="text-align:center;color:var(--text);margin-bottom:24px;font-size:26px;opacity:0.9;">Mục lục</h3>${list}
-    <div style="text-align:center;margin-top:32px;"><button class="btn" onclick="this.closest('div[style]').parentElement.remove()">Đóng</button></div>
+    <div style="text-align:center;margin-top:32px;"><button class="btn" onclick="this.closest('div[style*=fixed]').remove()">Đóng</button></div>
   </div>`;
-  overlay.onclick = e => { if(e.target === overlay) overlay.remove(); };
+  
+  overlay.onclick = e => { 
+    if(e.target === overlay) overlay.remove(); 
+    if(e.target.hasAttribute('data-chapter')){
+      e.preventDefault();
+      current = parseInt(e.target.getAttribute('data-chapter'));
+      localStorage.setItem('lastChapter', current);
+      load();
+      overlay.remove();
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  };
   document.body.appendChild(overlay);
 };
 
@@ -252,6 +386,13 @@ function updateProgress(){
   const p = h > 100 ? (s / h) * 100 : 0;
   $('#progress').style.width = p + '%';
   localStorage.setItem('scroll_' + current, s);
+  
+  // Show/hide scroll to top button
+  if(s > 500){
+    $('#scrollTop').classList.add('show');
+  }else{
+    $('#scrollTop').classList.remove('show');
+  }
 }
 window.addEventListener('scroll', updateProgress);
 function restoreScroll(){
@@ -259,6 +400,18 @@ function restoreScroll(){
   if(pos) window.scrollTo(0, parseInt(pos));
 }
 updateProgress();
+
+// Scroll to top
+$('#scrollTop').onclick = () => {
+  window.scrollTo({top: 0, behavior: 'smooth'});
+};
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if(e.key === 'ArrowLeft') prev();
+  if(e.key === 'ArrowRight') next();
+});
 </script>
 </body>
 </html>
