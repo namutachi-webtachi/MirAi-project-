@@ -6,10 +6,6 @@
   <title>Project-MirAi</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <!-- Facebook SDK -->
-  <div id="fb-root"></div>
-  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v20.0"></script>
-
   <style>
     :root{--bg:#fdfdfd;--text:#000000;--card:#ffffff;--accent:#000000;--border:rgba(0,0,0,0.08);--shadow:0 10px 40px rgba(0,0,0,0.07);}
     [data-theme="dark"]{--bg:#0a0a0a;--text:#ffffff;--card:#0f0f0f;--accent:#ffffff;--border:rgba(255,255,255,0.08);--shadow:0 12px 50px rgba(0,0,0,0.7);}
@@ -71,6 +67,10 @@
     .toast{position:fixed;top:100px;right:30px;background:var(--card);padding:18px 26px;border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--border);z-index:999;opacity:0;transform:translateX(400px);transition:.4s;}
     .toast.show{opacity:1;transform:translateX(0);}
 
+    /* Giscus comments styling */
+    .comments-section{margin:70px 0 40px;border-top:1px solid var(--border);padding-top:40px;}
+    .comments-section h3{text-align:center;margin-bottom:30px;font-size:24px;color:var(--text);opacity:0.9;}
+
     @media(max-width:868px){
       .social-float{flex-direction:row;bottom:24px;top:auto;left:50%;right:auto;transform:translateX(-50%);gap:26px;}
       .chapter-card{padding:32px 22px;}
@@ -129,9 +129,25 @@
       <div id="reactionResult">Chưa có ai thả cảm xúc...</div>
     </div>
 
-    <!-- Bình luận FB -->
-    <div style="margin:70px 0 40px;border-top:1px solid var(--border);padding-top:40px;">
-      <div class="fb-comments" data-href="" data-width="100%" data-numposts="15" data-colorscheme="light" data-lazy="true" data-order-by="reverse_time"></div>
+    <!-- Giscus Comments - Thay thế FB Comments -->
+    <div class="comments-section">
+      <h3>💬 Bình luận</h3>
+      <script src="https://giscus.app/client.js"
+              data-repo="namutachi-webtachi/MirAi-project-"
+              data-repo-id="YOUR_REPO_ID_HERE"
+              data-category="General"
+              data-category-id="YOUR_CATEGORY_ID_HERE"
+              data-mapping="pathname"
+              data-strict="0"
+              data-reactions-enabled="1"
+              data-emit-metadata="0"
+              data-input-position="bottom"
+              data-theme="preferred_color_scheme"
+              data-lang="vi"
+              data-loading="lazy"
+              crossorigin="anonymous"
+              async>
+      </script>
     </div>
 
     <div class="nav-btns">
@@ -185,6 +201,18 @@ $('#toggleTheme').onclick = () => {
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
   localStorage.setItem('theme', isDark ? 'light' : 'dark');
   $('#toggleTheme').textContent = isDark ? 'Dark' : 'Light';
+  
+  // Update Giscus theme dynamically
+  const giscusFrame = document.querySelector('iframe.giscus-frame');
+  if(giscusFrame){
+    giscusFrame.contentWindow.postMessage({
+      giscus: {
+        setConfig: {
+          theme: isDark ? 'dark' : 'light'
+        }
+      }
+    }, 'https://giscus.app');
+  }
 };
 
 // Font
@@ -248,7 +276,6 @@ async function load(){
     $('#content').innerHTML = '<p style="text-align:center;color:#888;">Lỗi tải chương</p>';
   }
 
-  document.querySelector('.fb-comments').setAttribute('data-href', location.href);
   loadReactions();
   restoreScroll();
   updateBookmarkBtn();
