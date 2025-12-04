@@ -1,159 +1,383 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Light Novel của NamuTachi</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f4f4f4;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            padding: 60px 20px;
-            margin-bottom: 40px;
-            border-radius: 10px;
-        }
-        
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        
-        header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
-        .novel-card {
-            background: white;
-            padding: 30px;
-            margin-bottom: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .novel-card h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-        
-        .novel-card p {
-            margin-bottom: 10px;
-        }
-        
-        .chapter-list {
-            list-style: none;
-            margin-top: 20px;
-        }
-        
-        .chapter-list li {
-            padding: 10px;
-            margin: 5px 0;
-            background: #f8f9fa;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        
-        .chapter-list li:hover {
-            background: #e9ecef;
-        }
-        
-        .chapter-list a {
-            text-decoration: none;
-            color: #667eea;
-            font-weight: 500;
-        }
-        
-        .about {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            background: #28a745;
-            color: white;
-            border-radius: 20px;
-            font-size: 0.9em;
-            margin: 10px 0;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MirAi — Light Novel Template</title>
+  <meta name="description" content="Template web truyện: dark mode, TOC, navigation, reading progress, comments placeholder" />
+
+  <!-- Basic styles (feel free to replace with Tailwind if desired) -->
+  <style>
+    :root{
+      --bg:#f7f7f7; --text:#111; --muted:#666; --accent:#7c3aed;
+      --card:#fff; --shadow: 0 6px 18px rgba(18,18,18,0.06);
+      --max-width:780px;
+    }
+    [data-theme="dark"]{ --bg:#0b0b0d; --text:#e6e6e9; --muted:#9aa0a6; --card:#0f1113; --accent:#8b5cf6; --shadow: 0 8px 30px rgba(0,0,0,0.6);} 
+
+    html,body{height:100%;}
+    body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+
+    header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg, rgba(255,255,255,0.6), transparent);backdrop-filter: blur(6px);border-bottom:1px solid rgba(0,0,0,0.04);} 
+    [data-theme="dark"] header{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-bottom:1px solid rgba(255,255,255,0.03);} 
+
+    .container{max-width:1200px;margin:0 auto;padding:18px;display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start}
+    main{max-width:var(--max-width);margin:0 auto;background:transparent}
+    .card{background:var(--card);box-shadow:var(--shadow);border-radius:12px;padding:22px}
+
+    .title{font-size:22px;font-weight:700;margin:6px 0}
+    .meta{color:var(--muted);font-size:13px;margin-bottom:12px}
+
+    /* reading controls */
+    .controls{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+    .btn{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:8px 10px;border-radius:8px;cursor:pointer}
+    [data-theme="dark"] .btn{border:1px solid rgba(255,255,255,0.04)}
+
+    .content{line-height:1.85;font-size:18px;color:var(--text)}
+    .content p{margin:12px 0}
+
+    /* progress bar */
+    .progress-wrap{height:6px;background:rgba(0,0,0,0.06);border-radius:999px;overflow:hidden;margin-top:6px}
+    .progress{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#3b82f6)}
+
+    /* Sidebar */
+    aside{position:relative}
+    .toc{position:sticky;top:88px}
+    .toc h3{margin:0 0 10px 0}
+    .toc ul{list-style:none;padding:0;margin:0}
+    .toc li{margin:8px 0}
+    .toc a{color:var(--text);text-decoration:none}
+
+    /* footer actions */
+    .nav-row{display:flex;justify-content:space-between;margin-top:18px}
+
+    /* small screens */
+    @media (max-width:900px){
+      .container{grid-template-columns:1fr}
+      aside{order:2}
+      header{position:static}
+    }
+
+    /* small niceties */
+    .fade{opacity:0;transform:translateY(6px);transition:all .45s cubic-bezier(.2,.9,.3,1)}
+    .fade.in{opacity:1;transform:none}
+
+    .back-to-top{position:fixed;right:18px;bottom:18px;padding:10px;border-radius:10px;box-shadow:var(--shadow);background:var(--card);cursor:pointer}
+
+    /* reading progress indicator (chapter percent) */
+    .reading-progress-bubble{position:fixed;left:18px;bottom:18px;padding:8px 10px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-weight:600}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Project-MirAi</h1>
-        </header>
-
-        <!-- Novel Info -->
-        <div class="novel-card">
-            <h2>📖 [MirAi-part 1]</h2>
-            <span class="status-badge">Đang cập nhật</span>
-            
-            <p><strong>Thể loại:</strong> Lãng mạn, Tâm Lý, Sci-fi, Bi kịch</p>
-            <p><strong>Tóm tắt:</strong></p>
-            <p>Đây là câu truyện xoay quanh Minh, một sinh viên đại học luôn vật lộn với sự tự ti và chứng khó giao tiếp xã hội.</p>
-
-            <p>Thế giới nội tâm vốn khép kín của cậu bắt đầu xáo động mạnh mẽ khi cậu đem lòng thầm yêu Vy. Mối tình đơn phương này trở thành động lực lớn nhất, thôi thúc Minh bước ra khỏi vùng an toàn của mình.</p>
-
-            <p>Câu chuyện sẽ theo chân Minh trong hành trình tìm cách thể hiện tình cảm, mà không biết rằng những lựa chọn và cảm xúc mãnh liệt này cũng chính là điểm khởi đầu cho một hành trình sẽ thử thách và định hình lại toàn bộ bản chất cũng như tâm lý cậu</p>
-            
-            
-            <h3 style="margin-top: 20px;">Danh sách chương:</h3>
-            <ul class="chapter-list">
-                <li><a href="volume1-chapter1.html">Chương 1</a></li>
-                <li><a href="volume1-chapter2.html">Chương 2</a></li>
-                <li><a href="volume1-chapter3.html">Chương 3</a></li>
-                <li style="color: #999;">Chương 4: Coming soon...</li>
-            </ul>
+  <header class="card" style="margin:12px auto 16px;max-width:1200px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div>
+        <div class="title">MirAi - Light Novel</div>
+        <div class="meta">Tác giả: NamuTachi • Template bởi: bạn / <strong>MirAi template</strong></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="toggleTheme" class="btn" title="Chuyển giao diện">🌙</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button id="fontDec" class="btn">A-</button>
+          <button id="fontInc" class="btn">A+</button>
         </div>
-
-        <!-- About Author -->
-        <div class="about">
-            <h2>Về Tác Giả</h2>
-        
-                <p>Xin chào! Tôi là NamuTachi. </p>
-                <p>Là một sinh viên trường H tại Hà Nội có niềm đam mê với viết lách.</p> 
-                <p>Đây là series light novel đầu tiên của tôi</p>
-                <p>Lưu ý: truyện được viết là của tôi và có sử dụng Ai như là 1 editor và đã được tôi kiểm tra bản sửa trước khi được đăng lên đây</p>
-            <p style="margin-top: 10px;">
-                <strong>Lịch update:</strong> Truyện được đăng vào mỗi thứ 7 hàng tuần mong mọi người ủng hộ ạ
-            </p>
-        </div>
-
-        <footer>
-            <p>© 2025 NamuTachi. Made with ❤️ and Notepad-UwU</p>
-            <p><a href="https://discord.gg/[your-invite]" style="color: #667eea;">Join Discord</a></p>
-        </footer>
+        <button id="tocToggle" class="btn">📚 Mục lục</button>
+      </div>
     </div>
+    <div class="progress-wrap" style="margin-top:12px">
+      <div id="siteProgress" class="progress"></div>
+    </div>
+  </header>
+
+  <div class="container">
+    <main>
+      <article id="chapter" class="card fade">
+        <div id="chapterHeader">
+          <h1 id="chapterTitle">Chương 1 — Tiêu đề mẫu</h1>
+          <div class="meta">Cập nhật: <span id="chapterDate">2025-12-05</span> • Dự kiến: 8 trang</div>
+        </div>
+
+        <div class="controls">
+          <div style="display:flex;align-items:center;gap:6px">
+            <button id="prevBtn" class="btn">◀ Trước</button>
+            <button id="nextBtn" class="btn">Sau ▶</button>
+          </div>
+
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+            <label style="font-size:13px;color:var(--muted)">Giãn dòng</label>
+            <select id="lineHeightSelect" class="btn">
+              <option value="1.4">1.4</option>
+              <option value="1.6" selected>1.6</option>
+              <option value="1.85">1.85 (mặc định)</option>
+              <option value="2.2">2.2</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="content" class="content">
+          <!-- Sample content; you will replace these paragraphs with chapter text or include this file from templates -->
+          <p>Minh mỉm cười, ánh sáng chiều cuối ngày tràn qua khung cửa sổ. Đây là mẫu nội dung chương, bạn có thể dán HTML hoặc markdown được chuyển đổi sang HTML.</p>
+          <h2 id="h-1">Đoạn phụ: Ký ức</h2>
+          <p>Đoạn mô tả, lời thoại, ...</p>
+          <h2 id="h-2">Đoạn phụ: Cuộc gặp</h2>
+          <p>Đoạn giới thiệu cảnh gặp gỡ giữa Minh và Vy ...</p>
+          <p>Nhiều đoạn nữa để test thanh tiến độ và lưu vị trí đọc.</p>
+        </div>
+
+        <div class="nav-row">
+          <div>
+            <button id="prevBtnBottom" class="btn">◀ Chương trước</button>
+          </div>
+          <div>
+            <button id="nextBtnBottom" class="btn">Chương sau ▶</button>
+          </div>
+        </div>
+
+        <!-- Comments placeholder: uncomment & configure Giscus or Utterances -->
+        <div style="margin-top:18px">
+          <!-- Giscus (GitHub Discussions) - replace data-* attributes with your repo info -->
+          <!--
+          <div id="giscus" class="card" style="padding:12px">
+            <script src="https://giscus.app/client.js"
+              data-repo="OWNER/REPO"
+              data-repo-id=""
+              data-category="Announcements"
+              data-category-id=""
+              data-mapping="pathname"
+              data-reactions-enabled="1"
+              data-emit-metadata="0"
+              data-theme="light"
+              crossorigin="anonymous"
+              async>
+            </script>
+          </div>
+          -->
+
+          <!-- Utterances (issues as comments) - replace repo -->
+          <!--
+          <script src="https://utteranc.es/client.js" repo="OWNER/REPO" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+          -->
+
+        </div>
+
+      </article>
+    </main>
+
+    <aside>
+      <div class="card toc" id="tocCard">
+        <h3>Mục lục</h3>
+        <ul id="tocList"></ul>
+        <hr style="margin:12px 0;border:none;border-top:1px dashed rgba(0,0,0,0.06)" />
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+          <small style="color:var(--muted)">Chương</small>
+          <small style="color:var(--muted)" id="chapterNumber">1/10</small>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button id="shareBtn" class="btn">Chia sẻ</button>
+          <button id="bookmarkBtn" class="btn">Đánh dấu</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h4 style="margin:0 0 8px 0">Cài đặt nhanh</h4>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="font-size:13px;color:var(--muted)">Chế độ</label>
+          <button id="themeMini" class="btn">🌗</button>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <div class="back-to-top" id="backToTop" title="Lên đầu trang" style="display:none">↑</div>
+  <div class="reading-progress-bubble" id="bubble" style="display:none">0%</div>
+
+  <script>
+    /* ---------- Configuration ---------- */
+    // If you store chapters as separate files, list them here (order matters). If you use single-file multi-section, leave empty.
+    const CHAPTERS = [
+      {title: "Chương 1 — Tiêu đề mẫu", file: "chapters/chapter-1.html", date: "2025-12-05"},
+      {title: "Chương 2 — Tiêu đề mẫu 2", file: "chapters/chapter-2.html", date: "2025-12-12"},
+      {title: "Chương 3 — Tiêu đề mẫu 3", file: "chapters/chapter-3.html", date: "2025-12-19"}
+    ];
+
+    // If you prefer to embed chapter content directly in this file, set USE_EXTERNAL_CHAPTERS = false and paste HTML content into the #content element within <article>.
+    const USE_EXTERNAL_CHAPTERS = true;
+
+    /* ---------- Utilities ---------- */
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    /* ---------- Theme (dark/light) ---------- */
+    function applyTheme(theme){
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      $('#toggleTheme').textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+    const savedTheme = localStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
+    $('#toggleTheme').addEventListener('click', ()=> applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+    $('#themeMini').addEventListener('click', ()=> $('#toggleTheme').click());
+
+    /* ---------- Font controls ---------- */
+    const content = $('#content');
+    function setFontSize(size){ content.style.fontSize = size + 'px'; localStorage.setItem('fontSize', size); }
+    const savedFont = localStorage.getItem('fontSize') || 18;
+    setFontSize(Number(savedFont));
+    $('#fontInc').addEventListener('click', ()=> setFontSize(Math.min(28, parseInt(getComputedStyle(content).fontSize) + 2)));
+    $('#fontDec').addEventListener('click', ()=> setFontSize(Math.max(12, parseInt(getComputedStyle(content).fontSize) - 2)));
+
+    $('#lineHeightSelect').addEventListener('change', (e)=> { content.style.lineHeight = e.target.value; localStorage.setItem('lineHeight', e.target.value); });
+    const savedLine = localStorage.getItem('lineHeight') || '1.85';
+    $('#lineHeightSelect').value = savedLine; content.style.lineHeight = savedLine;
+
+    /* ---------- Table of Contents auto-generate ---------- */
+    function buildTOC(){
+      const toc = $('#tocList'); toc.innerHTML = '';
+      // If content has headings, use them
+      const headings = content.querySelectorAll('h1,h2,h3');
+      if(headings.length){
+        headings.forEach(h=>{
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = '#' + (h.id || (h.id = 'id-' + Math.random().toString(36).slice(2,9)));
+          a.textContent = h.textContent;
+          a.addEventListener('click', (ev)=>{
+            ev.preventDefault(); document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth'});
+          });
+          li.appendChild(a); toc.appendChild(li);
+        });
+      } else {
+        // fallback: use CHAPTERS list
+        CHAPTERS.forEach((c,i)=>{
+          const li = document.createElement('li');
+          const a = document.createElement('a'); a.href = '#'; a.textContent = c.title;
+          a.addEventListener('click', (ev)=>{ ev.preventDefault(); loadChapter(i); });
+          li.appendChild(a); toc.appendChild(li);
+        });
+      }
+    }
+
+    /* ---------- Chapter loading & navigation ---------- */
+    let currentChapterIndex = Number(localStorage.getItem('lastChapter') || 0);
+    function renderChapterMeta(){
+      const ch = CHAPTERS[currentChapterIndex];
+      if(ch){
+        $('#chapterTitle').textContent = ch.title;
+        $('#chapterDate').textContent = ch.date || '';
+        $('#chapterNumber').textContent = (currentChapterIndex+1) + '/' + CHAPTERS.length;
+      }
+    }
+
+    async function loadChapter(index){
+      if(!CHAPTERS[index]) return; currentChapterIndex = index; localStorage.setItem('lastChapter', index);
+      renderChapterMeta();
+      if(USE_EXTERNAL_CHAPTERS){
+        try{
+          const res = await fetch(CHAPTERS[index].file);
+          if(!res.ok) throw new Error('Không thể load chương');
+          const html = await res.text();
+          // Expect the external file to contain only the inner HTML for #content OR a wrapper <article id="chapterContent"> ...</n          // Simple approach: extract body content
+          const tmp = document.createElement('div'); tmp.innerHTML = html;
+          const inner = tmp.querySelector('#content') || tmp.querySelector('article') || tmp;
+          $('#content').innerHTML = inner.innerHTML;
+          window.scrollTo({top:0,behavior:'auto'});
+          buildTOC();
+          window.dispatchEvent(new Event('resize'));
+        }catch(err){
+          console.error(err); $('#content').innerHTML = '<p>Không thể tải chương. Kiểm tra đường dẫn hoặc bật CORS nếu cần.</p>';
+        }
+      } else {
+        // if chapters are embedded in this file, show/hide sections (not implemented in this template)
+      }
+    }
+
+    // Prev/Next handlers
+    function goNext(){ if(currentChapterIndex < CHAPTERS.length -1) loadChapter(currentChapterIndex +1); }
+    function goPrev(){ if(currentChapterIndex > 0) loadChapter(currentChapterIndex -1); }
+    $('#nextBtn').addEventListener('click', goNext); $('#nextBtnBottom').addEventListener('click', goNext);
+    $('#prevBtn').addEventListener('click', goPrev); $('#prevBtnBottom').addEventListener('click', goPrev);
+
+    /* ---------- Scroll progress and reading position ---------- */
+    const progressEl = $('#siteProgress');
+    const bubble = $('#bubble');
+    function updateProgress(){
+      const rect = content.getBoundingClientRect();
+      const docHeight = content.scrollHeight - window.innerHeight + (rect.top * -1);
+      const scrolled = Math.min(Math.max(window.scrollY - (content.offsetTop - 20), 0), content.scrollHeight);
+      const percent = Math.round((window.scrollY - content.offsetTop + window.innerHeight/10) / (content.scrollHeight) * 100);
+      const p = Math.min(100, Math.max(0, (window.scrollY - content.offsetTop + window.innerHeight/10) / (content.scrollHeight) * 100));
+      progressEl.style.width = p + '%';
+      bubble.textContent = Math.round(p) + '%';
+      // show/hide back-to-top
+      $('#backToTop').style.display = (window.scrollY > 400) ? 'block' : 'none';
+      bubble.style.display = (window.scrollY > 120) ? 'block' : 'none';
+
+      // Save reading position per-chapter
+      const key = 'pos_ch_' + currentChapterIndex;
+      localStorage.setItem(key, window.scrollY);
+    }
+    window.addEventListener('scroll', updateProgress);
+
+    // restore reading position
+    function restorePosition(){
+      const key = 'pos_ch_' + currentChapterIndex; const pos = Number(localStorage.getItem(key) || 0);
+      if(pos){ window.scrollTo({top: pos, behavior: 'auto'}); }
+    }
+
+    $('#backToTop').addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
+
+    /* ---------- Bookmark & share ---------- */
+    $('#bookmarkBtn').addEventListener('click', ()=>{
+      const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+      const ch = CHAPTERS[currentChapterIndex]; if(!ch) return;
+      if(!bookmarks.find(b=>b.file===ch.file)){ bookmarks.push({file:ch.file,title:ch.title,at:Date.now()}); localStorage.setItem('bookmarks', JSON.stringify(bookmarks)); alert('Đã đánh dấu chương'); } else alert('Đã đánh dấu rồi');
+    });
+    $('#shareBtn').addEventListener('click', ()=>{
+      if(navigator.share){ navigator.share({title: document.title, text: CHAPTERS[currentChapterIndex].title, url: window.location.href}); }
+      else{ navigator.clipboard.writeText(window.location.href).then(()=> alert('Link đã copy')); }
+    });
+
+    /* ---------- small UI effects ---------- */
+    window.addEventListener('load', ()=>{ setTimeout(()=>{ document.querySelectorAll('.fade').forEach(el=>el.classList.add('in')); },60); });
+
+    /* ---------- TOC toggle for small screens ---------- */
+    $('#tocToggle').addEventListener('click', ()=>{
+      const card = $('#tocCard'); card.style.display = (card.style.display === 'none' ? 'block' : 'none');
+    });
+
+    /* ---------- Init ---------- */
+    (async function init(){
+      if(CHAPTERS.length){ renderChapterMeta(); await loadChapter(currentChapterIndex); restorePosition(); }
+      buildTOC();
+      // restore font size
+      const f = localStorage.getItem('fontSize'); if(f) setFontSize(Number(f));
+      updateProgress();
+    })();
+
+    /* ---------- Notes for maintainers ---------- */
+    // - For external chapters (recommended), create files like chapters/chapter-1.html containing only the inner HTML of #content
+    // - If hosting on GitHub Pages, ensure paths are correct and CORS is not an issue (same repo is fine).
+    // - To enable Giscus/Utterances comments, uncomment the respective block and replace OWNER/REPO with your GitHub repo info.
+    // - Accessibility: add proper aria-* attributes and tabindex if you want keyboard navigation.
+
+  </script>
+  <!-- Comment system per chapter using Giscus -->
+  <script src="https://giscus.app/client.js"
+        data-repo="namutachi-webtachi/MirAi-project-"
+        data-repo-id="REPO_ID_HERE"
+        data-category="General"
+        data-category-id="CATEGORY_ID_HERE"
+        data-mapping="pathname"
+        data-strict="1"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="light"
+        data-lang="vi"
+        crossorigin="anonymous"
+        async>
+  </script>
 </body>
 </html>
-```
