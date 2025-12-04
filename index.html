@@ -5,154 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Project-MirAi</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Facebook SDK -->
+  <div id="fb-root"></div>
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v20.0"></script>
+
   <style>
-    :root{
-      --bg:#ffffff;
-      --text:#000000;
-      --card:#ffffff;
-      --accent:#9366ff;
-      --border:rgba(0,0,0,0.1);
-      --shadow:0 8px 32px rgba(0,0,0,0.08);
-    }
-    [data-theme="dark"]{
-      --bg:#0d0d0f;
-      --text:#ffffff;
-      --card:#111113;
-      --accent:#b794f4;
-      --border:rgba(255,255,255,0.08);
-      --shadow:0 10px 40px rgba(0,0,0,0.6);
-    }
-
+    :root{--bg:#ffffff;--text:#000000;--card:#ffffff;--accent:#9366ff;--border:rgba(0,0,0,0.1);--shadow:0 8px 32px rgba(0,0,0,0.09);}
+    [data-theme="dark"]{--bg:#0d0d0f;--text:#ffffff;--card:#111113;--accent:#b794f4;--border:rgba(255,255,255,0.08);--shadow:0 10px 40px rgba(0,0,0,0.6);}
+    
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{
-      font-family:'Roboto', system-ui, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      line-height:1.9;
-      font-size:18px;
-      padding-bottom:80px;
-    }
-    header{
-      position:sticky;top:0;z-index:100;
-      background:var(--card);
-      border-bottom:1px solid var(--border);
-      backdrop-filter:blur(12px);
-      padding:16px 0;
-    }
-    .header-inner{
-      max-width:1100px;margin:0 auto;padding:0 20px;
-      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
-    }
+    body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);line-height:1.9;font-size:18px;padding-bottom:120px;}
+    
+    header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);padding:16px 0;}
+    .header-inner{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
     .title{font-size:28px;font-weight:800;color:var(--accent);}
-    .meta{font-size:15px;color:#555; margin-top:4px;}
+    .meta{font-size:15px;color:#666;margin-top:4px;}
     [data-theme="dark"] .meta{color:#aaa;}
-
-    .controls{
-      display:flex;gap:12px;flex-wrap:wrap;
-    }
-    .btn{
-      padding:10px 18px;
-      border-radius:50px;
-      border:none;
-      background:rgba(147,102,255,0.15);
-      color:var(--text);
-      font-weight:500;
-      cursor:pointer;
-      transition:.3s;
-    }
-    .btn:hover{background:var(--accent);color:white;}
-
-    .container{
-      max-width:900px;
-      margin:0 auto;
-      padding:20px;
-    }
-    .chapter-card{
-      background:var(--card);
-      border-radius:20px;
-      padding:32px;
-      box-shadow:var(--shadow);
-      margin-top:20px;
-    }
-    #chapterTitle{
-      font-size:30px;
-      text-align:center;
-      color:var(--accent);
-      margin-bottom:12px;
-    }
-    .chapter-meta{
-      text-align:center;
-      color:#666;
-      margin-bottom:30px;
-      font-size:16px;
-    }
-    [data-theme="dark"] .chapter-meta{color:#aaa;}
-
-    .nav-btns{
-      display:flex;justify-content:center;gap:16px;margin:30px 0 40px;
-      flex-wrap:wrap;
-    }
-    .nav-btns .btn{
-      min-width:140px;
-      display:flex;align-items:center;justify-content:center;gap:8px;
-    }
-
-    #content{
-      min-height:60vh;
-      color:var(--text) !important;
-    }
-    #content p{
-      margin:20px 0;
-      text-align:justify;
-    }
-    #content *{color:var(--text) !important;}
-
-    .progress-bar{
-      height:6px;background:#eee;border-radius:3px;overflow:hidden;margin:20px 0;}
+    
+    .controls{display:flex;gap:12px;flex-wrap:wrap;}
+    .btn{padding:11px 22px;border-radius:50px;background:rgba(147,102,255,0.15);border:none;color:var(--text);font-weight:500;cursor:pointer;transition:.3s;}
+    .btn:hover{background:var(--accent);color:white;transform:translateY(-2px);}
+    
+    .container{max-width:900px;margin:30px auto 0;padding:0 20px;}
+    .chapter-card{background:var(--card);border-radius:22px;padding:36px 32px;box-shadow:var(--shadow);position:relative;}
+    
+    #chapterTitle{font-size:31px;text-align:center;color:var(--accent);margin-bottom:12px;}
+    .chapter-meta{text-align:center;color:#777;margin-bottom:35px;font-size:16px;}
+    
+    .nav-btns{display:flex;justify-content:center;gap:18px;margin:35px 0 45px;flex-wrap:wrap;}
+    .nav-btns .btn{min-width:145px;font-size:16px;}
+    
+    #content{min-height:65vh;}
+    #content p{margin:22px 0;text-align:justify;}
+    #content *{color:var(--text)!important;}
+    
+    .progress-bar{height:6px;background:#f0e6ff;border-radius:3px;overflow:hidden;margin:25px 0;}
     [data-theme="dark"] .progress-bar{background:#222;}
-    .progress{height:100%;width:0;background:var(--accent);transition:width .4s;}
+    .progress{height:100%;width:0;background:var(--accent);transition:width .4s ease;}
 
-    /* Mobile TOC */
-    #tocOverlay{
-      position:fixed;top:0;left:0;right:0;bottom:0;
-      background:rgba(0,0,0,0.7);z-index:999;
-      display:none;align-items:center;justify-content:center;
-    }
-    #tocBox{
-      background:var(--card);
-      width:90%;max-width:400px;max-height:80vh;
-      border-radius:20px;padding:24px;
-      box-shadow:0 20px 50px rgba(0,0,0,0.3);
-      overflow-y:auto;
-    }
-    #tocBox h3{margin-bottom:16px;text-align:center;color:var(--accent);}
-    #tocList a{
-      display:block;padding:12px 16px;
-      border-radius:12px;margin:6px 0;
-      color:var(--text);
-      text-decoration:none;
-      transition:.2s;
-    }
-    #tocList a:hover, #tocList a.active{
-      background:rgba(147,102,255,0.2);
-      font-weight:600;
-    }
+    /* Nút nổi */
+    .fab{position:fixed;bottom:28px;z-index:999;padding:15px 22px;border-radius:50px;color:white;font-weight:700;box-shadow:0 8px 28px rgba(0,0,0,0.3);cursor:pointer;display:none;}
+    #backToTop{right:28px;background:#333;}
+    #progressBubble{left:28px;background:var(--accent);}
 
-    .floating{
-      position:fixed;bottom:24px;z-index:99;
-      padding:14px 20px;border-radius:50px;
-      background:var(--accent);color:white;
-      box-shadow:var(--shadow);font-weight:600;
-      display:none;
+    /* Social cố định - ĐẸP HOÀN HẢO */
+    .social-float{
+      position:fixed;right:24px;top:50%;transform:translateY(-50%);
+      display:flex;flex-direction:column;gap:18px;z-index:998;
     }
-    #backToTop{right:24px;}
-    #progressBubble{left:24px;}
+    .social-float a{
+      width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      color:white;font-size:24px;font-weight:bold;box-shadow:0 8px 25px rgba(0,0,0,0.25);
+      transition:transform .3s, box-shadow .3s;
+    }
+    .social-float a:hover{transform:scale(1.15) translateY(-4px);box-shadow:0 12px 35px rgba(0,0,0,0.35);}
+    .social-float .fb{background:#1877f2;}
+    .social-float .dc{background:#5865f2;}
+    .social-float .donate{background:#ff3040;}
 
-    @media(max-width:768px){
-      .container{padding:16px;}
-      .chapter-card{padding:24px 20px;}
-      #chapterTitle{font-size:26px;}
-      .nav-btns .btn{min-width:120px;font-size:15px;padding:10px 14px;}
+    @media(max-width:868px){
+      .social-float{
+        flex-direction:row;bottom:20px;top:auto;left:50%;right:auto;
+        transform:translateX(-50%);gap:24px;
+      }
+      .chapter-card{padding:28px 20px;}
+      #chapterTitle{font-size:27px;}
     }
   </style>
 </head>
@@ -165,7 +83,7 @@
       <div class="meta">Tác giả: NamuTachi / <strong>MirAi</strong></div>
     </div>
     <div class="controls">
-      <button id="toggleTheme" class="btn">Dark Mode</button>
+      <button id="toggleTheme" class="btn">Dark</button>
       <button id="fontDec" class="btn">A-</button>
       <button id="fontInc" class="btn">A+</button>
       <button id="tocBtn" class="btn">Mục lục</button>
@@ -184,35 +102,45 @@
     </div>
 
     <div class="nav-btns">
-      <button id="prevBtn" class="btn">Trước</button>
+      <button id="prevBtn" class="btn">◀ Trước</button>
       <button id="bookmarkBtn" class="btn">Bookmark</button>
       <button id="shareBtn" class="btn">Share</button>
-      <button id="nextBtn" class="btn">Sau</button>
+      <button id="nextBtn" class="btn">Sau ▶</button>
     </div>
 
     <div id="content">
-      <p style="text-align:center;color:#999;margin-top:50px;">
-        Đang tải chương... Nếu thấy 404, hãy tạo file trong thư mục <code>chapters/</code>
+      <p style="text-align:center;color:#999;margin-top:60px;font-size:17px;">
+        Đang tải chương...<br>Nếu thấy lỗi 404 → tạo file trong thư mục <b>chapters/</b> nhé đại ca!
       </p>
     </div>
 
+    <!-- Facebook Comments -->
+    <div class="fb-comments" data-href="" data-width="100%" data-numposts="15" data-colorscheme="light" data-lazy="true" style="margin-top:70px;"></div>
+
     <div class="nav-btns">
-      <button id="prevBtnBottom" class="btn">Trước</button>
-      <button id="nextBtnBottom" class="btn">Sau</button>
+      <button id="prevBtnBottom" class="btn">◀ Trước</button>
+      <button id="nextBtnBottom" class="btn">Sau ▶</button>
     </div>
   </div>
 </div>
 
 <!-- Nút nổi -->
-<div id="backToTop" class="floating">Top</div>
-<div id="progressBubble" class="floating">0%</div>
+<div id="backToTop" class="fab">↑ Top</div>
+<div id="progressBubble" class="fab">0%</div>
 
-<!-- Overlay mục lục (mobile) -->
-<div id="tocOverlay">
-  <div id="tocBox">
-    <h3>Mục lục</h3>
-    <div id="tocList"></div>
-    <div style="text-align:center;margin-top:20px;">
+<!-- Social Float -->
+<div class="social-float">
+  <a href="https://facebook.com/namutachi.mirai" target="_blank" class="fb" title="Facebook">f</a>
+  <a href="https://discord.gg/abc123xyz" target="_blank" class="dc" title="Discord">D</a>
+  <a href="https://momor.vn/donate-mirai" target="_blank" class="donate" title="Donate ủng hộ tác giả">♥</a>
+</div>
+
+<!-- Mục lục overlay -->
+<div id="tocOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card);width:100%;max-width:440px;border-radius:22px;padding:28px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+    <h3 style="text-align:center;color:var(--accent);font-size:24px;margin-bottom:20px;">Mục lục</h3>
+    <div id="tocList" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <div style="text-align:center;margin-top:28px;">
       <button class="btn" onclick="document.getElementById('tocOverlay').style.display='none'">Đóng</button>
     </div>
   </div>
@@ -223,112 +151,133 @@ const CHAPTERS = [
   {title:"Chương 1", file:"chapters/chuong-1.html", date:"2025-12-06"},
   {title:"Chương 2", file:"chapters/chuong-2.html", date:"2025-12-10"},
   {title:"Chương 3", file:"chapters/chuong-3.html", date:"2025-12-15"},
-  // thêm chương mới ở đây
+  // thêm thoải mái ở đây
 ];
 
 let current = parseInt(localStorage.getItem('lastChapter') || '0');
+
+// Helper
 const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
 
 // Theme
-const isDark = localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-if(isDark) document.documentElement.setAttribute('data-theme','dark');
-$('#toggleTheme').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+if(localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)){
+  document.documentElement.setAttribute('data-theme','dark');
+}
+$('#toggleTheme').textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? 'Light' : 'Dark';
 $('#toggleTheme').onclick = () => {
-  const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-  $('#toggleTheme').textContent = newTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  $('#toggleTheme').textContent = isDark ? 'Dark' : 'Light';
 };
 
 // Font
-let size = parseFloat(localStorage.getItem('fontSize') || '18');
-$('#content').style.fontSize = size + 'px';
-$('#fontInc').onclick = () => { size+=2; $('#content').style.fontSize=size+'px'; localStorage.setItem('fontSize',size); };
-$('#fontDec').onclick = () => { size=Math.max(14,size-2); $('#content').style.fontSize=size+'px'; localStorage.setItem('fontSize',size); };
+let fsize = parseFloat(localStorage.getItem('fontSize') || '18');
+$('#content').style.fontSize = fsize + 'px';
+$('#fontInc').onclick = () => { fsize += 2; $('#content').style.fontSize = fsize+'px'; localStorage.setItem('fontSize', fsize); };
+$('#fontDec').onclick = () => { fsize = Math.max(14, fsize-2); $('#content').style.fontSize = fsize+'px'; localStorage.setItem('fontSize', fsize); };
 
 // Load chương
 async function load(){
-  const ch = CHAPTERS[current];
-  if(!ch){
-    $('#content').innerHTML = '<p style="text-align:center;font-size:20px;color:#999;">Chưa có chương nào cả 😅</p>';
-    $('#chapterTitle').textContent = 'Project-MirAi';
-    return;
-  }
+  const ch = CHAPTERS[current] || {title: "Project-MirAi", date: ""};
   $('#chapterTitle').textContent = ch.title;
   $('#chapterDate').textContent = ch.date;
-  $('#chapterNumber').textContent = `${current+1}/${CHAPTERS.length}`;
+  $('#chapterNumber').textContent = CHAPTERS.length ? `${current+1}/${CHAPTERS.length}` : '';
 
-  try{
-    const res = await fetch(ch.file + '?v=' + Date.now());
-    if(res.ok){
-      const html = await res.text();
-      const div = document.createElement('div');
-      div.innerHTML = html;
-      const content = div.querySelector('#content') || div.querySelector('body') || div;
-      $('#content').innerHTML = content.innerHTML || '<p style="color:#666;text-align:center;">Chưa có nội dung chương này.</p>';
-    }else{
-      $('#content').innerHTML = `<p style="text-align:center;color:#ff5555;">404 - Không tìm thấy file<br><b>${ch.file}</b></p>`;
+  if(CHAPTERS.length === 0 || !ch.file){
+    $('#content').innerHTML = '<p style="text-align:center;font-size:20px;color:#999;">Chưa có chương nào cả...<br>Hãy thêm vào mảng CHAPTERS nhé!</p>';
+  }else{
+    try{
+      const res = await fetch(ch.file + '?t=' + Date.now());
+      if(res.ok){
+        const html = await res.text();
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        const cnt = temp.querySelector('#content') || temp.querySelector('body') || temp;
+        $('#content').innerHTML = cnt.innerHTML || '<p style="text-align:center;color:#aaa;">Chương trống</p>';
+      }else{
+        $('#content').innerHTML = `<p style="text-align:center;color:#ff3366;font-size:18px;">404 - Không tìm thấy file chương<br><b>${ch.file}</b></p>`;
+      }
+    }catch{
+      $('#content').innerHTML = '<p style="text-align:center;color:#ff3366;">Lỗi mạng hoặc file không tồn tại</p>';
     }
-  }catch(e){
-    $('#content').innerHTML = `<p style="text-align:center;color:#ff5555;">Lỗi tải chương<br><small>${e.message}</small></p>`;
   }
+
+  // Update FB comment URL
+  document.querySelector('.fb-comments').setAttribute('data-href', location.href);
+
+  buildTOC();
   updateProgress();
   restoreScroll();
-  buildTOC();
 }
 load();
+
+// Nút Trước Sau - FIX HOÀN TOÀN
+function prev(){ if(current > 0){ current--; localStorage.setItem('lastChapter', current); load(); } }
+function next(){ if(current < CHAPTERS.length-1){ current++; localStorage.setItem('lastChapter', current); load(); } }
+
+$$('#prevBtn, #prevBtnBottom').forEach(b => b.onclick = prev);
+$$('#nextBtn, #nextBtnBottom').forEach(b => b.onclick = next);
 
 // TOC
 function buildTOC(){
   const list = $('#tocList');
   list.innerHTML = '';
-  CHAPTERS.forEach((ch,i)=>{
+  CHAPTERS.forEach((ch, i) => {
     const a = document.createElement('a');
     a.href = '#';
     a.textContent = ch.title;
-    if(i===current) a.classList.add('active');
-    a.onclick = e=>{ e.preventDefault(); current=i; localStorage.setItem('lastChapter',i); load(); $('#tocOverlay').style.display='none'; };
+    a.style.cssText = 'display:block;padding:14px 18px;border-radius:14px;color:var(--text);text-decoration:none;transition:.2s;';
+    if(i === current){ a.style.background = 'rgba(147,102,255,0.25)'; a.style.fontWeight = '600'; }
+    a.onclick = e => { e.preventDefault(); current = i; localStorage.setItem('lastChapter', i); load(); $('#tocOverlay').style.display = 'none'; };
     list.appendChild(a);
   });
 }
-$('#tocBtn').onclick = () => $('#tocOverlay').style.display='flex';
-buildTOC();
+$('#tocBtn').onclick = () => $('#tocOverlay').style.display = 'flex';
 
-// Navigation
-function prev(){ if(current>0){ current--; localStorage.setItem('lastChapter',current); load(); }}
-function next(){ if(current<CHAPTERS.length-1){ current++; localStorage.setItem('lastChapter',current); load(); }}
-$('#prevBtn,#prevBtnBottom').forEach(b=>b.onclick=prev);
-$('#nextBtn,#nextBtnBottom').forEach(b=>b.onclick=next);
-
-// Progress
+// Progress + scroll
 function updateProgress(){
   const h = document.documentElement.scrollHeight - window.innerHeight;
   const s = window.scrollY;
-  p = h>0 ? Math.round(s/h*100) : 0;
+  const p = h > 100 ? Math.round((s / h) * 100) : 0;
   $('#progress').style.width = p + '%';
   $('#progressBubble').textContent = p + '%';
-  $('#progressBubble').style.display = s>300 ? 'block' : 'none';
-  $('#backToTop').style.display = s>600 ? 'block' : 'none';
-  localStorage.setItem('scroll_'+current, s);
+  $('#progressBubble').style.display = s > 300 ? 'block' : 'none';
+  $('#backToTop').style.display = s > 700 ? 'block' : 'none';
+  localStorage.setItem('scroll_' + current, s);
 }
 window.addEventListener('scroll', updateProgress);
-function restoreScroll(){
-  const saved = localStorage.getItem('scroll_'+current);
-  if(saved) window.scrollTo(0, parseInt(saved));
-}
-$('#backToTop').onclick = () => window.scrollTo({top:0,behavior:'smooth'});
 
-// Bookmark & Share
+function restoreScroll(){
+  const pos = localStorage.getItem('scroll_' + current);
+  if(pos) window.scrollTo(0, parseInt(pos));
+}
+$('#backToTop').onclick = () => window.scrollTo({top:0, behavior:'smooth'});
+
+// Bookmark
 $('#bookmarkBtn').onclick = () => {
-  let b = JSON.parse(localStorage.getItem('bm')||'[]');
-  const k = CHAPTERS[current].file;
-  if(!b.includes(k)){ b.push(k); localStorage.setItem('bm',JSON.stringify(b)); alert('Đã bookmark'); }
-  else alert('Đã bookmark rồi nha');
+  const key = CHAPTERS[current]?.file;
+  if(!key) return;
+  let bm = JSON.parse(localStorage.getItem('bm') || '[]');
+  if(!bm.includes(key)){
+    bm.push(key);
+    localStorage.setItem('bm', JSON.stringify(bm));
+    alert('Đã bookmark chương này ♡');
+  }else alert('Đã bookmark rồi nha ~');
 };
+
+// Share
 $('#shareBtn').onclick = () => {
-  navigator.clipboard?.writeText(location.href) || alert('Đã copy link');
-  alert('Đã copy link chương');
+  if(navigator.share){
+    navigator.share({title: CHAPTERS[current]?.title || 'Project-MirAi', url: location.href});
+  }else{
+    navigator.clipboard.writeText(location.href);
+    alert('Đã copy link chương!');
+  }
 };
+
+updateProgress();
 </script>
 </body>
 </html>
