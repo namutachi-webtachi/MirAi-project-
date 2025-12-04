@@ -1,293 +1,334 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Project-MirAi</title>
-  <meta name="description" content="Đọc truyện Project-MirAi - MirAi & NamuTachi" />
-  
-  <!-- Font Google đẹp mượt -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
   <style>
     :root{
-      --bg:#fdfdfd;
-      --text:#000000;           /* Đen tuyền */
-      --muted:#333333;
-      --accent:#8b5cf6;
+      --bg:#ffffff;
+      --text:#000000;
       --card:#ffffff;
-      --shadow:0 8px 25px rgba(0,0,0,0.08);
-      --border:rgba(0,0,0,0.08);
+      --accent:#9366ff;
+      --border:rgba(0,0,0,0.1);
+      --shadow:0 8px 32px rgba(0,0,0,0.08);
     }
     [data-theme="dark"]{
-      --bg:#0a0a0a;
-      --text:#ffffff;           /* Trắng tuyền */
-      --muted:#bbbbbb;
+      --bg:#0d0d0f;
+      --text:#ffffff;
+      --card:#111113;
       --accent:#b794f4;
-      --card:#0f0f0f;
-      --shadow:0 10px 35px rgba(0,0,0,0.7);
       --border:rgba(255,255,255,0.08);
+      --shadow:0 10px 40px rgba(0,0,0,0.6);
     }
 
     *{margin:0;padding:0;box-sizing:border-box;}
     body{
-      font-family:'Roboto','Segoe UI',system-ui,sans-serif;
+      font-family:'Roboto', system-ui, sans-serif;
       background:var(--bg);
       color:var(--text);
-      line-height:1.85;
+      line-height:1.9;
       font-size:18px;
-      min-height:100vh;
-      -webkit-font-smoothing:antialiased;
+      padding-bottom:80px;
     }
     header{
       position:sticky;top:0;z-index:100;
       background:var(--card);
       border-bottom:1px solid var(--border);
       backdrop-filter:blur(12px);
+      padding:16px 0;
     }
-    .container{
-      max-width:1260px;margin:0 auto;padding:16px;
-      display:grid;grid-template-columns:1fr 340px;gap:36px;align-items:start;
+    .header-inner{
+      max-width:1100px;margin:0 auto;padding:0 20px;
+      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
     }
-    main{max-width:860px;margin:0 auto;}
-    .card{
-      background:var(--card);
-      border-radius:18px;
-      padding:28px;
-      box-shadow:var(--shadow);
-      margin-bottom:28px;
-    }
-    .title{
-      font-size:28px;font-weight:800;color:var(--accent);margin-bottom:6px;
-    }
-    .meta{font-size:15px;color:var(--muted);margin-bottom:20px;}
+    .title{font-size:28px;font-weight:800;color:var(--accent);}
+    .meta{font-size:15px;color:#555; margin-top:4px;}
+    [data-theme="dark"] .meta{color:#aaa;}
+
     .controls{
-      display:flex;flex-wrap:wrap;gap:14px;margin:24px 0;
+      display:flex;gap:12px;flex-wrap:wrap;
     }
     .btn{
-      background:rgba(139,92,246,0.08);
-      border:1px solid var(--border);
+      padding:10px 18px;
+      border-radius:50px;
+      border:none;
+      background:rgba(147,102,255,0.15);
       color:var(--text);
-      padding:11px 18px;border-radius:14px;
-      cursor:pointer;font-weight:500;transition:.25s;
+      font-weight:500;
+      cursor:pointer;
+      transition:.3s;
     }
-    .btn:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(139,92,246,0.25);}
-    .content{
+    .btn:hover{background:var(--accent);color:white;}
+
+    .container{
+      max-width:900px;
+      margin:0 auto;
+      padding:20px;
+    }
+    .chapter-card{
+      background:var(--card);
+      border-radius:20px;
+      padding:32px;
+      box-shadow:var(--shadow);
+      margin-top:20px;
+    }
+    #chapterTitle{
+      font-size:30px;
+      text-align:center;
+      color:var(--accent);
+      margin-bottom:12px;
+    }
+    .chapter-meta{
+      text-align:center;
+      color:#666;
+      margin-bottom:30px;
+      font-size:16px;
+    }
+    [data-theme="dark"] .chapter-meta{color:#aaa;}
+
+    .nav-btns{
+      display:flex;justify-content:center;gap:16px;margin:30px 0 40px;
+      flex-wrap:wrap;
+    }
+    .nav-btns .btn{
+      min-width:140px;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+
+    #content{
+      min-height:60vh;
       color:var(--text) !important;
-      font-size:18.5px;
     }
-    .content p{
-      margin:18px 0;
-      color:var(--text) !important;
+    #content p{
+      margin:20px 0;
+      text-align:justify;
     }
-    .content *{color:var(--text) !important;}
-    .progress-wrap{
-      height:7px;background:rgba(0,0,0,0.08);border-radius:8px;overflow:hidden;margin-top:14px;
+    #content *{color:var(--text) !important;}
+
+    .progress-bar{
+      height:6px;background:#eee;border-radius:3px;overflow:hidden;margin:20px 0;}
+    [data-theme="dark"] .progress-bar{background:#222;}
+    .progress{height:100%;width:0;background:var(--accent);transition:width .4s;}
+
+    /* Mobile TOC */
+    #tocOverlay{
+      position:fixed;top:0;left:0;right:0;bottom:0;
+      background:rgba(0,0,0,0.7);z-index:999;
+      display:none;align-items:center;justify-content:center;
     }
-    [data-theme="dark"] .progress-wrap{background:rgba(255,255,255,0.08);}
-    .progress{
-      height:100%;width:0;background:linear-gradient(90deg,var(--accent),#a78bfa);transition:width .4s;
+    #tocBox{
+      background:var(--card);
+      width:90%;max-width:400px;max-height:80vh;
+      border-radius:20px;padding:24px;
+      box-shadow:0 20px 50px rgba(0,0,0,0.3);
+      overflow-y:auto;
     }
-    .toc{position:sticky;top:96px;}
-    .toc h3{font-size:19px;margin-bottom:14px;}
-    .toc ul{list-style:none;}
-    .toc a{
-      display:block;padding:9px 12px;border-radius:10px;color:var(--text);
-      text-decoration:none;transition:.2s;border-radius:10px;
+    #tocBox h3{margin-bottom:16px;text-align:center;color:var(--accent);}
+    #tocList a{
+      display:block;padding:12px 16px;
+      border-radius:12px;margin:6px 0;
+      color:var(--text);
+      text-decoration:none;
+      transition:.2s;
     }
-    .toc a:hover{background:rgba(139,92,246,0.15);}
-    .toc a.active{font-weight:700;background:rgba(139,92,246,0.2);}
-    .nav-row{display:flex;justify-content:space-between;margin-top:50px;}
-    #backToTop,#bubble{
-      position:fixed;bottom:24px;padding:14px 18px;border-radius:50px;
-      background:var(--card);box-shadow:var(--shadow);cursor:pointer;
-      font-weight:700;font-size:15px;display:none;z-index:999;
+    #tocList a:hover, #tocList a.active{
+      background:rgba(147,102,255,0.2);
+      font-weight:600;
+    }
+
+    .floating{
+      position:fixed;bottom:24px;z-index:99;
+      padding:14px 20px;border-radius:50px;
+      background:var(--accent);color:white;
+      box-shadow:var(--shadow);font-weight:600;
+      display:none;
     }
     #backToTop{right:24px;}
-    #bubble{left:24px;background:var(--accent);color:white !important;}
+    #progressBubble{left:24px;}
 
-    @media(max-width:960px){
-      .container{grid-template-columns:1fr;padding:12px;}
-      .toc{position:static;margin-top:32px;}
-      #tocCard{display:none;}
+    @media(max-width:768px){
+      .container{padding:16px;}
+      .chapter-card{padding:24px 20px;}
+      #chapterTitle{font-size:26px;}
+      .nav-btns .btn{min-width:120px;font-size:15px;padding:10px 14px;}
     }
   </style>
 </head>
 <body>
 
-  <header class="card" style="margin:12px auto;max-width:1260px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
-      <div>
-        <div class="title">Project-MirAi</div>
-        <div class="meta">Tác giả: NamuTachi / <strong>MirAi</strong></div>
-      </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <button id="toggleTheme" class="btn">Dark</button>
-        <button id="fontDec" class="btn">A-</button>
-        <button id="fontInc" class="btn">A+</button>
-        <button id="tocToggle" class="btn">Mục lục</button>
-      </div>
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="title">Project-MirAi</div>
+      <div class="meta">Tác giả: NamuTachi / <strong>MirAi</strong></div>
     </div>
-    <div class="progress-wrap"><div id="siteProgress" class="progress"></div></div>
-  </header>
-
-  <div class="container">
-    <main>
-      <article class="card">
-        <h1 id="chapterTitle" style="font-size:29px;margin-bottom:10px;color:var(--accent);">Đang tải...</h1>
-        <div class="meta">
-          <span id="chapterNumber"></span> • Cập nhật: <span id="chapterDate"></span>
-        </div>
-
-        <div class="controls">
-          <button id="prevBtn" class="btn">◀ Trước</button>
-          <button id="bookmarkBtn" class="btn">Bookmark</button>
-          <button id="shareBtn" class="btn">Share</button>
-          <button id="nextBtn" class="btn">Sau ▶</button>
-        </div>
-
-        <div id="content" class="content">
-          <!-- Nội dung chương sẽ được load vào đây -->
-        </div>
-
-        <div class="nav-row">
-          <button id="prevBtnBottom" class="btn">◀ Trước</button>
-          <button id="nextBtnBottom" class="btn">Sau ▶</button>
-        </div>
-      </article>
-
-      <div id="backToTop">Top</div>
-      <div id="bubble">0%</div>
-    </main>
-
-    <aside>
-      <div id="tocCard" class="card toc">
-        <h3>Mục lục</h3>
-        <ul id="tocList"></ul>
-      </div>
-    </aside>
+    <div class="controls">
+      <button id="toggleTheme" class="btn">Dark Mode</button>
+      <button id="fontDec" class="btn">A-</button>
+      <button id="fontInc" class="btn">A+</button>
+      <button id="tocBtn" class="btn">Mục lục</button>
+    </div>
   </div>
+  <div style="max-width:1100px;margin:0 auto;padding:0 20px;">
+    <div class="progress-bar"><div id="progress" class="progress"></div></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="chapter-card">
+    <h1 id="chapterTitle">Đang tải...</h1>
+    <div class="chapter-meta">
+      <span id="chapterNumber"></span> • Cập nhật: <span id="chapterDate"></span>
+    </div>
+
+    <div class="nav-btns">
+      <button id="prevBtn" class="btn">Trước</button>
+      <button id="bookmarkBtn" class="btn">Bookmark</button>
+      <button id="shareBtn" class="btn">Share</button>
+      <button id="nextBtn" class="btn">Sau</button>
+    </div>
+
+    <div id="content">
+      <p style="text-align:center;color:#999;margin-top:50px;">
+        Đang tải chương... Nếu thấy 404, hãy tạo file trong thư mục <code>chapters/</code>
+      </p>
+    </div>
+
+    <div class="nav-btns">
+      <button id="prevBtnBottom" class="btn">Trước</button>
+      <button id="nextBtnBottom" class="btn">Sau</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nút nổi -->
+<div id="backToTop" class="floating">Top</div>
+<div id="progressBubble" class="floating">0%</div>
+
+<!-- Overlay mục lục (mobile) -->
+<div id="tocOverlay">
+  <div id="tocBox">
+    <h3>Mục lục</h3>
+    <div id="tocList"></div>
+    <div style="text-align:center;margin-top:20px;">
+      <button class="btn" onclick="document.getElementById('tocOverlay').style.display='none'">Đóng</button>
+    </div>
+  </div>
+</div>
 
 <script>
-// === DANH SÁCH CHƯƠNG - thêm thoải mái ===
 const CHAPTERS = [
   {title:"Chương 1", file:"chapters/chuong-1.html", date:"2025-12-06"},
   {title:"Chương 2", file:"chapters/chuong-2.html", date:"2025-12-10"},
   {title:"Chương 3", file:"chapters/chuong-3.html", date:"2025-12-15"},
-  // cứ thêm tiếp...
+  // thêm chương mới ở đây
 ];
 
-const USE_EXTERNAL_CHAPTERS = true;
+let current = parseInt(localStorage.getItem('lastChapter') || '0');
 const $ = s => document.querySelector(s);
 
-let currentChapterIndex = parseInt(localStorage.getItem('lastChapter') || '0');
-
 // Theme
-const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-document.documentElement.setAttribute('data-theme', savedTheme);
-$('#toggleTheme').textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
+const isDark = localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+if(isDark) document.documentElement.setAttribute('data-theme','dark');
+$('#toggleTheme').textContent = isDark ? 'Light Mode' : 'Dark Mode';
 $('#toggleTheme').onclick = () => {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const newTheme = isDark ? 'light' : 'dark';
+  const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', newTheme);
   localStorage.setItem('theme', newTheme);
-  $('#toggleTheme').textContent = newTheme === 'dark' ? 'Light' : 'Dark';
+  $('#toggleTheme').textContent = newTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
 };
 
-// Font size
-let fontSize = parseInt(localStorage.getItem('fontSize') || '18.5');
-$('#content').style.fontSize = fontSize + 'px';
-$('#fontInc').onclick = () => { fontSize+=2; $('#content').style.fontSize = fontSize+'px'; localStorage.setItem('fontSize',fontSize); };
-$('#fontDec').onclick = () => { fontSize-=2; if(fontSize<12) fontSize=12; $('#content').style.fontSize = fontSize+'px'; localStorage.setItem('fontSize',fontSize); };
+// Font
+let size = parseFloat(localStorage.getItem('fontSize') || '18');
+$('#content').style.fontSize = size + 'px';
+$('#fontInc').onclick = () => { size+=2; $('#content').style.fontSize=size+'px'; localStorage.setItem('fontSize',size); };
+$('#fontDec').onclick = () => { size=Math.max(14,size-2); $('#content').style.fontSize=size+'px'; localStorage.setItem('fontSize',size); };
+
+// Load chương
+async function load(){
+  const ch = CHAPTERS[current];
+  if(!ch){
+    $('#content').innerHTML = '<p style="text-align:center;font-size:20px;color:#999;">Chưa có chương nào cả 😅</p>';
+    $('#chapterTitle').textContent = 'Project-MirAi';
+    return;
+  }
+  $('#chapterTitle').textContent = ch.title;
+  $('#chapterDate').textContent = ch.date;
+  $('#chapterNumber').textContent = `${current+1}/${CHAPTERS.length}`;
+
+  try{
+    const res = await fetch(ch.file + '?v=' + Date.now());
+    if(res.ok){
+      const html = await res.text();
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      const content = div.querySelector('#content') || div.querySelector('body') || div;
+      $('#content').innerHTML = content.innerHTML || '<p style="color:#666;text-align:center;">Chưa có nội dung chương này.</p>';
+    }else{
+      $('#content').innerHTML = `<p style="text-align:center;color:#ff5555;">404 - Không tìm thấy file<br><b>${ch.file}</b></p>`;
+    }
+  }catch(e){
+    $('#content').innerHTML = `<p style="text-align:center;color:#ff5555;">Lỗi tải chương<br><small>${e.message}</small></p>`;
+  }
+  updateProgress();
+  restoreScroll();
+  buildTOC();
+}
+load();
 
 // TOC
 function buildTOC(){
-  const list = $('#tocList'); list.innerHTML = '';
+  const list = $('#tocList');
+  list.innerHTML = '';
   CHAPTERS.forEach((ch,i)=>{
-    const li = document.createElement('li');
     const a = document.createElement('a');
-    a.href='#'; a.textContent = ch.title;
-    a.onclick = e => {e.preventDefault(); loadChapter(i);};
-    if(i===currentChapterIndex) a.classList.add('active');
-    li.appendChild(a); list.appendChild(li);
+    a.href = '#';
+    a.textContent = ch.title;
+    if(i===current) a.classList.add('active');
+    a.onclick = e=>{ e.preventDefault(); current=i; localStorage.setItem('lastChapter',i); load(); $('#tocOverlay').style.display='none'; };
+    list.appendChild(a);
   });
 }
+$('#tocBtn').onclick = () => $('#tocOverlay').style.display='flex';
+buildTOC();
 
-// Load chương
-async function loadChapter(idx){
-  if(!CHAPTERS[idx]) return;
-  currentChapterIndex = idx;
-  localStorage.setItem('lastChapter', idx);
+// Navigation
+function prev(){ if(current>0){ current--; localStorage.setItem('lastChapter',current); load(); }}
+function next(){ if(current<CHAPTERS.length-1){ current++; localStorage.setItem('lastChapter',current); load(); }}
+$('#prevBtn,#prevBtnBottom').forEach(b=>b.onclick=prev);
+$('#nextBtn,#nextBtnBottom').forEach(b=>b.onclick=next);
 
-  const ch = CHAPTERS[idx];
-  $('#chapterTitle').textContent = ch.title;
-  $('#chapterDate').textContent = ch.date;
-  $('#chapterNumber').textContent = `${idx+1}/${CHAPTERS.length}`;
-
-  if(USE_EXTERNAL_CHAPTERS){
-    try{
-      const res = await fetch(ch.file + '?v=' + Date.now());
-      const html = await res.text();
-      const tmp = document.createElement('div'); tmp.innerHTML = html;
-      const inner = tmp.querySelector('#content') || tmp.querySelector('body') || tmp;
-      $('#content').innerHTML = inner.innerHTML;
-    }catch{
-      $('#content').innerHTML = `<p style="text-align:center;color:red;">Không tải được chương<br><b>${ch.file}</b></p>`;
-    }
-  }
-  window.scrollTo(0,0);
-  buildTOC();
-  restorePosition();
-  updateProgress();
-}
-
-function goPrev(){ if(currentChapterIndex>0) loadChapter(currentChapterIndex-1); }
-function goNext(){ if(currentChapterIndex<CHAPTERS.length-1) loadChapter(currentChapterIndex+1); }
-
-['prevBtn','prevBtnBottom'].forEach(id=>$(`#${id}`).onclick=goPrev);
-['nextBtn','nextBtnBottom'].forEach(id=>$(`#${id}`).onclick=goNext);
-
-// Progress & vị trí đọc
+// Progress
 function updateProgress(){
   const h = document.documentElement.scrollHeight - window.innerHeight;
   const s = window.scrollY;
-  const p = h>0 ? Math.round((s/h)*100) : 0;
-  $('#siteProgress').style.width = p + '%';
-  $('#bubble').textContent = p + '%';
-  $('#bubble').style.display = s>200 ? 'block' : 'none';
+  p = h>0 ? Math.round(s/h*100) : 0;
+  $('#progress').style.width = p + '%';
+  $('#progressBubble').textContent = p + '%';
+  $('#progressBubble').style.display = s>300 ? 'block' : 'none';
   $('#backToTop').style.display = s>600 ? 'block' : 'none';
-  localStorage.setItem('pos_'+currentChapterIndex, s);
+  localStorage.setItem('scroll_'+current, s);
 }
 window.addEventListener('scroll', updateProgress);
-function restorePosition(){
-  const pos = localStorage.getItem('pos_'+currentChapterIndex);
-  if(pos) window.scrollTo(0, parseInt(pos));
+function restoreScroll(){
+  const saved = localStorage.getItem('scroll_'+current);
+  if(saved) window.scrollTo(0, parseInt(saved));
 }
 $('#backToTop').onclick = () => window.scrollTo({top:0,behavior:'smooth'});
 
 // Bookmark & Share
 $('#bookmarkBtn').onclick = () => {
   let b = JSON.parse(localStorage.getItem('bm')||'[]');
-  const key = CHAPTERS[currentChapterIndex].file;
-  if(!b.includes(key)){ b.push(key); localStorage.setItem('bm',JSON.stringify(b)); alert('Đã bookmark'); }
-  else alert('Đã bookmark rồi');
+  const k = CHAPTERS[current].file;
+  if(!b.includes(k)){ b.push(k); localStorage.setItem('bm',JSON.stringify(b)); alert('Đã bookmark'); }
+  else alert('Đã bookmark rồi nha');
 };
 $('#shareBtn').onclick = () => {
-  if(navigator.share) navigator.share({title:CHAPTERS[currentChapterIndex].title,url:location.href});
-  else{ navigator.clipboard.writeText(location.href); alert('Đã copy link'); }
+  navigator.clipboard?.writeText(location.href) || alert('Đã copy link');
+  alert('Đã copy link chương');
 };
-
-// Mobile TOC
-$('#tocToggle').onclick = () => {
-  const toc = $('#tocCard');
-  toc.style.display = toc.style.display==='block' ? 'none' : 'block';
-};
-
-// Khởi động
-loadChapter(currentChapterIndex);
-buildTOC();
-updateProgress();
-
 </script>
 </body>
 </html>
