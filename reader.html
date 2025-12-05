@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đọc truyện</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div id="loading">Đang tải truyện...</div>
+
+    <div class="container">
+        <!-- Toolbar -->
+        <div class="glass-box reader-controls" style="position: sticky; top: 10px; z-index: 99;">
+            <a href="index.html" class="btn btn-outline">⬅ Trang chủ</a>
+            <div>
+                <button class="btn" onclick="toggleSettings()">⚙️ Cài đặt</button>
+                <!-- Popup cài đặt -->
+                <div id="settings-panel" class="settings-panel">
+                    <p style="margin: 0 0 10px 0; font-weight: bold;">Cỡ chữ:</p>
+                    <button class="btn" onclick="changeFontSize('down')">A-</button>
+                    <button class="btn" onclick="changeFontSize('up')">A+</button>
+                    <hr>
+                    <button class="btn" onclick="toggleTheme()" style="width: 100%">Đổi chế độ Sáng/Tối</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nội dung -->
+        <div class="glass-box">
+            <h2 id="chap-title" style="text-align: center; color: var(--primary);"></h2>
+            <div id="content-area"></div>
+        </div>
+
+        <!-- Điều hướng -->
+        <div class="glass-box reader-controls">
+            <button id="prev-btn" class="btn">⬅ Chương trước</button>
+            <button id="next-btn" class="btn">Chương sau ➡</button>
+        </div>
+
+        <!-- Bình luận -->
+        <div class="glass-box">
+            <h3>💬 Bình luận & Cảm xúc</h3>
+            <div id="comments"></div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
