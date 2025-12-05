@@ -7,8 +7,8 @@ const CONFIG = {
     repoName: "MirAi-project-",      // Tên Repo
      // 2. Social Media (Thêm link của bro vào đây)
     social: {
-        facebook: "https://www.facebook.com/namutachi", // Link Fanpage
-        discord: "https://discord.gg/link-discord-cua-bro" // Link Discord
+        facebook: "https://www.facebook.com/profile.php?id=61584772166691", // Link Fanpage
+        discord: "https://discord.gg/r4Y9gUNQ" // Link Discord
     },
     
     // 3. Cấu hình Bình luận (Giscus)
