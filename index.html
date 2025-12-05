@@ -43,14 +43,12 @@
     [data-theme="dark"] .progress-bar{background:rgba(255,255,255,0.08);}
     .progress{height:100%;width:0;background:var(--accent);transition:width .5s ease;}
 
-    /* Reaction - đen trắng thanh lịch */
     .reactions{margin:60px 0 50px;text-align:center;}
     .reactions > div:first-child{margin-bottom:16px;font-weight:500;color:#888;font-size:16px;}
     .reactions span{font-size:30px;cursor:pointer;margin:0 16px;transition:.3s;user-select:none;opacity:0.85;}
     .reactions span:hover{transform:scale(1.45) translateY(-6px);opacity:1;}
     #reactionResult{margin-top:20px;font-size:16px;color:#888;}
 
-    /* Social float - giữ màu gốc cho dễ nhận diện, nhưng làm tối hơn một chút cho thanh lịch */
     .social-float{position:fixed;right:26px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px;z-index:998;}
     .social-float a{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:24px;box-shadow:0 10px 30px rgba(0,0,0,0.35);transition:.3s;}
     .social-float a:hover{transform:scale(1.18) translateY(-6px);}
@@ -58,16 +56,13 @@
     .dc-bg{background:#5865f2;}
     .donate-bg{background:#ff4757;}
 
-    /* Scroll to top button */
     #scrollTop{position:fixed;bottom:30px;left:30px;width:50px;height:50px;border-radius:50%;background:var(--accent);color:var(--bg);border:none;font-size:24px;cursor:pointer;opacity:0;pointer-events:none;transition:.3s;z-index:998;box-shadow:0 8px 25px rgba(0,0,0,0.3);}
     #scrollTop.show{opacity:1;pointer-events:all;}
     #scrollTop:hover{transform:translateY(-5px);}
 
-    /* Toast notification */
     .toast{position:fixed;top:100px;right:30px;background:var(--card);padding:18px 26px;border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--border);z-index:999;opacity:0;transform:translateX(400px);transition:.4s;}
     .toast.show{opacity:1;transform:translateX(0);}
 
-    /* Giscus comments styling */
     .comments-section{margin:70px 0 40px;border-top:1px solid var(--border);padding-top:40px;}
     .comments-section h3{text-align:center;margin-bottom:30px;font-size:24px;color:var(--text);opacity:0.9;}
 
@@ -87,7 +82,7 @@
   <div class="header-inner">
     <div>
       <div class="title">Project-MirAi</div>
-      <div class="meta">Tác giả: NamuTachi / <strong>MirAi</strong></div>
+      <div class="meta">Tác giả: NamuTachi / <strong>MirAi-Part-11</strong></div>
     </div>
     <div class="controls">
       <button id="toggleTheme" class="btn">Dark</button>
@@ -117,7 +112,6 @@
 
     <div id="content"></div>
 
-    <!-- Reaction đen trắng -->
     <div class="reactions">
       <div>Cảm xúc của bạn sau chương này?</div>
       <span id="cry">😭</span>
@@ -129,7 +123,6 @@
       <div id="reactionResult">Chưa có ai thả cảm xúc...</div>
     </div>
 
-    <!-- Giscus Comments - Thay thế FB Comments -->
     <div class="comments-section">
       <h3>💬 Bình luận</h3>
       <script src="https://giscus.app/client.js"
@@ -157,28 +150,55 @@
   </div>
 </div>
 
-<!-- Social float -->
 <div class="social-float">
   <a href="https://facebook.com/namutachi.mirai" target="_blank" class="fb-bg">f</a>
   <a href="https://discord.gg/yourdiscord" target="_blank" class="dc-bg">D</a>
   <a href="https://ko-fi.com/namutachi" target="_blank" class="donate-bg">♥</a>
 </div>
 
-<!-- Scroll to top button -->
 <button id="scrollTop">↑</button>
 
 <script>
-const CHAPTERS = [
-  {title:"Chương 1", file:"chapters/chuong-1.html", date:"2025-12-06"},
-  {title:"Chương 2", file:"chapters/chuong-2.html", date:"2025-12-10"},
-  {title:"Chương 3", file:"chapters/chuong-3.html", date:"2025-12-15"},
-];
+// ===============================================
+// TỰ ĐỘNG LOAD CHAPTERS TỪ FILE JSON
+// ===============================================
 
-let current = parseInt(localStorage.getItem('lastChapter') || '0');
+let CHAPTERS = [];
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
-// Toast notification helper
+// Load chapters từ chapters.json
+async function loadChaptersData(){
+  try{
+    // Thử fetch từ file chapters.json trên GitHub
+    const res = await fetch('chapters.json?t=' + Date.now());
+    if(res.ok){
+      CHAPTERS = await res.json();
+      console.log('✅ Loaded chapters from chapters.json');
+    }else{
+      throw new Error('File not found');
+    }
+  }catch(e){
+    // Fallback: Đọc từ localStorage
+    console.log('⚠️ chapters.json not found, using localStorage');
+    CHAPTERS = JSON.parse(localStorage.getItem('chapters') || 'null');
+    
+    // Nếu localStorage cũng trống, dùng default
+    if(!CHAPTERS || CHAPTERS.length === 0){
+      CHAPTERS = [
+        {title:"Chương 0: Mở đầu", file:"chapters/chuong-0.html", date:"2025-12-05"},
+        {title:"Chương 1", file:"chapters/chuong-1.html", date:"2025-12-06"},
+        {title:"Chương 2", file:"chapters/chuong-2.html", date:"2025-12-10"},
+        {title:"Chương 3", file:"chapters/chuong-3.html", date:"2025-12-15"},
+      ];
+      localStorage.setItem('chapters', JSON.stringify(CHAPTERS));
+    }
+  }
+}
+
+let current = parseInt(localStorage.getItem('lastChapter') || '0');
+
+// Toast notification
 function showToast(msg){
   const toast = document.createElement('div');
   toast.className = 'toast';
@@ -202,7 +222,6 @@ $('#toggleTheme').onclick = () => {
   localStorage.setItem('theme', isDark ? 'light' : 'dark');
   $('#toggleTheme').textContent = isDark ? 'Dark' : 'Light';
   
-  // Update Giscus theme dynamically
   const giscusFrame = document.querySelector('iframe.giscus-frame');
   if(giscusFrame){
     giscusFrame.contentWindow.postMessage({
@@ -235,12 +254,11 @@ $('#fontDec').onclick = () => {
   }
 };
 
-// View counter - FIXED: Chỉ đếm 1 lần mỗi session
+// View counter
 function updateViewCount(){
   const key = 'view_' + current;
   const sessionKey = 'viewed_session_' + current;
   
-  // Chỉ tăng nếu chưa xem trong session này (chưa đóng tab)
   if(!sessionStorage.getItem(sessionKey)){
     let views = parseInt(localStorage.getItem(key) || '0');
     views++;
@@ -248,13 +266,17 @@ function updateViewCount(){
     sessionStorage.setItem(sessionKey, 'true');
   }
   
-  // Hiển thị view count
   const views = parseInt(localStorage.getItem(key) || '0');
   $('#viewCount').textContent = '👁️ ' + views + ' lượt xem';
 }
 
 // Load chương
 async function load(){
+  if(current >= CHAPTERS.length){
+    current = CHAPTERS.length - 1;
+    localStorage.setItem('lastChapter', current);
+  }
+  
   const ch = CHAPTERS[current];
   $('#chapterTitle').textContent = ch.title;
   $('#chapterDate').textContent = ch.date;
@@ -280,7 +302,6 @@ async function load(){
   restoreScroll();
   updateBookmarkBtn();
 }
-load();
 
 // Reaction
 function loadReactions(){
@@ -335,7 +356,7 @@ function next(){
 $$('#prevBtn, #prevBtnBottom').forEach(b => b.onclick = prev);
 $$('#nextBtn, #nextBtnBottom').forEach(b => b.onclick = next);
 
-// Bookmark functionality
+// Bookmark
 $('#bookmarkBtn').onclick = () => {
   localStorage.setItem('bookmark', current);
   showToast('✓ Đã bookmark chương ' + CHAPTERS[current].title);
@@ -351,7 +372,7 @@ function updateBookmarkBtn(){
   }
 }
 
-// Share functionality
+// Share
 $('#shareBtn').onclick = async () => {
   const url = window.location.href;
   const title = CHAPTERS[current].title + ' - Project-MirAi';
@@ -378,7 +399,7 @@ function copyToClipboard(text){
   showToast('✓ Đã copy link vào clipboard!');
 }
 
-// TOC with navigation
+// TOC
 $('#tocBtn').onclick = () => {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -414,7 +435,6 @@ function updateProgress(){
   $('#progress').style.width = p + '%';
   localStorage.setItem('scroll_' + current, s);
   
-  // Show/hide scroll to top button
   if(s > 500){
     $('#scrollTop').classList.add('show');
   }else{
@@ -426,9 +446,7 @@ function restoreScroll(){
   const pos = localStorage.getItem('scroll_' + current);
   if(pos) window.scrollTo(0, parseInt(pos));
 }
-updateProgress();
 
-// Scroll to top
 $('#scrollTop').onclick = () => {
   window.scrollTo({top: 0, behavior: 'smooth'});
 };
@@ -438,6 +456,12 @@ document.addEventListener('keydown', e => {
   if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   if(e.key === 'ArrowLeft') prev();
   if(e.key === 'ArrowRight') next();
+});
+
+// Init: Load chapters then load current chapter
+loadChaptersData().then(() => {
+  updateProgress();
+  load();
 });
 </script>
 </body>
