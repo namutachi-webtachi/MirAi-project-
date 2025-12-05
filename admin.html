@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>MirAi Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style> .status { margin-top: 10px; font-weight: bold; text-align: center; } </style>
+</head>
+<body>
+    <div class="container">
+        <header class="glass-box" style="text-align: center;">
+            <h2>🛠 Đăng Truyện Tự Động</h2>
+            <a href="index.html" class="btn btn-outline">⬅ Về Web</a>
+        </header>
+
+        <div class="glass-box">
+            <h3>🔑 Cấu hình Token</h3>
+            <input type="password" id="token" placeholder="Dán GitHub Token của cậu vào đây (ghp_...)" onchange="saveToken()">
+            <p style="font-size: 0.8rem; color: #666;">*Token được lưu vào trình duyệt của cậu, an toàn tuyệt đối.</p>
+        </div>
+
+        <div class="glass-box">
+            <h3>📝 Soạn thảo</h3>
+            
+            <label>Tiêu đề chương:</label>
+            <input type="text" id="chapTitle" placeholder="VD: Chương 10: Cao trào">
+
+            <div class="file-drop" onclick="document.getElementById('txtInput').click()">
+                <input type="file" id="txtInput" accept=".txt" hidden onchange="handleTxt()">
+                📂 <b>Bấm để chọn file .TXT</b> (Tool sẽ tự copy vào khung soạn thảo)
+            </div>
+
+            <div class="file-drop" onclick="document.getElementById('imgInput').click()">
+                <input type="file" id="imgInput" accept="image/*" hidden onchange="handleImg()">
+                🖼 <b>Bấm để chọn Ảnh minh họa</b> (Tự upload và chèn link)
+            </div>
+            <p id="imgStatus" style="text-align: center; font-size: 0.9rem; color: var(--primary);"></p>
+
+            <textarea id="content" rows="15" placeholder="Nội dung truyện (Markdown)..."></textarea>
+            
+            <button class="btn" onclick="publish()" style="width: 100%; justify-content: center; font-size: 1.2rem;">🚀 ĐĂNG NGAY</button>
+            <div id="status" class="status"></div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // Token logic
+        if(localStorage.getItem('gh_token')) document.getElementById('token').value = localStorage.getItem('gh_token');
+        function saveToken() { localStorage.setItem('gh_token', document.getElementById('token').value); }
+
+        // Xử lý file TXT
+        function handleTxt() {
+            const file = document.getElementById('txtInput').files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                let text = e.target.result;
+                // Tự động định dạng lại đoạn văn cho chuẩn Markdown
+                text = text.replace(/\r\n/g, "\n").replace(/\n/g, "\n\n");
+                document.getElementById('content').value = text;
+            };
+            reader.readAsText(file);
+        }
+
+        // Xử lý Upload Ảnh
+        async function handleImg() {
+            const file = document.getElementById('imgInput').files[0];
+            if(!file) return;
+            const token = document.getElementById('token').value;
+            if(!token) return alert("Cần Token để up ảnh!");
+
+            document.getElementById('imgStatus').innerText = "⏳ Đang upload ảnh...";
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async function() {
+                try {
+                    const base64 = reader.result.split(',')[1];
+                    const fileName = `images/${Date.now()}_${file.name}`;
+                    await githubReq(fileName, base64, "Up ảnh minh họa", token);
+                    
+                    const imgUrl = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${fileName}`;
+                    const mdTag = `\n![Minh họa](${imgUrl})\n`;
+                    
+                    const txtArea = document.getElementById('content');
+                    txtArea.value = mdTag + txtArea.value;
+                    document.getElementById('imgStatus').innerText = "✅ Đã chèn ảnh vào bài viết!";
+                } catch(e) { alert("Lỗi up ảnh: " + e); }
+            }
+        }
+
+        // Đăng bài
+        async function publish() {
+            const token = document.getElementById('token').value;
+            const title = document.getElementById('chapTitle').value;
+            const content = document.getElementById('content').value;
+            const status = document.getElementById('status');
+
+            if(!token || !title || !content) return alert("Thiếu thông tin!");
+            
+            status.innerText = "⏳ Đang xử lý...";
+            status.style.color = "blue";
+
+            try {
+                // 1. Up file chương
+                const fileId = `chap_${Date.now()}`;
+                const filePath = `chapters/${fileId}.md`;
+                const contentB64 = btoa(unescape(encodeURIComponent(content)));
+                await githubReq(filePath, contentB64, `New chap: ${title}`, token);
+
+                // 2. Lấy data.json cũ
+                const jsonUrl = `https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`;
+                const getRes = await fetch(jsonUrl, { headers: {Authorization: `token ${token}`} });
+                let list = [], sha = null;
+                
+                if(getRes.ok) {
+                    const data = await getRes.json();
+                    sha = data.sha;
+                    list = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                }
+
+                // 3. Cập nhật list
+                list.push({ id: fileId, title: title, file: filePath });
+                const jsonB64 = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
+                await githubReq("data.json", jsonB64, "Update list", token, sha);
+
+                status.innerText = "🎉 THÀNH CÔNG! Đợi 1 phút rồi F5 trang chủ.";
+                status.style.color = "green";
+                document.getElementById('content').value = '';
+                document.getElementById('chapTitle').value = '';
+
+            } catch(e) {
+                console.error(e);
+                status.innerText = "❌ Lỗi: " + e.message;
+                status.style.color = "red";
+            }
+        }
+
+        async function githubReq(path, content, msg, token, sha=null) {
+            const body = { message: msg, content: content };
+            if(sha) body.sha = sha;
+            const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if(!res.ok) throw new Error((await res.json()).message);
+        }
+    </script>
+</body>
+</html>
