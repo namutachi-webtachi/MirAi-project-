@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Panel Pro - Project MirAi</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 30px 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    .tab {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: #666;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .3s;
+    }
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+    .tab:hover {
+      color: #667eea;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    
+    .section {
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 16px;
+      margin-bottom: 25px;
+    }
+    .section h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .form-group {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 15px;
+      transition: .3s;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    textarea {
+      min-height: 300px;
+      resize: vertical;
+      font-family: 'Courier New', monospace;
+      line-height: 1.6;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+    .btn-secondary {
+      background: #6c757d;
+    }
+    .btn-success {
+      background: #28a745;
+    }
+    .btn-warning {
+      background: #ffc107;
+      color: #333;
+    }
+    .btn-danger {
+      background: #dc3545;
+    }
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .chapter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chapter-item {
+      background: white;
+      padding: 16px 20px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 2px solid #e0e0e0;
+      transition: .2s;
+    }
+    .chapter-item:hover {
+      border-color: #667eea;
+      transform: translateX(5px);
+    }
+    .chapter-info {
+      flex: 1;
+    }
+    .chapter-title {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .chapter-meta {
+      font-size: 13px;
+      color: #999;
+    }
+    .chapter-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .output-box {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 20px;
+      border-radius: 12px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 15px;
+    }
+    
+    .success-msg {
+      background: #d4edda;
+      color: #155724;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      border: 2px solid #c3e6cb;
+    }
+    .success-msg.show { display: flex; }
+    
+    .alert {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 2px solid;
+    }
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border-color: #bee5eb;
+    }
+    .alert-warning {
+      background: #fff3cd;
+      color: #856404;
+      border-color: #ffeaa7;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      border: 2px solid #e0e0e0;
+    }
+    .stat-number {
+      font-size: 32px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .preview {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      border: 2px solid #e0e0e0;
+      margin-top: 20px;
+      min-height: 200px;
+      line-height: 1.8;
+    }
+    .preview h3 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .preview p {
+      margin: 15px 0;
+      text-align: justify;
+    }
+    
+    @media (max-width: 768px) {
+      .container { padding: 25px 20px; }
+      h1 { font-size: 26px; }
+      .tabs { overflow-x: auto; }
+      .chapter-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .chapter-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚙️ Admin Panel Pro</h1>
+    <p class="subtitle">Quản lý chương Project-MirAi - Phiên bản nâng cao</p>
+    
+    <div class="success-msg" id="successMsg">
+      <span style="font-size:20px">✓</span>
+      <span id="successText">Thành công!</span>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(0)">📝 TXT → HTML</button>
+      <button class="tab" onclick="switchTab(1)">➕ Quản lý chương</button>
+      <button class="tab" onclick="switchTab(2)">💾 Export/Import</button>
+    </div>
+    
+    <!-- Tab 1: TXT to HTML Converter -->
+    <div class="tab-content active" id="tab0">
+      <div class="section">
+        <h2>📝 Chuyển đổi TXT sang HTML</h2>
+        <div class="alert alert-info">
+          💡 <strong>Hướng dẫn:</strong> Paste nội dung chương vào ô bên dưới. Mỗi đoạn văn cách nhau bởi 1 dòng trống sẽ tự động thành thẻ &lt;p&gt;
+        </div>
+        
+        <div class="form-group">
+          <label>Tiêu đề chương (không bắt buộc)</label>
+          <input type="text" id="convertTitle" placeholder="Ví dụ: Chương 5: Bắt đầu">
+        </div>
+        
+        <div class="form-group">
+          <label>Nội dung văn bản (TXT)</label>
+          <textarea id="txtInput" placeholder="Paste nội dung chương ở đây...
+
+Đoạn 1: Mỗi đoạn cách nhau bởi dòng trống.
+
+Đoạn 2: Sẽ tự động thành HTML.
+
+Đoạn 3: Rất đơn giản!"></textarea>
+        </div>
+        
+        <div class="btn-group">
+          <button class="btn" onclick="convertToHTML()">
+            <span>🔄</span>
+            Chuyển đổi sang HTML
+          </button>
+          <button class="btn btn-success" onclick="downloadHTML()">
+            <span>💾</span>
+            Tải file HTML
+          </button>
+          <button class="btn btn-secondary" onclick="copyHTML()">
+            <span>📋</span>
+            Copy HTML
+          </button>
+        </div>
+        
+        <div class="preview" id="preview">
+          <h3>👁️ Preview</h3>
+          <p style="color:#999;">Nội dung preview sẽ hiện ở đây...</p>
+        </div>
+        
+        <div class="form-group" style="margin-top:20px;">
+          <label>HTML Code (để copy vào file)</label>
+          <div class="output-box" id="htmlOutput"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tab 2: Chapter Management -->
+    <div class="tab-content" id="tab1">
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number" id="totalChapters">0</div>
+          <div class="stat-label">Tổng chương</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="latestDate">---</div>
+          <div class="stat-label">Chương mới nhất</div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2>➕ Thêm chương mới</h2>
+        <form id="addChapterForm">
+          <div class="form-group">
+            <label>Tiêu đề chương</label>
+            <input type="text" id="chapterTitle" placeholder="Ví dụ: Chương 5" required>
+          </div>
+          <div class="form-group">
+            <label>File path</label>
+            <input type="text" id="chapterFile" placeholder="chapters/chuong-5.html" required>
+          </div>
+          <div class="form-group">
+            <label>Ngày đăng (YYYY-MM-DD)</label>
+            <input type="date" id="chapterDate" required>
+          </div>
+          <button type="submit" class="btn">
+            <span>➕</span>
+            Thêm chương
+          </button>
+        </form>
+      </div>
+      
+      <div class="section">
+        <h2>📚 Danh sách chương</h2>
+        <div class="chapter-list" id="chapterList"></div>
+      </div>
+    </div>
+    
+    <!-- Tab 3: Export/Import -->
+    <div class="tab-content" id="tab2">
+      <div class="section">
+        <h2>💾 Export Chapters</h2>
+        <div class="alert alert-info">
+          💡 Export danh sách chương ra file JSON để backup hoặc commit lên GitHub
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-success" onclick="exportJSON()">
+            <span>💾</span>
+            Export chapters.json
+          </button>
+          <button class="btn btn-secondary" onclick="exportJS()">
+            <span>📄</span>
+            Copy JS code (backup)
+          </button>
+        </div>
+        <div class="output-box" id="exportOutput" style="margin-top:20px;">Export data sẽ hiện ở đây...</div>
+        
+        <div class="alert alert-info" style="margin-top:20px;">
+          <strong>📤 Cách upload KHÔNG CẦN GIT:</strong><br>
+          1. Click "Export chapters.json" → File tự động tải về<br>
+          2. Vào <a href="https://github.com/namutachi-webtachi/MirAi-project-/upload/main" target="_blank" style="color:#667eea;font-weight:600;">GitHub Upload</a><br>
+          3. Kéo file <code>chapters.json</code> vào<br>
+          4. Click "Commit changes"<br>
+          5. DONE! Web tự động cập nhật! ✨
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2>📥 Import Chapters</h2>
+        <div class="alert alert-warning">
+          ⚠️ <strong>Cảnh báo:</strong> Import sẽ GHI ĐÈ toàn bộ danh sách chương hiện tại!
+        </div>
+        <div class="form-group">
+          <label>Paste JSON hoặc JS code</label>
+          <textarea id="importInput" placeholder='[
+  {"title":"Chương 1", "file":"chapters/chuong-1.html", "date":"2025-12-06"},
+  {"title":"Chương 2", "file":"chapters/chuong-2.html", "date":"2025-12-10"}
+]'></textarea>
+        </div>
+        <button class="btn btn-warning" onclick="importData()">
+          <span>📥</span>
+          Import Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let chapters = JSON.parse(localStorage.getItem('chapters') || '[]');
+    if(chapters.length === 0){
+      chapters = [
+        {title:"Chương 0: Mở đầu", file:"chapters/chuong-0.html", date:"2025-12-05"},
+        {title:"Chương 1", file:"chapters/chuong-1.html", date:"2025-12-06"},
+        {title:"Chương 2", file:"chapters/chuong-2.html", date:"2025-12-10"},
+        {title:"Chương 3", file:"chapters/chuong-3.html", date:"2025-12-15"},
+      ];
+      saveChapters();
+    }
+    
+    function switchTab(index){
+      document.querySelectorAll('.tab').forEach((t,i) => {
+        t.classList.toggle('active', i === index);
+      });
+      document.querySelectorAll('.tab-content').forEach((c,i) => {
+        c.classList.toggle('active', i === index);
+      });
+    }
+    
+    function showSuccess(msg){
+      const el = document.getElementById('successMsg');
+      document.getElementById('successText').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    
+    function saveChapters(){
+      localStorage.setItem('chapters', JSON.stringify(chapters));
+      render();
+    }
+    
+    function render(){
+      updateStats();
+      renderChapterList();
+    }
+    
+    function updateStats(){
+      document.getElementById('totalChapters').textContent = chapters.length;
+      if(chapters.length > 0){
+        const latest = chapters[chapters.length - 1].date;
+        document.getElementById('latestDate').textContent = latest;
+      }
+    }
+    
+    function renderChapterList(){
+      const list = document.getElementById('chapterList');
+      if(chapters.length === 0){
+        list.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">Chưa có chương nào</p>';
+        return;
+      }
+      
+      list.innerHTML = chapters.map((ch, i) => `
+        <div class="chapter-item">
+          <div class="chapter-info">
+            <div class="chapter-title">${ch.title}</div>
+            <div class="chapter-meta">📄 ${ch.file} • 📅 ${ch.date}</div>
+          </div>
+          <div class="chapter-actions">
+            <button class="btn btn-danger btn-small" onclick="deleteChapter(${i})">
+              🗑️ Xóa
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Chapter Management
+    document.getElementById('addChapterForm').onsubmit = (e) => {
+      e.preventDefault();
+      const title = document.getElementById('chapterTitle').value;
+      const file = document.getElementById('chapterFile').value;
+      const date = document.getElementById('chapterDate').value;
+      
+      chapters.push({title, file, date});
+      saveChapters();
+      e.target.reset();
+      showSuccess(`✓ Đã thêm "${title}" thành công!`);
+      document.getElementById('chapterDate').valueAsDate = new Date();
+    };
+    
+    function deleteChapter(index){
+      if(confirm(`Xóa "${chapters[index].title}"?`)){
+        chapters.splice(index, 1);
+        saveChapters();
+        showSuccess('✓ Đã xóa chương!');
+      }
+    }
+    
+    // TXT to HTML Converter
+    function convertToHTML(){
+      const title = document.getElementById('convertTitle').value;
+      const txt = document.getElementById('txtInput').value;
+      
+      if(!txt.trim()){
+        alert('Vui lòng nhập nội dung!');
+        return;
+      }
+      
+      // Split by double newline (paragraph breaks)
+      const paragraphs = txt.split(/\n\n+/).filter(p => p.trim());
+      
+      let html = '<!DOCTYPE html>\n<html lang="vi">\n<head>\n  <meta charset="utf-8">\n';
+      if(title) html += `  <title>${title}</title>\n`;
+      html += '</head>\n<body>\n  <div id="content">\n';
+      
+      if(title) html += `    <h2>${title}</h2>\n`;
+      
+      paragraphs.forEach(p => {
+        const cleaned = p.trim().replace(/\n/g, ' ');
+        html += `    <p>${cleaned}</p>\n`;
+      });
+      
+      html += '  </div>\n</body>\n</html>';
+      
+      // Display
+      document.getElementById('htmlOutput').textContent = html;
+      
+      // Preview
+      let previewHTML = '';
+      if(title) previewHTML += `<h3>${title}</h3>`;
+      paragraphs.forEach(p => {
+        const cleaned = p.trim().replace(/\n/g, ' ');
+        previewHTML += `<p>${cleaned}</p>`;
+      });
+      document.getElementById('preview').innerHTML = previewHTML;
+      
+      showSuccess('✓ Đã chuyển đổi thành công!');
+    }
+    
+    function downloadHTML(){
+      const html = document.getElementById('htmlOutput').textContent;
+      if(!html || html === ''){
+        alert('Chưa có HTML để tải! Hãy chuyển đổi trước.');
+        return;
+      }
+      
+      const title = document.getElementById('convertTitle').value || 'chuong';
+      const filename = title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.html';
+      
+      const blob = new Blob([html], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showSuccess('✓ Đã tải file HTML!');
+    }
+    
+    function copyHTML(){
+      const html = document.getElementById('htmlOutput').textContent;
+      if(!html || html === ''){
+        alert('Chưa có HTML để copy!');
+        return;
+      }
+      
+      navigator.clipboard.writeText(html).then(() => {
+        showSuccess('✓ Đã copy HTML!');
+      });
+    }
+    
+    // Export/Import
+    function exportJSON(){
+      const json = JSON.stringify(chapters, null, 2);
+      document.getElementById('exportOutput').textContent = json;
+      
+      const blob = new Blob([json], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'chapters.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showSuccess('✓ Đã tải file chapters.json! Upload lên GitHub là xong!');
+    }
+    
+    function exportJS(){
+      const js = `const CHAPTERS = ${JSON.stringify(chapters, null, 2)};`;
+      document.getElementById('exportOutput').textContent = js;
+      
+      navigator.clipboard.writeText(js).then(() => {
+        showSuccess('✓ Đã copy JS code! Paste vào index.html');
+      });
+    }
+    
+    function importData(){
+      const input = document.getElementById('importInput').value.trim();
+      if(!input){
+        alert('Vui lòng paste data!');
+        return;
+      }
+      
+      try{
+        // Try parse as JSON
+        let data = input;
+        if(input.startsWith('const CHAPTERS')){
+          // Extract array from JS code
+          const match = input.match(/\[[\s\S]*\]/);
+          if(match) data = match[0];
+        }
+        
+        const parsed = JSON.parse(data);
+        if(!Array.isArray(parsed)){
+          throw new Error('Data phải là array!');
+        }
+        
+        if(confirm(`Import ${parsed.length} chương? Sẽ GHI ĐÈ data hiện tại!`)){
+          chapters = parsed;
+          saveChapters();
+          showSuccess(`✓ Đã import ${parsed.length} chương!`);
+          document.getElementById('importInput').value = '';
+        }
+      }catch(e){
+        alert('Lỗi: ' + e.message + '\n\nVui lòng kiểm tra format JSON!');
+      }
+    }
+    
+    // Open GitHub Edit (NO GIT NEEDED!)
+    function openGitHubEdit(){
+      const repoUrl = prompt('Nhập URL repo GitHub của bạn:', 'https://github.com/namutachi-webtachi/MirAi-project-');
+      if(!repoUrl) return;
+      
+      // Extract username/repo from URL
+      const match = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+      if(!match){
+        alert('URL không hợp lệ!');
+        return;
+      }
+      
+      const [, username, repo] = match;
+      const editUrl = `https://github.com/${username}/${repo}/edit/main/index.html`;
+      
+      // Copy JS code first
+      exportJS();
+      
+      alert('✓ Code đã copy!\n\n📝 Hướng dẫn:\n1. Trình duyệt sẽ mở GitHub\n2. Tìm dòng "const CHAPTERS = [...]"\n3. Paste code đã copy (Ctrl+V)\n4. Scroll xuống → Click "Commit changes"\n5. DONE!');
+      
+      window.open(editUrl, '_blank');
+    }
+    
+    // Init
+    document.getElementById('chapterDate').valueAsDate = new Date();
+    render();
+  </script>
+</body>
+</html>
