@@ -2,110 +2,126 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN AREA</title>
-    <!-- CSS CHẮC CHẮN HIỆN -->
-    <style>
-        body {
-            background-color: black;
-            color: lime; /* Màu xanh lá hacker */
-            font-family: monospace;
-            margin: 0;
-            overflow: hidden; /* Chặn cuộn chuột khi chưa mở khóa */
-        }
-        
-        /* Màn hình khóa nằm đè lên tất cả */
-        #lock-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: black;
-            z-index: 99999; /* Luôn nằm trên cùng */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        input {
-            background: transparent;
-            border: 2px solid lime;
-            color: lime;
-            font-size: 2rem;
-            padding: 10px;
-            text-align: center;
-            margin-top: 20px;
-            outline: none;
-            letter-spacing: 5px;
-            border-radius: 10px;
-        }
-
-        /* Ẩn nội dung chính ban đầu */
-        #admin-content { display: none; }
-    </style>
-    <!-- Link CSS chính (chỉ dùng khi đã vào trong) -->
+    <title>404 Not Found</title> <!-- Đặt tên giả để lừa tình -->
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Mặc định ẩn mọi thứ, nền đen */
+        body { background-color: #000; margin: 0; overflow: hidden; }
+        
+        /* Tool Admin (Mặc định ẩn) */
+        #admin-panel { display: none; padding-bottom: 50px; }
+        
+        /* Hiệu ứng khi hiện ra */
+        .reveal { animation: fadeIn 1s forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
 </head>
 <body>
 
-    <!-- 👇👇 PHẦN NÀY LÀ CÁI MÀN HÌNH KHÓA (KIỂM TRA KỸ2006";
+    <!-- PHẦN TOOL NẰM ẨN Ở ĐÂY -->
+    <div id="admin-panel" class="container">
+        <header class="glass-box" style="text-align: center; margin-top: 30px;">
+            <h2 style="color: var(--primary);">🚀 TRUNG TÂM ĐIỀU KHIỂN</h2>
+            <p style="color: #666;">Chào mừng trở lại, Boss!</p>
+            <a href="index.html" class="btn btn-outline">⬅ Thoát</a>
+        </header>
 
-        function checkPass(el) {
-            if(el.value === PASS) {
-                document.getElementById('lock-screen').style.display = 'none'; // Ẩn khóa
-                document.getElementById('admin-content').style.display = 'block'; // Hiện tool
-                document.body.style.background = "url('" + (typeof CONFIG !== 'undefined' ? CONFIG.bgImage : '') + "')";
+        <div class="glass-box">
+            <h3>🔑 Token GitHub</h3>
+            <input type="password" id="token" placeholder="GitHub Token (ghp_...)" onchange="saveToken()">
+        </div>
+
+        <div class="glass-box">
+            <h3>📝 Đăng Truyện Mới</h3>
+            <input type="text" id="chapTitle" placeholder="Tiêu đề chương (VD: Chương 1)">
+
+            <div class="file-drop" onclick="document.getElementById('txtInput').click()">
+                <input type="file" id="txtInput" accept=".txt" hidden onchange="handleTxt()">
+                📂 <b>Import File .TXT</b>
+            </div>
+
+            <div class="file-drop" onclick="document.getElementById('imgInput').click()">
+                <input type="file" id="imgInput" accept="image/*" hidden onchange="handleImg()">
+                🖼 <b>Upload Ảnh Minh Họa</b>
+            </div>
+            <p id="imgStatus" style="color: var(--primary); text-align: center; font-size: 0.9rem;"></p>
+
+            <textarea id="content" rows="15" placeholder="Nội dung truyện..."></textarea>
+            
+            <button class="btn" onclick="publish()" style="width: 100%; margin-top: 20px;">🚀 ĐĂNG BÀI</button>
+            <div id="status" style="text-align: center; margin-top: 10px; font-weight: bold;"></div>
+        </div>
+    </div>
+
+    <!-- SCRIPT XỬ LÝ -->
+    <script src="config.js"></script>
+    <script>
+        // ===========================================
+        // 🔐 MẬT KHẨU CỦA BRO (SỐ NÀO CŨNG ĐƯỢC)
+        const SECRET_PASS = "2006";
+        // ===========================================
+
+        // In hướng dẫn ra màn hình Console cho Bro nhớ
+        console.log("%c🛑 HỆ THỐNG ĐÃ KHÓA!", "color: red; font-size: 30px; font-weight: bold;");
+        console.log("%cMuốn truy cập? Hãy nhập lệnh: login('MẬT_KHẨU')", "color: yellow; font-size: 16px;");
+
+        // Hàm mở khóa (Gõ vào console mới chạy)
+        window.login = function(pass) {
+            if(pass === SECRET_PASS) {
+                console.clear();
+                console.log("%c✅ ĐÃ MỞ KHÓA! WELCOME BOSS.", "color: lime; font-size: 20px;");
+                
+                // Hiện giao diện
+                document.body.style.backgroundColor = "#f1f2f6"; // Trả lại màu nền web
+                document.body.style.backgroundImage = `url('${CONFIG.bgImage}')`;
                 document.body.style.overflow = "auto";
                 
-                // Load token cũ nếu có
+                const panel = document.getElementById('admin-panel');
+                panel.style.display = "block";
+                panel.classList.add('reveal');
+
+                // Load token cũ
                 if(localStorage.getItem('gh_token')) document.getElementById('token').value = localStorage.getItem('gh_token');
-            } else if (el.value.length >= 4) {
-                document.getElementById('msg').innerText = "SAI MẬT KHẨU!";
-                el.value = "";
+            } else {
+                console.log("%c❌ SAI MẬT KHẨU!", "color: red; font-size: 20px;");
             }
         }
 
-        // Xử lý file TXT
-        function handleTxt(el) {
+        // --- CÁC HÀM XỬ LÝ CŨ (GIỮ NGUYÊN) ---
+        function saveToken() { localStorage.setItem('gh_token', document.getElementById('token').value); }
+        
+        function handleTxt() {
+            const file = document.getElementById('txtInput').files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 let txt = e.target.result.replace(/\r\n/g, "\n").replace(/\n/g, "\n\n");
                 document.getElementById('content').value = txt;
             }
-            reader.readAsText(el.files[0]);
+            reader.readAsText(file);
         }
 
-        // Xử lý Upload Ảnh
-        async function handleImg(el) {
-            const file = el.files[0];
+        async function handleImg() {
+            const file = document.getElementById('imgInput').files[0];
             if(!file) return;
             const token = document.getElementById('token').value;
-            if(!token) return alert("Chưa nhập Token!");
+            if(!token) return alert("Cần Token!");
 
-            document.getElementById('uploadStatus').innerText = "⏳ Đang upload ảnh...";
+            document.getElementById('imgStatus').innerText = "⏳ Đang upload...";
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = async function() {
                 try {
                     const b64 = reader.result.split(',')[1];
                     const name = `images/${Date.now()}_${file.name}`;
-                    // Upload
-                    await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${name}`, {
-                        method: 'PUT',
-                        headers: {'Authorization': `token ${token}`},
-                        body: JSON.stringify({message: "img", content: b64})
-                    });
-                    
+                    await githubReq(name, b64, "Img", token);
                     const url = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${name}`;
-                    const textArea = document.getElementById('content');
-                    textArea.value = `![Img](${url})\n` + textArea.value;
-                    document.getElementById('uploadStatus').innerText = "✅ Ảnh đã lên!";
-                } catch(e) { alert("Lỗi: " + e); }
+                    const ta = document.getElementById('content');
+                    ta.value = `![Img](${url})\n` + ta.value;
+                    document.getElementById('imgStatus').innerText = "✅ Xong!";
+                } catch(e) { alert(e); }
             }
         }
 
-        // Đăng bài
         async function publish() {
             const token = document.getElementById('token').value;
             const title = document.getElementById('chapTitle').value;
@@ -113,40 +129,41 @@
             const status = document.getElementById('status');
             
             if(!token || !title || !content) return alert("Thiếu thông tin!");
-            status.innerText = "⏳ Đang xử lý...";
+            status.innerText = "⏳ Đang xử lý..."; status.style.color = "blue";
             
             try {
-                // 1. Up file
                 const id = `chap_${Date.now()}`;
                 const path = `chapters/${id}.md`;
                 const b64 = btoa(unescape(encodeURIComponent(content)));
-                
-                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {
-                    method: 'PUT',
-                    headers: {'Authorization': `token ${token}`},
-                    body: JSON.stringify({message: `Add ${title}`, content: b64})
-                });
+                await githubReq(path, b64, `New: ${title}`, token);
 
-                // 2. Update list
-                const jsonRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
-                    headers: {'Authorization': `token ${token}`}
-                });
-                const jsonData = await jsonRes.json();
-                const list = JSON.parse(decodeURIComponent(escape(atob(jsonData.content))));
+                const jsonUrl = `https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`;
+                const getRes = await fetch(jsonUrl, {headers: {'Authorization': `token ${token}`}});
+                let list = [], sha = null;
+                if(getRes.ok) {
+                    const d = await getRes.json();
+                    sha = d.sha;
+                    list = JSON.parse(decodeURIComponent(escape(atob(d.content))));
+                }
                 list.push({id: id, title: title, file: path});
+                const jsonB64 = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
+                await githubReq("data.json", jsonB64, "Update List", token, sha);
                 
-                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
-                    method: 'PUT',
-                    headers: {'Authorization': `token ${token}`},
-                    body: JSON.stringify({
-                        message: "Update list",
-                        content: btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2)))),
-                        sha: jsonData.sha
-                    })
-                });
+                status.innerText = "🎉 THÀNH CÔNG!"; status.style.color = "green";
+                document.getElementById('content').value = '';
+                document.getElementById('chapTitle').value = '';
+            } catch(e) { status.innerText = "❌ Lỗi: " + e; status.style.color = "red"; }
+        }
 
-                status.innerText = "🎉 THÀNH CÔNG!";
-            } catch(e) { status.innerText = "❌ Lỗi: " + e; }
+        async function githubReq(path, content, msg, token, sha=null) {
+            const body = { message: msg, content: content };
+            if(sha) body.sha = sha;
+            const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if(!res.ok) throw new Error((await res.json()).message);
         }
     </script>
 </body>
