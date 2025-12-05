@@ -2,168 +2,288 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>404 Not Found</title> <!-- Đặt tên giả để lừa tình -->
+    <title>MirAi Admin V3</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Mặc định ẩn mọi thứ, nền đen */
-        body { background-color: #000; margin: 0; overflow: hidden; }
+        body { background-color: #000; margin: 0; overflow: hidden; font-family: monospace; }
         
-        /* Tool Admin (Mặc định ẩn) */
-        #admin-panel { display: none; padding-bottom: 50px; }
+        /* Màn hình khóa */
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: #0f0; z-index: 9999; background: black;
+        }
         
-        /* Hiệu ứng khi hiện ra */
-        .reveal { animation: fadeIn 1s forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Admin Panel */
+        #admin-panel { display: none; padding-bottom: 50px; background: #f4f4f4; min-height: 100vh; overflow-y: auto; }
+        
+        /* Danh sách chương */
+        .chapter-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: white; padding: 10px; margin-bottom: 8px; border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .chapter-row:hover { border-color: var(--primary); background: #fff5f5; }
+        .edit-btn { background: #f39c12; color: white; padding: 5px 15px; border-radius: 5px; cursor: pointer; border: none; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; cursor: pointer; background: #ddd; border: none; border-radius: 5px; font-weight: bold; }
+        .tab-btn.active { background: var(--primary); color: white; }
     </style>
 </head>
 <body>
 
-    <!-- PHẦN TOOL NẰM ẨN Ở ĐÂY -->
+    <!-- MÀN HÌNH KHÓA -->
+    <div id="lock-screen">
+        <h1 style="font-size: 60px;">☠️ RESTRICTED</h1>
+        <p>Gõ mật khẩu trực tiếp để mở khóa...</p>
+    </div>
+
+    <!-- ADMIN TOOL -->
     <div id="admin-panel" class="container">
         <header class="glass-box" style="text-align: center; margin-top: 30px;">
-            <h2 style="color: var(--primary);">🚀 TRUNG TÂM ĐIỀU KHIỂN</h2>
-            <p style="color: #666;">Chào mừng trở lại, Boss!</p>
+            <h2 style="color: var(--primary);">⚙️ QUẢN LÝ TRUYỆN</h2>
             <a href="index.html" class="btn btn-outline">⬅ Thoát</a>
         </header>
 
         <div class="glass-box">
             <h3>🔑 Token GitHub</h3>
-            <input type="password" id="token" placeholder="GitHub Token (ghp_...)" onchange="saveToken()">
+            <input type="password" id="token" placeholder="Dán Token vào đây..." onchange="saveToken()">
         </div>
 
-        <div class="glass-box">
-            <h3>📝 Đăng Truyện Mới</h3>
-            <input type="text" id="chapTitle" placeholder="Tiêu đề chương (VD: Chương 1)">
+        <!-- MENU CHỌN CHỨC NĂNG -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('new')">📝 Đăng Mới</button>
+            <button class="tab-btn" onclick="switchTab('list')">📋 Quản Lý / Sửa</button>
+        </div>
 
-            <div class="file-drop" onclick="document.getElementById('txtInput').click()">
-                <input type="file" id="txtInput" accept=".txt" hidden onchange="handleTxt()">
-                📂 <b>Import File .TXT</b>
-            </div>
-
-            <div class="file-drop" onclick="document.getElementById('imgInput').click()">
-                <input type="file" id="imgInput" accept="image/*" hidden onchange="handleImg()">
-                🖼 <b>Upload Ảnh Minh Họa</b>
-            </div>
-            <p id="imgStatus" style="color: var(--primary); text-align: center; font-size: 0.9rem;"></p>
-
-            <textarea id="content" rows="15" placeholder="Nội dung truyện..."></textarea>
+        <!-- TAB 1: ĐĂNG MỚI / SOẠN THẢO -->
+        <div id="tab-editor" class="glass-box">
+            <h3 id="editor-title">📝 Soạn Thảo</h3>
+            <input type="hidden" id="edit-id" value=""> <!-- Lưu ID khi sửa -->
+            <input type="hidden" id="edit-file-sha" value=""> <!-- Lưu SHA file truyện -->
             
-            <button class="btn" onclick="publish()" style="width: 100%; margin-top: 20px;">🚀 ĐĂNG BÀI</button>
-            <div id="status" style="text-align: center; margin-top: 10px; font-weight: bold;"></div>
+            <input type="text" id="chapTitle" placeholder="Tiêu đề chương">
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div class="file-drop" style="flex: 1;" onclick="document.getElementById('txtInput').click()">
+                    📂 Import TXT
+                    <input type="file" id="txtInput" accept=".txt" hidden onchange="handleTxt()">
+                </div>
+                <div class="file-drop" style="flex: 1;" onclick="document.getElementById('imgInput').click()">
+                    🖼 Up Ảnh
+                    <input type="file" id="imgInput" accept="image/*" hidden onchange="handleImg()">
+                </div>
+            </div>
+            <p id="imgStatus" style="text-align: center; color: blue; font-size: 0.8rem;"></p>
+
+            <textarea id="content" rows="15" placeholder="Nội dung..."></textarea>
+            
+            <button id="publishBtn" class="btn" onclick="publish()" style="width: 100%; margin-top: 10px;">🚀 ĐĂNG BÀI</button>
+            <button id="cancelBtn" class="btn" onclick="resetForm()" style="width: 100%; margin-top: 10px; background: #7f8c8d; display: none;">Hủy Sửa</button>
+            <p id="status" style="text-align: center; font-weight: bold; margin-top: 10px;"></p>
+        </div>
+
+        <!-- TAB 2: DANH SÁCH CHƯƠNG -->
+        <div id="tab-list" class="glass-box" style="display: none;">
+            <h3>📋 Danh sách đã đăng</h3>
+            <button class="btn btn-outline" onclick="loadChapterList()" style="width: 100%; margin-bottom: 15px;">🔄 Làm mới danh sách</button>
+            <div id="chapter-container">Đang tải...</div>
         </div>
     </div>
 
-    <!-- SCRIPT XỬ LÝ -->
     <script src="config.js"></script>
     <script>
-        // ===========================================
-        // 🔐 MẬT KHẨU CỦA BRO (SỐ NÀO CŨNG ĐƯỢC)
-        const SECRET_PASS = "2006";
-        // ===========================================
+        // === 🔐 MẬT KHẨU ===
+        const PASS = "2006"; // Sửa mật khẩu ở đây
+        // ===================
 
-        // In hướng dẫn ra màn hình Console cho Bro nhớ
-        console.log("%c🛑 HỆ THỐNG ĐÃ KHÓA!", "color: red; font-size: 30px; font-weight: bold;");
-        console.log("%cMuốn truy cập? Hãy nhập lệnh: login('MẬT_KHẨU')", "color: yellow; font-size: 16px;");
+        // Logic mở khóa
+        let buffer = "";
+        document.addEventListener('keydown', (e) => {
+            if(e.key.length===1) {
+                buffer += e.key;
+                if(buffer.endsWith(PASS)) unlock();
+            }
+        });
 
-        // Hàm mở khóa (Gõ vào console mới chạy)
-        window.login = function(pass) {
-            if(pass === SECRET_PASS) {
-                console.clear();
-                console.log("%c✅ ĐÃ MỞ KHÓA! WELCOME BOSS.", "color: lime; font-size: 20px;");
-                
-                // Hiện giao diện
-                document.body.style.backgroundColor = "#f1f2f6"; // Trả lại màu nền web
-                document.body.style.backgroundImage = `url('${CONFIG.bgImage}')`;
-                document.body.style.overflow = "auto";
-                
-                const panel = document.getElementById('admin-panel');
-                panel.style.display = "block";
-                panel.classList.add('reveal');
+        function unlock() {
+            document.getElementById('lock-screen').style.display='none';
+            document.getElementById('admin-panel').style.display='block';
+            document.body.style.overflow='auto';
+            if(localStorage.getItem('gh_token')) document.getElementById('token').value = localStorage.getItem('gh_token');
+            if(typeof CONFIG !== 'undefined') document.body.style.backgroundImage = `url('${CONFIG.bgImage}')`;
+        }
 
-                // Load token cũ
-                if(localStorage.getItem('gh_token')) document.getElementById('token').value = localStorage.getItem('gh_token');
+        // Chuyển Tab
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if(tab === 'new') {
+                document.getElementById('tab-editor').style.display = 'block';
+                document.getElementById('tab-list').style.display = 'none';
+                document.querySelector('button[onclick="switchTab(\'new\')"]').classList.add('active');
             } else {
-                console.log("%c❌ SAI MẬT KHẨU!", "color: red; font-size: 20px;");
+                document.getElementById('tab-editor').style.display = 'none';
+                document.getElementById('tab-list').style.display = 'block';
+                document.querySelector('button[onclick="switchTab(\'list\')"]').classList.add('active');
+                loadChapterList();
             }
         }
 
-        // --- CÁC HÀM XỬ LÝ CŨ (GIỮ NGUYÊN) ---
-        function saveToken() { localStorage.setItem('gh_token', document.getElementById('token').value); }
-        
-        function handleTxt() {
-            const file = document.getElementById('txtInput').files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                let txt = e.target.result.replace(/\r\n/g, "\n").replace(/\n/g, "\n\n");
-                document.getElementById('content').value = txt;
-            }
-            reader.readAsText(file);
-        }
-
-        async function handleImg() {
-            const file = document.getElementById('imgInput').files[0];
-            if(!file) return;
-            const token = document.getElementById('token').value;
-            if(!token) return alert("Cần Token!");
-
-            document.getElementById('imgStatus').innerText = "⏳ Đang upload...";
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async function() {
-                try {
-                    const b64 = reader.result.split(',')[1];
-                    const name = `images/${Date.now()}_${file.name}`;
-                    await githubReq(name, b64, "Img", token);
-                    const url = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${name}`;
-                    const ta = document.getElementById('content');
-                    ta.value = `![Img](${url})\n` + ta.value;
-                    document.getElementById('imgStatus').innerText = "✅ Xong!";
-                } catch(e) { alert(e); }
-            }
-        }
-
-        async function publish() {
-            const token = document.getElementById('token').value;
-            const title = document.getElementById('chapTitle').value;
-            const content = document.getElementById('content').value;
-            const status = document.getElementById('status');
-            
-            if(!token || !title || !content) return alert("Thiếu thông tin!");
-            status.innerText = "⏳ Đang xử lý..."; status.style.color = "blue";
+        // Load danh sách chương để sửa
+        async function loadChapterList() {
+            const t = document.getElementById('token').value;
+            if(!t) return alert("Chưa nhập Token!");
+            const container = document.getElementById('chapter-container');
             
             try {
-                const id = `chap_${Date.now()}`;
-                const path = `chapters/${id}.md`;
-                const b64 = btoa(unescape(encodeURIComponent(content)));
-                await githubReq(path, b64, `New: ${title}`, token);
-
-                const jsonUrl = `https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`;
-                const getRes = await fetch(jsonUrl, {headers: {'Authorization': `token ${token}`}});
-                let list = [], sha = null;
-                if(getRes.ok) {
-                    const d = await getRes.json();
-                    sha = d.sha;
-                    list = JSON.parse(decodeURIComponent(escape(atob(d.content))));
-                }
-                list.push({id: id, title: title, file: path});
-                const jsonB64 = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
-                await githubReq("data.json", jsonB64, "Update List", token, sha);
+                const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`);
+                const data = await res.json();
+                const chapters = JSON.parse(decodeURIComponent(escape(atob(data.content))));
                 
-                status.innerText = "🎉 THÀNH CÔNG!"; status.style.color = "green";
-                document.getElementById('content').value = '';
-                document.getElementById('chapTitle').value = '';
-            } catch(e) { status.innerText = "❌ Lỗi: " + e; status.style.color = "red"; }
+                container.innerHTML = '';
+                chapters.forEach((chap, index) => {
+                    container.innerHTML += `
+                        <div class="chapter-row">
+                            <div><b>#${index+1}:</b> ${chap.title}</div>
+                            <button class="edit-btn" onclick="startEdit(${index})">✏️ Sửa</button>
+                        </div>
+                    `;
+                });
+                // Lưu SHA của data.json để dùng khi update
+                window.jsonSha = data.sha; 
+                window.chapterData = chapters;
+            } catch(e) { container.innerHTML = "Lỗi tải danh sách: " + e; }
         }
 
-        async function githubReq(path, content, msg, token, sha=null) {
-            const body = { message: msg, content: content };
-            if(sha) body.sha = sha;
-            const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {
-                method: 'PUT',
-                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            if(!res.ok) throw new Error((await res.json()).message);
+        // Bắt đầu sửa chương
+        async function startEdit(index) {
+            const chap = window.chapterData[index];
+            const t = document.getElementById('token').value;
+            
+            document.getElementById('status').innerText = "⏳ Đang tải nội dung chương...";
+            switchTab('new'); // Quay về tab soạn thảo
+            
+            try {
+                // Lấy nội dung file .md
+                const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${chap.file}?t=${Date.now()}`);
+                const data = await res.json();
+                const content = decodeURIComponent(escape(atob(data.content)));
+                
+                // Điền dữ liệu vào form
+                document.getElementById('chapTitle').value = chap.title;
+                document.getElementById('content').value = content;
+                document.getElementById('edit-id').value = index; // Lưu index để biết đang sửa
+                document.getElementById('edit-file-sha').value = data.sha; // Lưu SHA file md
+                
+                // Đổi giao diện sang chế độ Sửa
+                document.getElementById('editor-title').innerText = "✏️ Đang Sửa: " + chap.title;
+                document.getElementById('publishBtn').innerText = "💾 CẬP NHẬT CHƯƠNG";
+                document.getElementById('publishBtn').style.background = "#f39c12";
+                document.getElementById('cancelBtn').style.display = "block";
+                document.getElementById('status').innerText = "";
+            } catch(e) { alert("Lỗi tải nội dung: " + e); }
+        }
+
+        function resetForm() {
+            document.getElementById('chapTitle').value = '';
+            document.getElementById('content').value = '';
+            document.getElementById('edit-id').value = '';
+            document.getElementById('edit-file-sha').value = '';
+            document.getElementById('editor-title').innerText = "📝 Soạn Thảo";
+            document.getElementById('publishBtn').innerText = "🚀 ĐĂNG BÀI";
+            document.getElementById('publishBtn').style.background = "var(--primary)";
+            document.getElementById('cancelBtn').style.display = "none";
+        }
+
+        // Logic Đăng / Cập nhật
+        async function publish() {
+            const t = document.getElementById('token').value;
+            const title = document.getElementById('chapTitle').value;
+            const content = document.getElementById('content').value;
+            const editIndex = document.getElementById('edit-id').value;
+            const status = document.getElementById('status');
+
+            if(!t || !title || !content) return alert("Thiếu thông tin!");
+            status.innerText = "⏳ Đang xử lý...";
+
+            try {
+                // 1. Lấy danh sách mới nhất (để lấy SHA mới nhất của data.json)
+                const jsonRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {headers:{Authorization:`token ${t}`}});
+                const jsonData = await jsonRes.json();
+                let list = JSON.parse(decodeURIComponent(escape(atob(jsonData.content))));
+                let jsonSha = jsonData.sha;
+
+                // XÁC ĐỊNH: ĐĂNG MỚI HAY CẬP NHẬT?
+                let filePath, fileSha = null;
+                
+                if (editIndex !== "") {
+                    // --- CHẾ ĐỘ SỬA ---
+                    const idx = parseInt(editIndex);
+                    filePath = list[idx].file;
+                    fileSha = document.getElementById('edit-file-sha').value; // SHA của file md cũ
+                    
+                    // Cập nhật thông tin trong list
+                    list[idx].title = title;
+                } else {
+                    // --- CHẾ ĐỘ ĐĂNG MỚI ---
+                    const id = `chap_${Date.now()}`;
+                    filePath = `chapters/${id}.md`;
+                    list.push({ id: id, title: title, file: filePath });
+                }
+
+                // 2. Upload/Update file .md
+                const b64 = btoa(unescape(encodeURIComponent(content)));
+                const bodyMd = { message: `Update ${title}`, content: b64 };
+                if (fileSha) bodyMd.sha = fileSha; // Nếu sửa thì phải gửi kèm SHA cũ
+
+                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${filePath}`, {
+                    method: 'PUT', headers: {Authorization: `token ${t}`}, body: JSON.stringify(bodyMd)
+                });
+
+                // 3. Update data.json
+                const jsonB64 = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
+                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
+                    method: 'PUT', headers: {Authorization: `token ${t}`},
+                    body: JSON.stringify({ message: "Update list", content: jsonB64, sha: jsonSha })
+                });
+
+                status.innerText = "🎉 THÀNH CÔNG!";
+                setTimeout(() => {
+                    status.innerText = "";
+                    if(editIndex !== "") switchTab('list'); // Sửa xong thì về danh sách
+                    resetForm();
+                }, 1500);
+
+            } catch(e) { status.innerText = "❌ Lỗi: " + e; console.error(e); }
+        }
+
+        // Giữ nguyên các hàm helper cũ
+        function saveToken() { localStorage.setItem('gh_token', document.getElementById('token').value); }
+        function handleTxt() {
+            const r = new FileReader();
+            r.onload = e => document.getElementById('content').value = e.target.result.replace(/\r\n/g,"\n").replace(/\n/g,"\n\n");
+            r.readAsText(document.getElementById('txtInput').files[0]);
+        }
+        async function handleImg() {
+            const f = document.getElementById('imgInput').files[0];
+            if(!f) return; const t = document.getElementById('token').value;
+            document.getElementById('imgStatus').innerText = "Uploading...";
+            const r = new FileReader(); r.readAsDataURL(f);
+            r.onload = async function() {
+                try {
+                    const b64 = r.result.split(',')[1];
+                    const n = `images/${Date.now()}_${f.name}`;
+                    await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${n}`, {
+                        method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify({message:"img",content:b64})
+                    });
+                    const url = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${n}`;
+                    const ta = document.getElementById('content');
+                    ta.value = `![Img](${url})\n` + ta.value;
+                    document.getElementById('imgStatus').innerText = "✅ Done";
+                } catch(e) { alert(e); }
+            }
         }
     </script>
 </body>
