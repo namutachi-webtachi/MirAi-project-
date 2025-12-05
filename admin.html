@@ -2,93 +2,129 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>MirAi Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống bí mật</title>
     <link rel="stylesheet" href="css/style.css">
-    <style> .status { margin-top: 10px; font-weight: bold; text-align: center; } </style>
+    <style>
+        /* CSS cho màn hình khóa */
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #2d3436; z-index: 99999;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+        #app-content { display: none; } /* Ẩn nội dung chính */
+        .login-box {
+            background: white; padding: 30px; border-radius: 10px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .login-input { padding: 10px; font-size: 1.2rem; width: 200px; text-align: center; letter-spacing: 5px; }
+    </style>
 </head>
 <body>
-    <div class="container">
+
+    <!-- 🔒 LỚP 1: MÀN HÌNH ĐĂNG NHẬP -->
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2 style="margin: 0 0 20px 0; color: #333;">🔒 KHU VỰC CẤM</h2>
+            <p>Nhập mã PIN để truy cập:</p>
+            <input type="password" id="pinCode" class="login-input" placeholder="****" onkeyup="checkPin(event)">
+            <p id="login-msg" style="color: red; margin-top: 10px;"></p>
+        </div>
+    </div>
+
+    <!-- 🔓 LỚP 2: NỘI DUNG ADMIN (Chỉ hiện khi nhập đúng pass) -->
+    <div id="app-content" class="container">
         <header class="glass-box" style="text-align: center;">
-            <h2>🛠 Đăng Truyện Tự Động</h2>
-            <a href="index.html" class="btn btn-outline">⬅ Về Web</a>
+            <h2>🛠 MirAi Admin Center</h2>
+            <a href="index.html" class="btn btn-outline">⬅ Về Web Chính</a>
         </header>
 
         <div class="glass-box">
-            <h3>🔑 Cấu hình Token</h3>
-            <input type="password" id="token" placeholder="Dán GitHub Token của cậu vào đây (ghp_...)" onchange="saveToken()">
-            <p style="font-size: 0.8rem; color: #666;">*Token được lưu vào trình duyệt của cậu, an toàn tuyệt đối.</p>
+            <h3>🔑 Token GitHub</h3>
+            <input type="password" id="token" placeholder="Dán Token vào đây (được lưu trong máy cậu)..." onchange="saveToken()">
         </div>
 
         <div class="glass-box">
-            <h3>📝 Soạn thảo</h3>
+            <h3>📝 Soạn thảo & Đăng bài</h3>
             
-            <label>Tiêu đề chương:</label>
-            <input type="text" id="chapTitle" placeholder="VD: Chương 10: Cao trào">
+            <input type="text" id="chapTitle" placeholder="Tiêu đề chương (VD: Chương 5)">
 
             <div class="file-drop" onclick="document.getElementById('txtInput').click()">
                 <input type="file" id="txtInput" accept=".txt" hidden onchange="handleTxt()">
-                📂 <b>Bấm để chọn file .TXT</b> (Tool sẽ tự copy vào khung soạn thảo)
+                📂 <b>Import file .TXT</b>
             </div>
 
             <div class="file-drop" onclick="document.getElementById('imgInput').click()">
                 <input type="file" id="imgInput" accept="image/*" hidden onchange="handleImg()">
-                🖼 <b>Bấm để chọn Ảnh minh họa</b> (Tự upload và chèn link)
+                🖼 <b>Upload Ảnh Minh Họa</b>
             </div>
-            <p id="imgStatus" style="text-align: center; font-size: 0.9rem; color: var(--primary);"></p>
+            <p id="imgStatus" style="color: var(--primary); text-align: center;"></p>
 
-            <textarea id="content" rows="15" placeholder="Nội dung truyện (Markdown)..."></textarea>
+            <textarea id="content" rows="15" placeholder="Nội dung..."></textarea>
             
-            <button class="btn" onclick="publish()" style="width: 100%; justify-content: center; font-size: 1.2rem;">🚀 ĐĂNG NGAY</button>
+            <button class="btn" onclick="publish()" style="width: 100%; justify-content: center; font-size: 1.2rem; margin-top: 10px;">🚀 ĐĂNG NGAY</button>
             <div id="status" class="status"></div>
         </div>
     </div>
 
     <script src="config.js"></script>
     <script>
-        // Token logic
+        // === 🔐 CẤU HÌNH MẬT KHẨU TẠI ĐÂY ===
+        const SECRET_PIN = "2006"; // <--- Đổi số này thành mật khẩu cậu muốn (VD: Năm sinh)
+        // =====================================
+
+        function checkPin(e) {
+            const input = document.getElementById('pinCode').value;
+            // Nếu nhập đủ độ dài pass thì kiểm tra
+            if (input === SECRET_PIN) {
+                document.getElementById('login-overlay').style.display = 'none'; // Ẩn màn hình khóa
+                document.getElementById('app-content').style.display = 'block';  // Hiện admin
+            } else if (input.length >= SECRET_PIN.length) {
+                document.getElementById('login-msg').innerText = "Sai mã PIN rồi cậu ơi!";
+                document.getElementById('pinCode').value = '';
+            }
+        }
+
+        // --- Code cũ bên dưới giữ nguyên ---
         if(localStorage.getItem('gh_token')) document.getElementById('token').value = localStorage.getItem('gh_token');
         function saveToken() { localStorage.setItem('gh_token', document.getElementById('token').value); }
 
-        // Xử lý file TXT
         function handleTxt() {
             const file = document.getElementById('txtInput').files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 let text = e.target.result;
-                // Tự động định dạng lại đoạn văn cho chuẩn Markdown
                 text = text.replace(/\r\n/g, "\n").replace(/\n/g, "\n\n");
                 document.getElementById('content').value = text;
             };
             reader.readAsText(file);
         }
 
-        // Xử lý Upload Ảnh
         async function handleImg() {
             const file = document.getElementById('imgInput').files[0];
             if(!file) return;
             const token = document.getElementById('token').value;
-            if(!token) return alert("Cần Token để up ảnh!");
+            if(!token) return alert("Chưa nhập Token!");
 
-            document.getElementById('imgStatus').innerText = "⏳ Đang upload ảnh...";
+            document.getElementById('imgStatus').innerText = "⏳ Đang upload...";
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = async function() {
                 try {
                     const base64 = reader.result.split(',')[1];
                     const fileName = `images/${Date.now()}_${file.name}`;
-                    await githubReq(fileName, base64, "Up ảnh minh họa", token);
+                    await githubReq(fileName, base64, "Up ảnh", token);
                     
                     const imgUrl = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${fileName}`;
                     const mdTag = `\n![Minh họa](${imgUrl})\n`;
-                    
                     const txtArea = document.getElementById('content');
                     txtArea.value = mdTag + txtArea.value;
-                    document.getElementById('imgStatus').innerText = "✅ Đã chèn ảnh vào bài viết!";
-                } catch(e) { alert("Lỗi up ảnh: " + e); }
+                    document.getElementById('imgStatus').innerText = "✅ Xong!";
+                } catch(e) { alert("Lỗi: " + e); }
             }
         }
 
-        // Đăng bài
         async function publish() {
             const token = document.getElementById('token').value;
             const title = document.getElementById('chapTitle').value;
@@ -101,13 +137,11 @@
             status.style.color = "blue";
 
             try {
-                // 1. Up file chương
                 const fileId = `chap_${Date.now()}`;
                 const filePath = `chapters/${fileId}.md`;
                 const contentB64 = btoa(unescape(encodeURIComponent(content)));
-                await githubReq(filePath, contentB64, `New chap: ${title}`, token);
+                await githubReq(filePath, contentB64, `New: ${title}`, token);
 
-                // 2. Lấy data.json cũ
                 const jsonUrl = `https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`;
                 const getRes = await fetch(jsonUrl, { headers: {Authorization: `token ${token}`} });
                 let list = [], sha = null;
@@ -118,18 +152,15 @@
                     list = JSON.parse(decodeURIComponent(escape(atob(data.content))));
                 }
 
-                // 3. Cập nhật list
                 list.push({ id: fileId, title: title, file: filePath });
                 const jsonB64 = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
-                await githubReq("data.json", jsonB64, "Update list", token, sha);
+                await githubReq("data.json", jsonB64, "Update List", token, sha);
 
-                status.innerText = "🎉 THÀNH CÔNG! Đợi 1 phút rồi F5 trang chủ.";
+                status.innerText = "🎉 THÀNH CÔNG!";
                 status.style.color = "green";
                 document.getElementById('content').value = '';
                 document.getElementById('chapTitle').value = '';
-
             } catch(e) {
-                console.error(e);
                 status.innerText = "❌ Lỗi: " + e.message;
                 status.style.color = "red";
             }
