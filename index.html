@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MirAi Project</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="loading">Loading...</div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="glass-box" style="text-align: center;">
+            <h1 id="web-name">MirAi Project</h1>
+            <p class="tagline" id="sub-title">Thư viện Novel cá nhân</p>
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="toggleTheme()">🌙 Giao diện</button>
+                <a href="admin.html" class="btn btn-outline">🛠 Admin</a>
+            </div>
+        </div>
+
+        <!-- Search & List -->
+        <div class="glass-box">
+            <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm kiếm tên chương...">
+            <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 20px 0;">
+            <h3>📖 Mục lục</h3>
+            <div id="chapter-list" class="chapter-list"></div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+        document.getElementById('web-name').innerText = CONFIG.webName;
+        document.getElementById('sub-title').innerText = CONFIG.subTitle;
+    </script>
+</body>
+</html>
