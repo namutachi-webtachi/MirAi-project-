@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Merriweather:wght@300;400;700&display=swap');
+
+:root {
+    --primary: #ff6b81;
+    --accent: #a29bfe;
+    --glass: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --text: #2d3436;
+    --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+[data-theme="dark"] {
+    --primary: #ff4757;
+    --accent: #70a1ff;
+    --glass: rgba(30, 30, 30, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text: #dfe4ea;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    color: var(--text);
+    background: #f1f2f6; /* Fallback */
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    margin: 0; min-height: 100vh;
+    transition: 0.3s;
+}
+
+/* Scrollbar đẹp */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+.container { max-width: 900px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+
+/* Hiệu ứng kính */
+.glass-box {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: var(--shadow);
+    animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Header & Title */
+h1 { 
+    background: linear-gradient(to right, var(--primary), var(--accent)); 
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+    font-size: 2.5rem; margin: 0; text-align: center;
+}
+.tagline { text-align: center; font-style: italic; opacity: 0.8; margin-bottom: 20px; }
+
+/* Nút bấm xịn */
+.btn {
+    padding: 10px 20px; border: none; border-radius: 50px;
+    background: linear-gradient(45deg, var(--primary), var(--accent));
+    color: white; font-weight: bold; cursor: pointer;
+    transition: 0.3s; display: inline-flex; align-items: center; gap: 5px;
+    text-decoration: none; font-size: 0.9rem;
+}
+.btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 107, 129, 0.4); }
+.btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+
+/* Input Search & Form */
+.search-box { width: 100%; padding: 12px 20px; border-radius: 30px; border: 2px solid rgba(0,0,0,0.1); outline: none; transition: 0.3s; }
+.search-box:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(255, 107, 129, 0.2); }
+
+/* Danh sách chương */
+.chapter-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+.chap-card {
+    background: rgba(255,255,255,0.5); padding: 15px; border-radius: 12px;
+    text-decoration: none; color: var(--text); font-weight: 600;
+    transition: 0.3s; border-left: 4px solid transparent; display: block;
+}
+[data-theme="dark"] .chap-card { background: rgba(0,0,0,0.3); }
+.chap-card:hover { background: white; border-left-color: var(--primary); transform: translateX(5px); color: var(--primary); }
+
+/* Trang đọc */
+.reader-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+#content-area { font-family: 'Merriweather', serif; font-size: 1.2rem; line-height: 1.8; text-align: justify; }
+#content-area img { max-width: 100%; border-radius: 10px; display: block; margin: 15px auto; box-shadow: var(--shadow); }
+
+/* Settings Menu (Popup) */
+.settings-panel {
+    display: none; background: var(--glass); padding: 15px; border-radius: 10px;
+    position: absolute; top: 60px; right: 20px; box-shadow: var(--shadow); z-index: 100;
+}
+.settings-panel.active { display: block; }
+
+/* Admin Tool Styles */
+.file-drop { border: 2px dashed #aaa; padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
+.file-drop:hover { border-color: var(--primary); background: rgba(255, 107, 129, 0.1); }
+input, textarea { width: 100%; box-sizing: border-box; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; }
+
+/* Loading Overlay */
+#loading {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--glass); z-index: 9999;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 1.5rem; font-weight: bold; color: var(--primary);
+    backdrop-filter: blur(20px);
+}
