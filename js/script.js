@@ -40,6 +40,33 @@ async function initIndex() {
 
     render(chapters);
     hideLoading();
+    
+    // MỚI: Gọi hàm load bookmark
+    loadBookmark(chapters);
+
+    const render = (items) => {
+        listEl.innerHTML = '';
+        if(items.length === 0) { listEl.innerHTML = '<p style="text-align:center">Chưa có chương nào.</p>'; return;}
+        
+        items.forEach((chap) => {
+            const originalIndex = chapters.findIndex(c => c.id === chap.id);
+            listEl.innerHTML += `
+                <a href="reader.html?id=${originalIndex}" class="chap-card">
+                    <div style="font-size:0.8em; opacity:0.7">${chap.title}</div>
+                </a>
+            `;
+        });
+    };
+
+    render(chapters);
+    hideLoading();
+
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = chapters.filter(c => c.title.toLowerCase().includes(term));
+        render(filtered);
+    });
+}
 
     // Tính năng tìm kiếm
     searchInput.addEventListener('input', (e) => {
@@ -93,6 +120,44 @@ async function initReader() {
 
     // Apply cài đặt người dùng
     applyUserSetting();
+}
+// MỚI: LƯU BOOKMARK KHI VÀO CHƯƠNG
+    localStorage.setItem('mirai_bookmark', id);
+
+    const chap = chapters[id];
+    document.title = `${chap.title} - ${CONFIG.webName}`;
+    document.getElementById('chap-title').innerText = chap.title;
+
+    try {
+        const mdRes = await fetch(chap.file + `?t=${Date.now()}`);
+        const mdText = await mdRes.text();
+        document.getElementById('content-area').innerHTML = marked.parse(mdText);
+    } catch {
+        document.getElementById('content-area').innerText = "Lỗi tải nội dung.";
+    }
+
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    prevBtn.onclick = () => window.location.href = `reader.html?id=${id - 1}`;
+    nextBtn.onclick = () => window.location.href = `reader.html?id=${id + 1}`;
+    if (id === 0) prevBtn.style.display = 'none';
+    if (id === chapters.length - 1) nextBtn.style.display = 'none';
+
+    loadGiscus();
+    hideLoading();
+    applyUserSetting();
+}
+
+// === MỚI: HÀM XỬ LÝ BOOKMARK ===
+function loadBookmark(chapters) {
+    const bookmarkId = localStorage.getItem('mirai_bookmark');
+    if (bookmarkId !== null && chapters[bookmarkId]) {
+        const link = document.getElementById('bookmark-link');
+        const chap = chapters[bookmarkId];
+        link.style.display = 'inline-flex';
+        link.href = `reader.html?id=${bookmarkId}`;
+        link.innerHTML = `📖 Đọc tiếp: ${chap.title}`;
+    }
 }
 
 // === GISCUS LOADER ===
