@@ -26,3 +26,19 @@ const CONFIG = {
     // 5. Nhạc mặc định
     defaultMusic: "images/music.mp3" 
 };
+// === CHỐNG COPY WEB (ANTI-FORK PROTECTION) ===
+(function() {
+    const myDomain = "namutachi-webtachi.github.io"; // <--- Tên miền chính chủ của bro
+    const currentDomain = window.location.hostname;
+
+    // Cho phép chạy trên localhost để bro test, còn lại phải đúng domain chính
+    if (currentDomain !== myDomain && currentDomain !== "127.0.0.1" && currentDomain !== "localhost") {
+        
+        // Cách 1: Hiện cảnh báo "Ăn cắp"
+        alert("⚠️ CẢNH BÁO: Đây là trang web mạo danh!");
+        alert("Bạn đang truy cập vào bản sao chép trái phép. Hệ thống sẽ đưa bạn về trang chính chủ của NamuTachi.");
+        
+        // Cách 2: Chuyển hướng ngay lập tức về nhà
+        window.location.href = `https://${myDomain}/MirAi-project-/`; 
+    }
+})();
