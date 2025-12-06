@@ -348,3 +348,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         initReaderPage();
     }
 });
+// =================================================================
+// 8. HỆ THỐNG BẢO VỆ BẢN QUYỀN (ANTI-COPY SYSTEM)
+// =================================================================
+
+(function() {
+    // Không chặn ở trang Admin để Boss còn làm việc
+    if (window.location.href.includes("admin.html")) return;
+
+    // 1. Chặn menu chuột phải (Right Click)
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        // alert("© Bản quyền thuộc về NamuTachi. Vui lòng không sao chép!"); // Bỏ comment nếu muốn hiện thông báo
+    });
+
+    // 2. Chặn phím tắt Copy/Cut/View Source (Ctrl+C, Ctrl+X, Ctrl+U, F12...)
+    document.addEventListener('keydown', function(e) {
+        // Chặn Ctrl+C, Ctrl+X, Ctrl+U, Ctrl+S, Ctrl+P
+        if (e.ctrlKey && (e.key === 'c' || e.key === 'x' || e.key === 'u' || e.key === 's' || e.key === 'p')) {
+            e.preventDefault();
+            // alert("Nội dung được bảo vệ!");
+        }
+        // Chặn F12 (Developer Tools) - Tùy chọn, nếu bro muốn chặn soi code gắt hơn
+        // if (e.key === 'F12') { e.preventDefault(); } 
+    });
+
+    // 3. Chặn bôi đen văn bản (CSS Injection)
+    const style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            -webkit-user-select: none; /* Chrome/Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+ */
+            user-select: none; /* Chuẩn chung */
+        }
+        /* Cho phép bôi đen ở các ô nhập liệu (nếu có) */
+        input, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+    `;
+    document.head.appendChild(style);
+})();
