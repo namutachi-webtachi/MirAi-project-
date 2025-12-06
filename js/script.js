@@ -132,49 +132,100 @@ function initReadingProgress() {
         bar.style.width = `${progress}%`;
     });
 }
+// 4. MUSIC PLAYER (JSON EDITION)
+let playlist = [];
+let currentTrackIdx = parseInt(localStorage.getItem('bgm_track_idx')) || 0;
+const bgm = new Audio();
+bgm.loop = false;
+let isBGMPlaying = false;
 
-// 7. TRÌNH PHÁT NHẠC (BGM)
-const bgm = new Audio('https://www.mboxdrive.com/lofi-study-112191.mp3');
-bgm.loop = true;
-let isBGMInitialized = false;
+// Hàm khởi tạo nhạc (gọi ngay khi load trang)
+async function initMusic() {
+    try {
+        const res = await fetch(`music.json?t=${Date.now()}`);
+        if(res.ok) playlist = await res.json();
+    } catch(e) { console.error("Lỗi load nhạc:", e); }
 
-function updateBGMUI(isPlaying) {
+    // Fallback nếu không có nhạc nào
+    if (playlist.length === 0) {
+        // Nếu có config cũ thì dùng, không thì dùng bài mặc định
+        if(typeof CONFIG!=='undefined' && CONFIG.musicList) playlist = CONFIG.musicList;
+        else playlist = [{title: "Lofi Default", url: "images/music.mp3"}];
+    }
+    
+    // Đảm bảo index hợp lệ
+    if (currentTrackIdx >= playlist.length) currentTrackIdx = 0;
+}
+
+// ... (Các hàm loadTrack, updatePlayerUI, toggleBGM, nextSong giữ nguyên như cũ) ...
+// CHỈ SỬA LẠI ĐOẠN KHỞI CHẠY CUỐI CÙNG:
+
+function loadTrack(index) {
+    if (index >= playlist.length) index = 0;
+    currentTrackIdx = index;
+    bgm.src = playlist[index].url;
+    localStorage.setItem('bgm_track_idx', index);
+}
+
+bgm.addEventListener('ended', nextSong);
+
+function updatePlayerUI() {
     const icon = document.getElementById('bgm-icon');
-    const controls = document.getElementById('bgm-controls');
-    if (isPlaying) {
-        icon.classList.add('playing');
-        controls.innerHTML = '⏸️';
-    } else {
-        icon.classList.remove('playing');
-        controls.innerHTML = '▶️';
+    const btn = document.getElementById('bgm-btn');
+    if(!icon) return;
+    if(isBGMPlaying) { icon.classList.add('playing'); btn.innerHTML = '⏸️'; } 
+    else { icon.classList.remove('playing'); btn.innerHTML = '▶️'; }
+}
+
+function showSongToast() {
+    const toast = document.getElementById('song-toast');
+    if(toast && playlist[currentTrackIdx]) {
+        toast.innerText = `🎵 ${playlist[currentTrackIdx].title}`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 }
 
 function toggleBGM() {
-    if (!isBGMInitialized) {
-        bgm.load();
-        isBGMInitialized = true;
-    }
+    if (!bgm.src) loadTrack(currentTrackIdx);
     if (bgm.paused) {
         bgm.play().then(() => {
-            updateBGMUI(true);
+            isBGMPlaying = true; updatePlayerUI();
             localStorage.setItem('bgm_status', 'on');
-        }).catch(e => console.error("Lỗi phát nhạc:", e));
+            if(bgm.currentTime < 1) showSongToast();
+        }).catch(e => console.error(e));
     } else {
-        bgm.pause();
-        updateBGMUI(false);
+        bgm.pause(); isBGMPlaying = false; updatePlayerUI();
         localStorage.setItem('bgm_status', 'off');
     }
 }
 
-// Lách luật: Chờ click đầu tiên để bật nhạc nếu đã lưu trạng thái 'on'
+function nextSong() {
+    currentTrackIdx++;
+    if (currentTrackIdx >= playlist.length) currentTrackIdx = 0;
+    loadTrack(currentTrackIdx);
+    if (localStorage.getItem('bgm_status') === 'on') {
+        bgm.play(); isBGMPlaying = true; updatePlayerUI(); showSongToast();
+    }
+}
+
+// Auto play logic
 if (localStorage.getItem('bgm_status') === 'on') {
     document.body.addEventListener('click', () => {
         if (bgm.paused && localStorage.getItem('bgm_status') === 'on') {
-            toggleBGM();
+            if(!bgm.src) loadTrack(currentTrackIdx);
+            bgm.play().then(() => { isBGMPlaying = true; updatePlayerUI(); });
         }
     }, { once: true });
 }
+
+// THÊM DÒNG NÀY VÀO CUỐI FILE (Trong DOMContentLoaded):
+document.addEventListener('DOMContentLoaded', async () => {
+    await initMusic(); // <--- CHỜ TẢI LIST NHẠC XONG
+    applyUserSettings();
+    if(document.getElementById('chapter-list')) initIndexPage();
+    else if(document.getElementById('content-area')) initReaderPage();
+});
 
 // 8. HACKER MODE (KONAMI CODE)
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
