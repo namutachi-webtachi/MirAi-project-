@@ -23,3 +23,6 @@ const CONFIG = {
     // 4. Ảnh nền (Có thể thay link ảnh anime khác)
     bgImage: "https://i.pinimg.com/1200x/b0/8f/59/b08f5925aeb1141b7cf18ea63f3185ae.jpg"
 };
+    // Nhạc mặc định (khi chưa có music.json)
+    defaultMusic: "images/music.mp3" 
+};
