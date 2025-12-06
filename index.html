@@ -14,13 +14,18 @@
         <div class="glass-box" style="text-align: center;">
             <h1 id="web-name">MirAi Project</h1>
             <p class="tagline" id="sub-title">Thư viện Novel cá nhân</p>
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
                 <button class="btn" onclick="toggleTheme()">🌙 Giao diện</button>
-                <a href="admin.html" class="btn btn-outline">🛠 Admin</a>
-            </div>
-        </div>
+                <!-- MỚI: NÚT BOOKMARK (SẼ ẨN NẾU CHƯA ĐỌC) -->
+        <a href="#" id="bookmark-link" class="btn" style="background: #27ae60; display: none;">
+            📖 Đọc tiếp
+        </a>
 
-        <!-- Search & List -->
+        <a href="admin.html" class="btn btn-outline" style="border-color: red; color: red;">⛔ Admin</a>
+    </div>
+</div>
+
+       <!-- Search & List -->
         <div class="glass-box">
             <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm kiếm tên chương...">
             <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 20px 0;">
