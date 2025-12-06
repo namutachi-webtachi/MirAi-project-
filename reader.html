@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff6b81">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đọc truyện</title>
@@ -45,6 +48,18 @@
             <div id="comments"></div>
         </div>
     </div>
+    <!-- PWA Service Worker Register -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/MirAi-project-/sw.js').then(registration => {
+                console.log('SW registered: ', registration);
+            }).catch(registrationError => {
+                console.log('SW registration failed: ', registrationError);
+            });
+        });
+    }
+</script>
 
     <script src="config.js"></script>
     <script src="js/script.js"></script>
@@ -68,7 +83,7 @@
         <span>👤 Người đọc: <span id="busuanzi_value_site_uv" style="font-weight: bold; color: var(--primary);">...</span></span>
     </div>
 
-    <p style="font-size: 0.8rem; opacity: 0.7;">&copy; 2024 MirAi Project - NamuTachi</p>
+    <p style="font-size: 0.8rem; opacity: 0.7;">&copy;  MirAi Project - NamuTachi</p>
 </footer>
 
 <!-- Script đếm view (Busuanzi) -->
