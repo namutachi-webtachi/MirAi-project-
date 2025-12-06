@@ -1,0 +1,21 @@
+{
+  "name": "MirAi Project",
+  "short_name": "MirAi",
+  "start_url": "/MirAi-project-/",
+  "display": "standalone",
+  "background_color": "#1e1e2e",
+  "theme_color": "#ff6b81",
+  "description": "NamuTachi muốn viết truyện ahihi",
+  "icons": [
+    {
+      "src": "images/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
