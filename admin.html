@@ -2,182 +2,493 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>404 Not Found</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title> <!-- Ngụy trang -->
     <link rel="stylesheet" href="css/style.css">
     <style>
+        /* CSS riêng cho Admin để đảm bảo hiển thị đúng */
         body { background-color: #000; margin: 0; overflow: hidden; font-family: monospace; }
-        #admin-panel { display: none; padding-bottom: 50px; background: #f4f4f4; min-height: 100vh; overflow-y: auto; }
-        .reveal { animation: fadeIn 1s forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; cursor: pointer; background: #ddd; border: none; border-radius: 5px; font-weight: bold; }
-        .tab-btn.active { background: var(--primary); color: white; }
-        .chapter-row { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px; margin-bottom: 8px; border-radius: 8px; }
-        .action-group { display: flex; gap: 5px; }
-        .btn-action { padding: 5px 12px; border-radius: 4px; cursor: pointer; border: none; color: white; font-weight: bold; }
-        .edit-btn { background: #f39c12; }
-        .del-btn { background: #e74c3c; }
+        
+        /* Màn hình khóa đen */
+        #black-screen {
+            height: 100vh; width: 100vw; 
+            display: flex; justify-content: center; align-items: center; 
+            color: #333; font-size: 1.2rem;
+        }
 
-        /* === CSS CHO KHUNG HƯỚNG DẪN (MỚI) === */
-        .guide-box { border: 1px dashed #ccc; border-radius: 8px; margin-bottom: 15px; background: #f9f9f9; }
-        .guide-header { padding: 12px; font-weight: bold; cursor: pointer; user-select: none; color: #34495e; }
-        .guide-header:hover { background: #f0f0f0; }
-        .guide-content { display: none; padding: 0 15px 15px 15px; border-top: 1px dashed #ccc; }
-        .guide-content ul { padding-left: 20px; margin: 10px 0 0 0; }
-        .guide-content li { margin-bottom: 8px; line-height: 1.5; }
-        code { background: #e0e0e0; padding: 2px 5px; border-radius: 4px; font-family: monospace; }
-        /* ========================================= */
+        /* Panel Admin */
+        #admin-panel { display: none; padding-bottom: 50px; background: #f4f4f4; min-height: 100vh; overflow-y: auto; }
+
+        /* Tabs Navigation */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { flex: 1; padding: 12px; cursor: pointer; background: #ddd; border: none; border-radius: 8px; font-weight: bold; transition: 0.3s; min-width: 120px; }
+        .tab-btn:hover { background: #ccc; }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+        /* Danh sách item */
+        .chapter-row { display: flex; justify-content: space-between; align-items: center; background: white; padding: 12px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .chapter-row:hover { border-color: var(--primary); transform: translateX(2px); transition: 0.2s; }
+        
+        /* Buttons Action */
+        .action-group { display: flex; gap: 5px; }
+        .btn-action { padding: 6px 12px; border-radius: 6px; cursor: pointer; border: none; color: white; font-weight: bold; font-size: 0.8rem; }
+        .edit-btn { background: #f39c12; } .edit-btn:hover { background: #d35400; }
+        .del-btn { background: #e74c3c; } .del-btn:hover { background: #c0392b; }
+
+        /* File Drop Zone */
+        .file-drop { border: 2px dashed #aaa; padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; margin-bottom: 15px; background: white; transition: 0.3s; font-weight: bold; color: #555; }
+        .file-drop:hover { border-color: var(--primary); background: rgba(255, 107, 129, 0.1); color: var(--primary); }
+        
+        /* Inputs & Textarea */
+        input[type="text"], input[type="password"], textarea {
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; font-family: inherit; font-size: 1rem; box-sizing: border-box;
+        }
+        textarea { resize: vertical; min-height: 300px; }
     </style>
 </head>
 <body>
-    <div id="black-screen" style="height: 100vh; width: 100vw;"></div>
 
+    <!-- 1. MÀN HÌNH KHÓA -->
+    <div id="black-screen">
+        <p>SYSTEM HALTED. PRESS F12 TO LOGIN.</p>
+    </div>
+
+    <!-- 2. GIAO DIỆN ADMIN CHÍNH -->
     <div id="admin-panel" class="container">
         <header class="glass-box" style="text-align: center; margin-top: 30px;">
             <h2 style="color: var(--primary);">☠️ GOD MODE ADMIN</h2>
-            <a href="index.html" class="btn btn-outline">⬅ Thoát</a>
+            <p style="color: #666; margin-bottom: 15px;">Trung tâm điều khiển tối thượng</p>
+            <a href="index.html" class="btn btn-outline">⬅ Quay về Web</a>
         </header>
 
+        <!-- TOKEN -->
         <div class="glass-box">
-            <h3>🔑 Token GitHub</h3>
-            <input type="password" id="token" placeholder="GitHub Token (ghp_...)" onchange="saveToken()">
+            <h3>🔑 GitHub Token</h3>
+            <input type="password" id="token" placeholder="Dán Token vào đây (ghp_...)" onchange="saveToken()">
+            <small style="color: #666;">Token được lưu trong trình duyệt của bạn.</small>
         </div>
 
+        <!-- THANH MENU (TABS) -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('new')">📝 Đăng Mới</button>
-            <button class="tab-btn" onclick="switchTab('list')">📋 Quản Lý (Sửa/Xóa)</button>
+            <button class="tab-btn active" onclick="switchTab('new')">📝 Đăng Truyện</button>
+            <button class="tab-btn" onclick="switchTab('list')">📋 Quản Lý Truyện</button>
+            <button class="tab-btn" onclick="switchTab('music')">🎵 Kho Nhạc (DJ)</button>
         </div>
 
+        <!-- TAB 1: SOẠN THẢO & ĐĂNG TRUYỆN -->
         <div id="tab-editor" class="glass-box">
-            <h3 id="editor-title">📝 Soạn Thảo</h3>
+            <h3 id="editor-title">📝 Soạn Thảo Chương Mới</h3>
+            
+            <!-- Các biến ẩn để lưu trạng thái sửa -->
             <input type="hidden" id="edit-index" value="">
             <input type="hidden" id="edit-file-sha" value="">
 
-            <input type="text" id="chapTitle" placeholder="Tiêu đề chương">
-            
-            <!-- === KHUNG HƯỚNG DẪN TÍCH HỢP (MỚI) === -->
-            <div class="guide-box">
-                <div class="guide-header" onclick="toggleGuide()">
-                    📚 Quy Tắc Soạn Thảo (Bấm để xem/ẩn)
-                </div>
-                <div class="guide-content" id="guide-content">
-                    <ul>
-                        <li><b>Lời thoại:</b> Bắt đầu bằng <code>[Tên]:</code> (Ví dụ: <code>[Minh]: Chào cậu</code>)</li>
-                        <li><b>Suy nghĩ / Âm thanh:</b> Đặt trong ngoặc đơn <code>(...)</code> (Ví dụ: <code>(Mình nên làm gì?)</code>)</li>
-                        <li><b>Ngắt cảnh:</b> Dùng 3 dấu sao <code>***</code> trên một dòng riêng.</li>
-                    </ul>
-                </div>
-            </div>
-            <!-- ========================================= -->
+            <label>Tiêu đề:</label>
+            <input type="text" id="chapTitle" placeholder="Ví dụ: Chương 1: Khởi đầu">
             
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <div class="file-drop" style="flex: 1;" onclick="document.getElementById('txtInput').click()">📂 Import TXT</div>
-                <div class="file-drop" style="flex: 1;" onclick="document.getElementById('imgInput').click()">🖼 Up Ảnh</div>
-                <input type="file" id="txtInput" accept=".txt" hidden onchange="handleTxt()">
-                <input type="file" id="imgInput" accept="image/*" hidden onchange="handleImg()">
+                <div class="file-drop" style="flex: 1;" onclick="document.getElementById('txtInput').click()">
+                    📂 Import File TXT
+                    <input type="file" id="txtInput" accept=".txt" hidden onchange="handleTxt()">
+                </div>
+                <div class="file-drop" style="flex: 1;" onclick="document.getElementById('imgInput').click()">
+                    🖼 Upload Ảnh
+                    <input type="file" id="imgInput" accept="image/*" hidden onchange="handleImg()">
+                </div>
             </div>
-            <p id="imgStatus" style="text-align: center; color: blue; font-size: 0.8rem;"></p>
+            <p id="imgStatus" style="text-align: center; color: var(--primary); font-size: 0.9rem; font-weight: bold;"></p>
 
-            <button class="btn" onclick="autoFormat()" style="width: 100%; background: #2ecc71; margin-bottom: 10px;">✨ Tự Động Định Dạng</button>
-            <textarea id="content" rows="15" placeholder="Nội dung..."></textarea>
+            <button class="btn" onclick="autoFormat()" style="width: 100%; background: #2ecc71; margin-bottom: 15px;">✨ Tự Động Định Dạng (AI)</button>
             
-            <button id="publishBtn" class="btn" onclick="publish()" style="width: 100%; margin-top: 10px;">🚀 ĐĂNG BÀI</button>
-            <button id="cancelBtn" class="btn" onclick="resetForm()" style="width: 100%; margin-top: 10px; background: gray; display: none;">Hủy Sửa</button>
-            <p id="status" style="text-align: center; font-weight: bold; margin-top: 10px;"></p>
+            <textarea id="content" placeholder="Nội dung truyện (Markdown)..."></textarea>
+            
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button id="publishBtn" class="btn" onclick="publish()" style="flex: 1;">🚀 ĐĂNG BÀI NGAY</button>
+                <button id="cancelBtn" class="btn" onclick="resetForm()" style="background: #95a5a6; display: none;">Hủy Sửa</button>
+            </div>
+            <p id="status" style="text-align: center; font-weight: bold; margin-top: 15px; font-size: 1.1rem;"></p>
         </div>
 
+        <!-- TAB 2: DANH SÁCH & QUẢN LÝ TRUYỆN -->
         <div id="tab-list" class="glass-box" style="display: none;">
-            <h3>📋 Danh sách chương</h3>
-            <button class="btn btn-outline" onclick="loadList()" style="width: 100%; margin-bottom: 15px;">🔄 Làm mới</button>
-            <div id="list-container">Đang tải...</div>
+            <h3>📋 Danh sách chương đã đăng</h3>
+            <button class="btn btn-outline" onclick="loadList()" style="width: 100%; margin-bottom: 15px;">🔄 Làm mới danh sách</button>
+            <div id="list-container">Đang tải dữ liệu...</div>
+        </div>
+
+        <!-- TAB 3: QUẢN LÝ NHẠC (MUSIC STATION) -->
+        <div id="tab-music" class="glass-box" style="display: none;">
+            <h3>🎵 Upload Nhạc Mới</h3>
+            
+            <label>Tên bài hát:</label>
+            <input type="text" id="songTitle" placeholder="Ví dụ: Lofi Chill Morning">
+            
+            <div class="file-drop" onclick="document.getElementById('mp3Input').click()">
+                💿 Chọn file MP3 (từ máy tính)
+                <input type="file" id="mp3Input" accept=".mp3" hidden>
+            </div>
+            
+            <button class="btn" onclick="uploadSong()" style="width: 100%;">⬆️ Upload vào Playlist</button>
+            <p id="musicStatus" style="text-align: center; font-weight: bold; margin-top: 15px; color: var(--primary);"></p>
+            
+            <hr style="margin: 30px 0; border: 0; border-top: 1px dashed #ccc;">
+            
+            <h3>🎼 Danh sách phát hiện tại</h3>
+            <button class="btn btn-outline" onclick="loadMusicList()" style="width: 100%; margin-bottom: 15px;">🔄 Làm mới Playlist</button>
+            <div id="music-list-container">Đang tải dữ liệu...</div>
         </div>
     </div>
 
+    <!-- SCRIPT XỬ LÝ (JS) -->
     <script src="config.js"></script>
     <script>
-        // === 🔐 MẬT KHẨU ===
-        const SECRET_PASS = "2006";
+        // ==========================================
+        // 🔐 MẬT KHẨU HACKER CỦA BRO
+        const SECRET_PASS = "2006"; 
+        // ==========================================
 
-        // === 🤖 HÀM "AI" ĐỊNH DẠNG ===
-        function autoFormat() {
-            const textArea = document.getElementById('content'); let text = textArea.value;
-            text = text.replace(/\r\n/g, "\n").replace(/\n{2,}/g, "\n\n").replace(/(?<!\n)\n(?!\n)/g, "\n\n");
-            text = text.replace(/^\[(.*?)\]:\s*(.*)$/gm, '**[$1]:** $2');
-            text = text.replace(/\((.*?)\)/g, '*($1)*');
-            text = text.replace(/^\s*\*\*\*\s*$/gm, '---');
-            textArea.value = text;
-            alert("✅ Đã tự động định dạng xong!");
-        }
+        // --- 1. LOGIC ĐĂNG NHẬP (CONSOLE) ---
+        console.log("%c🛑 SYSTEM LOCKED", "color: red; font-size: 30px; font-weight: bold;");
+        console.log("%cGõ lệnh: login('MAT_KHAU') để truy cập.", "color: yellow; font-size: 16px;");
 
-        // === HÀM BẬT/TẮT HƯỚNG DẪN (MỚI) ===
-        function toggleGuide() {
-            const content = document.getElementById('guide-content');
-            content.style.display = (content.style.display === 'block') ? 'none' : 'block';
-        }
-
-        // === CÁC HÀM CŨ GIỮ NGUYÊN ===
-        console.log("%c🛑 SYSTEM LOCKED", "color: red; font-size: 30px;");
-        console.log("%cGõ: login('PASSWORD')", "color: yellow;");
         window.login = function(pass) {
             if(pass === SECRET_PASS) {
-                console.clear(); console.log("%c✅ ACCESS GRANTED", "color: lime;");
+                console.clear();
+                console.log("%c✅ ACCESS GRANTED", "color: lime; font-size: 20px;");
                 document.getElementById('black-screen').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'block';
                 document.body.style.backgroundColor = "#f4f4f4";
-                document.body.style.backgroundImage = `url('${CONFIG.bgImage}')`;
+                if(typeof CONFIG !== 'undefined') document.body.style.backgroundImage = `url('${CONFIG.bgImage}')`;
                 document.body.style.overflow = "auto";
                 if(localStorage.getItem('gh_token')) document.getElementById('token').value = localStorage.getItem('gh_token');
-            } else { console.log("%c❌ WRONG PASSWORD", "color: red;"); }
+            } else {
+                console.log("%c❌ WRONG PASSWORD", "color: red; font-size: 20px;");
+            }
         }
+
+        // --- 2. LOGIC CHUYỂN TAB ---
         function switchTab(t) {
+            // Ẩn tất cả tab, bỏ active nút
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            if(t==='new'){document.getElementById('tab-editor').style.display='block';document.getElementById('tab-list').style.display='none';document.querySelector('button[onclick="switchTab(\'new\')"]').classList.add('active');}
-            else{document.getElementById('tab-editor').style.display='none';document.getElementById('tab-list').style.display='block';document.querySelector('button[onclick="switchTab(\'list\')"]').classList.add('active');loadList();}
+            document.querySelectorAll('.glass-box[id^="tab-"]').forEach(d => d.style.display = 'none');
+            
+            // Hiện tab được chọn
+            let targetTab = (t === 'new') ? 'tab-editor' : (t === 'list' ? 'tab-list' : 'tab-music');
+            document.getElementById(targetTab).style.display = 'block';
+            document.querySelector(`button[onclick="switchTab('${t}')"]`).classList.add('active');
+            
+            // Load dữ liệu tương ứng
+            if(t === 'list') loadList();
+            if(t === 'music') loadMusicList();
         }
-        async function loadList(){
-            const t=document.getElementById('token').value; if(!t)return;
-            try{const res=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`);const data=await res.json();
-            window.chapters=JSON.parse(decodeURIComponent(escape(atob(data.content))));window.jsonSha=data.sha;const c=document.getElementById('list-container');c.innerHTML='';
-            window.chapters.forEach((h,i)=>{c.innerHTML+=`<div class="chapter-row"><div><b>#${i+1}:</b> ${h.title}</div><div class="action-group"><button class="btn-action edit-btn" onclick="editChap(${i})">✏️</button><button class="btn-action del-btn" onclick="delChap(${i})">🗑️</button></div></div>`;});
-            }catch(e){document.getElementById('list-container').innerHTML="Lỗi: "+e;}
+
+        function saveToken() { localStorage.setItem('gh_token', document.getElementById('token').value); }
+
+        // ============================================================
+        // PHẦN A: QUẢN LÝ TRUYỆN (Upload, Edit, Delete)
+        // ============================================================
+
+        // A1. Xử lý File TXT và Ảnh
+        function handleTxt() {
+            const r = new FileReader();
+            r.onload = e => {
+                // Chuẩn hóa xuống dòng
+                document.getElementById('content').value = e.target.result.replace(/\r\n/g, "\n").replace(/\n/g, "\n\n");
+            };
+            r.readAsText(document.getElementById('txtInput').files[0]);
         }
-        async function editChap(i){
-            const c=window.chapters[i];switchTab('new');document.getElementById('status').innerText="Đang tải...";
-            try{const res=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${c.file}?t=${Date.now()}`);const d=await res.json();
-            document.getElementById('chapTitle').value=c.title;document.getElementById('content').value=decodeURIComponent(escape(atob(d.content)));
-            document.getElementById('edit-index').value=i;document.getElementById('edit-file-sha').value=d.sha;
-            document.getElementById('editor-title').innerText="✏️ Sửa: "+c.title;document.getElementById('publishBtn').innerText="💾 CẬP NHẬT";
-            document.getElementById('publishBtn').style.background="#f39c12";document.getElementById('cancelBtn').style.display="block";
-            document.getElementById('status').innerText="";}catch(e){alert(e);}
+
+        async function handleImg() {
+            const f = document.getElementById('imgInput').files[0];
+            if(!f) return;
+            const t = document.getElementById('token').value;
+            if(!t) return alert("Thiếu Token!");
+
+            document.getElementById('imgStatus').innerText = "⏳ Đang upload ảnh...";
+            const r = new FileReader();
+            r.readAsDataURL(f);
+            r.onload = async function() {
+                try {
+                    const b64 = r.result.split(',')[1];
+                    const n = `images/${Date.now()}_${f.name}`;
+                    // Upload lên GitHub
+                    await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${n}`, {
+                        method: 'PUT', headers: {Authorization: `token ${t}`}, 
+                        body: JSON.stringify({message: "upload img", content: b64})
+                    });
+                    
+                    const url = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${n}`;
+                    const ta = document.getElementById('content');
+                    // Chèn link ảnh vào bài
+                    ta.value = `![Minh họa](${url})\n` + ta.value;
+                    document.getElementById('imgStatus').innerText = "✅ Ảnh đã lên! Link đã chèn vào bài.";
+                } catch(e) { alert("Lỗi up ảnh: " + e); }
+            }
         }
-        async function delChap(i){
-            const c=window.chapters[i]; const t=document.getElementById('token').value;
-            if(!confirm(`⚠️ XÓA VĨNH VIỄN:\n"${c.title}"?`)) return;
-            document.getElementById('list-container').innerHTML="Đang xóa...";
-            try{const fR=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${c.file}`);const fD=await fR.json();
-            await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${c.file}`,{method:'DELETE',headers:{Authorization:`token ${t}`},body:JSON.stringify({message:`Delete ${c.title}`,sha:fD.sha})});
-            window.chapters.splice(i,1);const jB=btoa(unescape(encodeURIComponent(JSON.stringify(window.chapters,null,2))));
-            await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`,{method:'PUT',headers:{Authorization:`token ${t}`},body:JSON.stringify({message:"Del item",content:jB,sha:window.jsonSha})});
-            alert("✅ Đã xóa!");loadList();}catch(e){alert(e);loadList();}
+
+        // A2. Auto Format (AI Mini)
+        function autoFormat() {
+            const ta = document.getElementById('content');
+            let txt = ta.value;
+            txt = txt.replace(/\r\n/g, "\n").replace(/\n{2,}/g, "\n\n").replace(/(?<!\n)\n(?!\n)/g, "\n\n");
+            txt = txt.replace(/^\[(.*?)\]:\s*(.*)$/gm, '**[$1]:** $2'); // Bôi đậm thoại
+            txt = txt.replace(/\((.*?)\)/g, '*($1)*'); // In nghiêng suy nghĩ
+            txt = txt.replace(/^\s*\*\*\*\s*$/gm, '---'); // Kẻ ngang
+            ta.value = txt;
+            alert("✅ Đã định dạng xong!");
         }
-        async function publish(){
-            const t=document.getElementById('token').value,ti=document.getElementById('chapTitle').value,c=document.getElementById('content').value,i=document.getElementById('edit-index').value,s=document.getElementById('status');
-            if(!t||!ti||!c)return alert("Thiếu thông tin!");s.innerText="Đang xử lý...";
-            try{const jR=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`,{headers:{Authorization:`token ${t}`}});const jD=await jR.json();
-            let l=JSON.parse(decodeURIComponent(escape(atob(jD.content))));let p,h=null;
-            if(i!==""){p=l[i].file;h=document.getElementById('edit-file-sha').value;l[i].title=ti;}
-            else{const d=`chap_${Date.now()}`;p=`chapters/${d}.md`;l.push({id:d,title:ti,file:p});}
-            const b64=btoa(unescape(encodeURIComponent(c))),b={message:`Upd ${ti}`,content:b64};if(h)b.sha=h;
-            await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${p}`,{method:'PUT',headers:{Authorization:`token ${t}`},body:JSON.stringify(b)});
-            const jB=btoa(unescape(encodeURIComponent(JSON.stringify(l,null,2))));
-            await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`,{method:'PUT',headers:{Authorization:`token ${t}`},body:JSON.stringify({message:"Upd list",content:jB,sha:jD.sha})});
-            s.innerText="🎉 THÀNH CÔNG!";if(i!==""){switchTab('list');resetForm();}else{document.getElementById('content').value='';document.getElementById('chapTitle').value='';}
-            }catch(e){s.innerText="Lỗi: "+e;}
+
+        // A3. Load Danh Sách Chương
+        async function loadList() {
+            const t = document.getElementById('token').value;
+            if(!t) return document.getElementById('list-container').innerHTML = "Chưa nhập Token!";
+            
+            try {
+                const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`);
+                const data = await res.json();
+                window.chapters = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                window.jsonSha = data.sha;
+
+                const c = document.getElementById('list-container');
+                c.innerHTML = '';
+                if(window.chapters.length === 0) c.innerHTML = "Chưa có chương nào.";
+                
+                window.chapters.forEach((h, i) => {
+                    c.innerHTML += `
+                        <div class="chapter-row">
+                            <div><b>#${i+1}:</b> ${h.title}</div>
+                            <div class="action-group">
+                                <button class="btn-action edit-btn" onclick="editChap(${i})">✏️ Sửa</button>
+                                <button class="btn-action del-btn" onclick="delChap(${i})">🗑 Xóa</button>
+                            </div>
+                        </div>`;
+                });
+            } catch(e) { document.getElementById('list-container').innerHTML = "Lỗi: " + e; }
         }
-        function resetForm(){document.getElementById('chapTitle').value='';document.getElementById('content').value='';document.getElementById('edit-index').value='';document.getElementById('edit-file-sha').value='';document.getElementById('publishBtn').innerText="🚀 ĐĂNG BÀI";document.getElementById('publishBtn').style.background="var(--primary)";document.getElementById('cancelBtn').style.display="none";document.getElementById('editor-title').innerText="📝 Soạn Thảo";}
-        function saveToken(){localStorage.setItem('gh_token',document.getElementById('token').value);}
-        function handleTxt(){const r=new FileReader();r.onload=e=>document.getElementById('content').value=e.target.result;r.readAsText(document.getElementById('txtInput').files[0]);}
-        async function handleImg(){const f=document.getElementById('imgInput').files[0];if(!f)return;const t=document.getElementById('token').value;document.getElementById('imgStatus').innerText="Uploading...";const r=new FileReader();r.readAsDataURL(f);r.onload=async function(){try{const b64=r.result.split(',')[1],n=`images/${Date.now()}_${f.name}`;await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${n}`,{method:'PUT',headers:{Authorization:`token ${t}`},body:JSON.stringify({message:"img",content:b64})});const url=`https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${n}`;const ta=document.getElementById('content');ta.value=`![Img](${url})\n`+ta.value;document.getElementById('imgStatus').innerText="✅ Done";}catch(e){alert(e);}}}
+
+        // A4. Chuẩn bị Sửa Chương
+        async function editChap(i) {
+            const c = window.chapters[i];
+            switchTab('new');
+            document.getElementById('status').innerText = "⏳ Đang tải nội dung chương cũ...";
+            
+            try {
+                const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${c.file}?t=${Date.now()}`);
+                const d = await res.json();
+                
+                document.getElementById('chapTitle').value = c.title;
+                document.getElementById('content').value = decodeURIComponent(escape(atob(d.content)));
+                document.getElementById('edit-index').value = i;
+                document.getElementById('edit-file-sha').value = d.sha;
+                
+                document.getElementById('editor-title').innerText = "✏️ Đang Sửa: " + c.title;
+                document.getElementById('publishBtn').innerText = "💾 CẬP NHẬT CHƯƠNG";
+                document.getElementById('publishBtn').style.background = "#f39c12";
+                document.getElementById('cancelBtn').style.display = "block";
+                document.getElementById('status').innerText = "";
+            } catch(e) { alert("Lỗi tải nội dung: " + e); }
+        }
+
+        // A5. Xóa Chương
+        async function delChap(i) {
+            const c = window.chapters[i];
+            const t = document.getElementById('token').value;
+            if(!confirm(`⚠️ XÓA VĨNH VIỄN chương:\n"${c.title}"?`)) return;
+            
+            document.getElementById('list-container').innerHTML = "⏳ Đang xóa file...";
+            try {
+                // Lấy SHA file md để xóa
+                const fR = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${c.file}`);
+                const fD = await fR.json();
+                // Xóa file md
+                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${c.file}`, {
+                    method:'DELETE', headers:{Authorization:`token ${t}`}, 
+                    body:JSON.stringify({message:`Delete ${c.title}`, sha:fD.sha})
+                });
+                
+                // Cập nhật list
+                window.chapters.splice(i, 1);
+                const jB = btoa(unescape(encodeURIComponent(JSON.stringify(window.chapters, null, 2))));
+                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
+                    method:'PUT', headers:{Authorization:`token ${t}`}, 
+                    body:JSON.stringify({message:"Del item", content:jB, sha:window.jsonSha})
+                });
+                
+                alert("✅ Đã xóa thành công!");
+                loadList();
+            } catch(e) { alert("Lỗi: " + e); loadList(); }
+        }
+
+        // A6. Đăng / Cập nhật Chương (PUBLISH)
+        async function publish() {
+            const t = document.getElementById('token').value;
+            const ti = document.getElementById('chapTitle').value;
+            const c = document.getElementById('content').value;
+            const i = document.getElementById('edit-index').value;
+            const s = document.getElementById('status');
+
+            if(!t || !ti || !c) return alert("Thiếu thông tin (Token, Tiêu đề hoặc Nội dung)!");
+            s.innerText = "⏳ Đang xử lý..."; s.style.color = "blue";
+
+            try {
+                // Lấy list mới nhất
+                const jR = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {headers:{Authorization:`token ${t}`}});
+                const jD = await jR.json();
+                let list = JSON.parse(decodeURIComponent(escape(atob(jD.content))));
+                
+                let p, h = null;
+                if(i !== "") { // Chế độ Sửa
+                    p = list[i].file;
+                    h = document.getElementById('edit-file-sha').value;
+                    list[i].title = ti;
+                } else { // Chế độ Mới
+                    const d = `chap_${Date.now()}`;
+                    p = `chapters/${d}.md`;
+                    list.push({id:d, title:ti, file:p});
+                }
+
+                // Upload file MD
+                const b64 = btoa(unescape(encodeURIComponent(c)));
+                const b = {message: `Update ${ti}`, content: b64};
+                if(h) b.sha = h; // Nếu sửa thì gửi kèm SHA cũ
+                
+                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${p}`, {
+                    method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify(b)
+                });
+
+                // Update List JSON
+                const jB = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
+                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
+                    method:'PUT', headers:{Authorization:`token ${t}`}, 
+                    body:JSON.stringify({message:"Update list", content:jB, sha:jD.sha})
+                });
+
+                s.innerText = "🎉 THÀNH CÔNG!"; s.style.color = "green";
+                if(i !== "") { switchTab('list'); resetForm(); }
+                else { document.getElementById('content').value=''; document.getElementById('chapTitle').value=''; }
+
+            } catch(e) { s.innerText = "❌ Lỗi: " + e; s.style.color = "red"; }
+        }
+
+        function resetForm() {
+            document.getElementById('chapTitle').value=''; document.getElementById('content').value='';
+            document.getElementById('edit-index').value=''; document.getElementById('edit-file-sha').value='';
+            document.getElementById('publishBtn').innerText="🚀 ĐĂNG BÀI NGAY";
+            document.getElementById('publishBtn').style.background="var(--primary)";
+            document.getElementById('cancelBtn').style.display="none";
+            document.getElementById('editor-title').innerText="📝 Soạn Thảo Chương Mới";
+        }
+
+        // ============================================================
+        // PHẦN B: QUẢN LÝ NHẠC (MUSIC STATION)
+        // ============================================================
+
+        // B1. Load Danh Sách Nhạc
+        async function loadMusicList() {
+            const t = document.getElementById('token').value;
+            const c = document.getElementById('music-list-container');
+            c.innerHTML = "Đang tải...";
+            try {
+                const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/music.json?t=${Date.now()}`);
+                const data = await res.json();
+                window.musicData = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                window.musicSha = data.sha;
+                
+                c.innerHTML = '';
+                if(window.musicData.length === 0) c.innerHTML = "Chưa có bài nhạc nào.";
+
+                window.musicData.forEach((song, i) => {
+                    c.innerHTML += `
+                        <div class="chapter-row">
+                            <div>🎵 ${song.title}</div>
+                            <button class="btn-action del-btn" onclick="delSong(${i})">🗑 Xóa</button>
+                        </div>`;
+                });
+            } catch(e) { 
+                c.innerHTML = "Chưa tạo file music.json hoặc lỗi tải."; 
+                window.musicData = []; window.musicSha = null;
+            }
+        }
+
+        // B2. Upload Nhạc & Cập nhật Playlist
+        async function uploadSong() {
+            const t = document.getElementById('token').value;
+            const title = document.getElementById('songTitle').value;
+            const file = document.getElementById('mp3Input').files[0];
+            const status = document.getElementById('musicStatus');
+
+            if(!t || !title || !file) return alert("Thiếu thông tin (Token, Tên bài, File)!");
+            status.innerText = "⏳ Đang upload MP3 (có thể mất vài phút)...";
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async function() {
+                try {
+                    const b64 = reader.result.split(',')[1];
+                    const path = `images/music/${Date.now()}_${file.name}`; // Lưu vào folder riêng
+                    
+                    // 1. Upload File MP3
+                    await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {
+                        method: 'PUT', headers: {Authorization: `token ${t}`}, 
+                        body: JSON.stringify({message: `Add song ${title}`, content: b64})
+                    });
+
+                    // 2. Lấy hoặc Tạo music.json
+                    if(!window.musicData || window.musicData.length === 0) {
+                        try {
+                            const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/music.json`);
+                            if(res.ok) {
+                                const d = await res.json();
+                                window.musicData = JSON.parse(decodeURIComponent(escape(atob(d.content))));
+                                window.musicSha = d.sha;
+                            } else { window.musicData = []; window.musicSha = null; }
+                        } catch { window.musicData = []; }
+                    }
+
+                    // 3. Thêm bài mới vào list
+                    window.musicData.push({ title: title, url: path });
+                    
+                    const jsonBody = {
+                        message: "Update music list",
+                        content: btoa(unescape(encodeURIComponent(JSON.stringify(window.musicData, null, 2))))
+                    };
+                    if(window.musicSha) jsonBody.sha = window.musicSha;
+
+                    // 4. Lưu music.json
+                    await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/music.json`, {
+                        method: 'PUT', headers: {Authorization: `token ${t}`}, body: JSON.stringify(jsonBody)
+                    });
+
+                    status.innerText = "✅ Thành công! Đợi 1-2 phút rồi F5 trang chủ.";
+                    document.getElementById('songTitle').value = '';
+                    loadMusicList(); // Refresh list
+
+                } catch(e) { status.innerText = "❌ Lỗi: " + e; }
+            };
+        }
+
+        // B3. Xóa Nhạc
+        async function delSong(index) {
+            if(!confirm("Bạn có chắc muốn xóa bài này khỏi Playlist?")) return;
+            const t = document.getElementById('token').value;
+            
+            // Xóa khỏi mảng
+            window.musicData.splice(index, 1);
+            
+            const jsonBody = {
+                message: "Remove song",
+                content: btoa(unescape(encodeURIComponent(JSON.stringify(window.musicData, null, 2)))),
+                sha: window.musicSha
+            };
+            
+            // Cập nhật music.json
+            await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/music.json`, {
+                method: 'PUT', headers: {Authorization: `token ${t}`}, body: JSON.stringify(jsonBody)
+            });
+            alert("Đã xóa khỏi danh sách!");
+            loadMusicList();
+        }
+
     </script>
 </body>
 </html>
