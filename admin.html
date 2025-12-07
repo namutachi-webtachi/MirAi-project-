@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MirAi Command Center</title>
-    <!-- CSS Giao diện chính -->
+    
+    <!-- 1. CSS GIAO DIỆN CHÍNH -->
     <link rel="stylesheet" href="css/style.css">
-    <!-- CSS Bộ soạn thảo văn bản -->
+    
+    <!-- 2. CSS CHO BỘ SOẠN THẢO VĂN BẢN (EasyMDE) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
     
     <style>
-        /* --- GIAO DIỆN RIÊNG CHO ADMIN --- */
+        /* --- GIAO DIỆN RIÊNG CHO TRANG ADMIN --- */
+        
+        /* Cấu trúc nền tảng */
         body { 
             background-color: #000; 
             margin: 0; 
@@ -18,18 +22,23 @@
             font-family: 'Consolas', monospace; 
         }
 
-        /* Màn hình khóa Hacker */
+        /* Màn hình khóa (Security Screen) */
         #black-screen { 
-            height: 100vh; width: 100vw; 
-            display: flex; justify-content: center; align-items: center; 
-            color: #0f0; font-size: 1.5rem; 
-            background: black; z-index: 9999;
+            height: 100vh; 
+            width: 100vw; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: #0f0; 
+            font-size: 1.5rem; 
+            background: black; 
+            z-index: 9999;
             transition: opacity 0.5s;
         }
 
-        /* Khung làm việc chính (Mặc định ẩn) */
+        /* Khung làm việc chính (Dashboard) */
         #admin-panel { 
-            display: none; 
+            display: none; /* Mặc định ẩn, chờ login */
             padding-bottom: 50px; 
             background: #f4f4f4; 
             min-height: 100vh; 
@@ -38,22 +47,44 @@
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Tabs chuyển đổi */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        /* --- CÁC THÀNH PHẦN GIAO DIỆN (COMPONENTS) --- */
+
+        /* Thanh điều hướng Tab */
+        .tabs { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+        }
         .tab-btn { 
-            flex: 1; padding: 12px; cursor: pointer; 
-            background: #ddd; border: none; border-radius: 8px; 
-            font-weight: bold; min-width: 120px; transition: 0.3s;
+            flex: 1; 
+            padding: 12px; 
+            cursor: pointer; 
+            background: #ddd; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            min-width: 120px;
+            transition: 0.3s;
         }
         .tab-btn:hover { background: #ccc; }
-        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .tab-btn.active { 
+            background: var(--primary); 
+            color: white; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+        }
 
-        /* Khu vực kéo thả file */
+        /* Khu vực kéo thả file (File Drop Zone) */
         .file-drop { 
-            border: 2px dashed #aaa; padding: 20px; 
-            text-align: center; border-radius: 10px; 
-            cursor: pointer; margin-bottom: 15px; 
-            background: white; font-weight: bold; color: #555; 
+            border: 2px dashed #aaa; 
+            padding: 20px; 
+            text-align: center; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            margin-bottom: 15px; 
+            background: white; 
+            font-weight: bold; 
+            color: #555; 
             transition: 0.3s; 
         }
         .file-drop:hover { 
@@ -62,58 +93,79 @@
             color: var(--primary);
         }
 
-        /* Form nhập liệu */
-        input[type="text"], input[type="password"], input[type="datetime-local"] { 
-            width: 100%; padding: 12px; 
-            border: 1px solid #ccc; border-radius: 8px; 
-            margin-bottom: 10px; font-family: inherit; 
-            font-size: 1rem; box-sizing: border-box; 
+        /* Form nhập liệu (Input) */
+        input[type="text"], 
+        input[type="password"], 
+        input[type="datetime-local"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            margin-bottom: 10px; 
+            font-family: inherit; 
+            font-size: 1rem; 
+            box-sizing: border-box; 
         }
 
-        /* Tùy chỉnh bộ soạn thảo EasyMDE */
+        /* Tùy chỉnh giao diện EasyMDE (Editor) */
         .EasyMDEContainer { background: white; border-radius: 8px; }
         .editor-toolbar { border-radius: 8px 8px 0 0; border-color: #ddd; }
         .CodeMirror { 
-            border-radius: 0 0 8px 8px; border-color: #ddd; 
-            min-height: 450px; font-size: 1.05rem; 
+            border-radius: 0 0 8px 8px; 
+            border-color: #ddd; 
+            min-height: 450px; 
+            font-size: 1.05rem; /* Chữ to hơn chút cho dễ đọc */
         }
 
-        /* Danh sách item (Truyện, Nháp, Nhạc) */
+        /* Danh sách Item (Chương truyện, Bản nháp, Nhạc) */
         .draft-item, .chapter-row { 
-            background: white; padding: 15px; margin-bottom: 10px; 
-            border-radius: 8px; border: 1px solid #eee; 
-            display: flex; justify-content: space-between; align-items: center; 
+            background: white; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            border-radius: 8px; 
+            border: 1px solid #eee; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
         }
-        .draft-item { border-left: 4px solid #f39c12; }
-        .chapter-row { border-left: 4px solid var(--primary); }
+        .draft-item { border-left: 4px solid #f39c12; } /* Màu cam cho nháp */
+        .chapter-row { border-left: 4px solid var(--primary); } /* Màu chính cho chương */
 
-        /* Nút bấm nhỏ */
+        /* Nút bấm thao tác nhỏ */
         .btn-action { 
-            padding: 6px 12px; border-radius: 6px; 
-            cursor: pointer; border: none; color: white; 
-            font-weight: bold; margin-left: 5px; font-size: 0.85rem; 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            border: none; 
+            color: white; 
+            font-weight: bold; 
+            margin-left: 5px; 
+            font-size: 0.85rem; 
         }
         .edit-btn { background: #f39c12; } .edit-btn:hover { background: #d35400; }
         .del-btn { background: #e74c3c; } .del-btn:hover { background: #c0392b; }
         .open-btn { background: #3498db; } .open-btn:hover { background: #2980b9; }
 
-        /* Thông báo chào mừng */
+        /* Thông báo chào mừng (Toast) */
         #welcome-toast { 
             position: fixed; top: 20px; right: 20px; 
             background: #27ae60; color: white; 
             padding: 15px 25px; border-radius: 8px; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
-            font-weight: bold; transform: translateX(200%); 
-            transition: 0.5s; z-index: 10000; 
+            font-weight: bold; 
+            transform: translateX(200%); 
+            transition: 0.5s; 
+            z-index: 10000; 
         }
         #welcome-toast.show { transform: translateX(0); }
 
-        /* Khung hướng dẫn */
+        /* Khung hướng dẫn sử dụng */
         .guide-box { border: 1px dashed #ccc; background: #f9f9f9; border-radius: 8px; margin-bottom: 15px; }
         .guide-header { padding: 12px; cursor: pointer; font-weight: bold; user-select: none; }
         .guide-content { display: none; padding: 10px 15px; border-top: 1px dashed #ccc; }
         .guide-content ul { margin: 0; padding-left: 20px; }
+        .guide-content li { margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -128,9 +180,11 @@
 
     <!-- 2. GIAO DIỆN ADMIN CHÍNH -->
     <div id="admin-panel" class="container">
+        
+        <!-- HEADER -->
         <header class="glass-box" style="text-align: center; margin-top: 30px;">
             <h2 style="color: var(--primary);">☠️ MIRAI COMMAND CENTER</h2>
-            <p style="color: #666;">Hệ thống quản trị tối thượng V7.1</p>
+            <p style="color: #666;">Hệ thống quản trị tối thượng V8.0</p>
             <a href="index.html" class="btn btn-outline">⬅ Quay về Trang chủ</a>
         </header>
 
@@ -150,7 +204,9 @@
             <button class="tab-btn" onclick="switchTab('music')">🎵 DJ Station</button>
         </div>
 
-        <!-- TAB 1: SOẠN THẢO (EDITOR) -->
+        <!-- =======================================================
+             TAB 1: SOẠN THẢO (EDITOR)
+             ======================================================= -->
         <div id="tab-editor" class="glass-box">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3 id="editor-title" style="margin: 0;">📝 Soạn Thảo Chương Mới</h3>
@@ -158,13 +214,13 @@
             </div>
             <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
 
-            <!-- Biến ẩn để lưu trạng thái sửa -->
+            <!-- Biến ẩn để lưu trạng thái sửa (ID và SHA file) -->
             <input type="hidden" id="edit-index" value="">
             <input type="hidden" id="edit-file-sha" value="">
 
             <input type="text" id="chapTitle" placeholder="Tiêu đề chương (Ví dụ: Chương 1: Khởi đầu)">
             
-            <!-- Hướng dẫn sử dụng -->
+            <!-- Hướng dẫn sử dụng tích hợp -->
             <div class="guide-box">
                 <div class="guide-header" onclick="document.getElementById('gc').style.display=document.getElementById('gc').style.display=='block'?'none':'block'">
                     📚 Phím tắt & Quy tắc (Bấm để xem)
@@ -179,34 +235,41 @@
                 </div>
             </div>
 
-            <!-- Nút công cụ -->
+            <!-- Nút Link đến AI Studio -->
+            <div style="margin-bottom: 15px;">
+                <a href="https://aistudio.google.com/prompts/1wYeI98PvvZuZZZTvg8D1SbIfJR6KveFO" target="_blank" class="btn" style="width: 100%; background: linear-gradient(45deg, #4285F4, #9B72CB); text-align: center; justify-content: center; box-sizing: border-box;">
+                    🧠 Mở AI Studio (Hỗ trợ viết truyện)
+                </a>
+            </div>
+
+            <!-- Khu vực công cụ Upload & Import -->
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                 <div class="file-drop" style="flex:1" onclick="document.getElementById('txtInput').click()">
                     📂 Import File TXT 
                     <input type="file" id="txtInput" accept=".txt" hidden onchange="handleTxtImport()">
                 </div>
                 <div class="file-drop" style="flex:1" onclick="document.getElementById('imgInput').click()">
-                    🖼 Upload Ảnh Minh Họa
+                    🖼 Upload Ảnh (Auto Nén)
                     <input type="file" id="imgInput" accept="image/*" hidden onchange="handleImgUpload()">
                 </div>
             </div>
-            <p id="imgStatus" style="text-align: center; color: blue; font-size: 0.9rem; margin-bottom: 10px;"></p>
+            <p id="imgStatus" style="text-align: center; color: blue; font-size: 0.9rem; margin-bottom: 10px; font-weight: bold;"></p>
 
             <button class="btn" onclick="runAutoFormat()" style="width: 100%; background: #2ecc71; margin-bottom: 15px;">
-                ✨ Tự Động Định Dạng (AI Format)
+                ✨ Tự Động Định Dạng (AI Format Local)
             </button>
             
-            <!-- KHUNG SOẠN THẢO CHÍNH -->
+            <!-- KHUNG SOẠN THẢO CHÍNH (EasyMDE sẽ hiện ở đây) -->
             <textarea id="content"></textarea>
             
-            <!-- Khu vực Hẹn giờ -->
+            <!-- Khu vực Hẹn giờ đăng bài -->
             <div style="background: #f1f1f1; padding: 15px; border-radius: 8px; margin-top: 15px;">
                 <label style="font-weight: bold;">⏰ Hẹn giờ đăng (Tùy chọn):</label>
                 <input type="datetime-local" id="scheduleTime" style="margin-top: 5px; background: white;">
-                <small>Nếu để trống, chương sẽ được đăng ngay lập tức.</small>
+                <small style="display: block; margin-top: 5px; color: #666;">Nếu để trống, chương sẽ được đăng và hiển thị ngay lập tức.</small>
             </div>
 
-            <!-- Nút hành động -->
+            <!-- Nút hành động chính -->
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button class="btn" onclick="saveDraft()" style="background: #f39c12; flex: 1;">💾 Lưu Nháp (Ctrl+S)</button>
                 <button id="publishBtn" class="btn" onclick="publishChapter()" style="flex: 1;">🚀 ĐĂNG BÀI</button>
@@ -219,28 +282,38 @@
             <p id="status" style="text-align: center; font-weight: bold; margin-top: 15px; font-size: 1.1rem;"></p>
         </div>
 
-        <!-- TAB 2: BẢN NHÁP (DRAFTS) -->
+        <!-- =======================================================
+             TAB 2: BẢN NHÁP (DRAFTS)
+             ======================================================= -->
         <div id="tab-drafts" class="glass-box" style="display: none;">
             <h3>💾 Kho Bản Nháp</h3>
-            <p style="opacity: 0.7;">Các bài viết chưa hoàn thiện được lưu tại đây.</p>
+            <p style="opacity: 0.7;">Các bài viết chưa hoàn thiện được lưu trong trình duyệt.</p>
             <div id="draft-list"></div>
         </div>
 
-        <!-- TAB 3: QUẢN LÝ (LIST) -->
+        <!-- =======================================================
+             TAB 3: QUẢN LÝ TRUYỆN (LIST)
+             ======================================================= -->
         <div id="tab-list" class="glass-box" style="display: none;">
             <h3>📋 Danh sách chương đã đăng</h3>
             <button class="btn btn-outline" onclick="loadChapterList()" style="width: 100%; margin-bottom: 15px;">🔄 Làm mới danh sách</button>
             <div id="list-container">Đang tải dữ liệu...</div>
         </div>
 
-        <!-- TAB 4: NHẠC (DJ STATION) -->
+        <!-- =======================================================
+             TAB 4: QUẢN LÝ NHẠC (DJ STATION)
+             ======================================================= -->
         <div id="tab-music" class="glass-box" style="display: none;">
             <h3>🎵 Upload Nhạc Mới</h3>
+            
+            <label>Tên bài hát:</label>
             <input type="text" id="songTitle" placeholder="Tên bài hát (VD: Nhạc nền đoạn cao trào)">
+            
             <div class="file-drop" onclick="document.getElementById('mp3Input').click()">
                 💿 Chọn file MP3 từ máy
                 <input type="file" id="mp3Input" accept=".mp3" hidden>
             </div>
+            
             <button class="btn" onclick="uploadMusic()" style="width: 100%;">⬆️ Upload vào Playlist</button>
             <p id="musicStatus" style="text-align: center; margin-top: 10px; font-weight: bold;"></p>
             
@@ -252,15 +325,17 @@
         </div>
     </div>
 
-    <!-- SCRIPT LIBRARY -->
+    <!-- 3. SCRIPT LIBRARY -->
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <!-- Thư viện nén ảnh -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>
     
-    <!-- SCRIPT LOGIC CHÍNH -->
+    <!-- 4. SCRIPT LOGIC CHÍNH (JAVASCRIPT) -->
     <script>
         const SECRET_PASS = "2006"; // Mật khẩu của bro
         
-        // --- 1. KHỞI TẠO EDITOR ---
+        // --- A. KHỞI TẠO EDITOR VÀ PHÍM TẮT ---
         var editor = new EasyMDE({ 
             element: document.getElementById("content"),
             spellChecker: false,
@@ -268,13 +343,13 @@
             autosave: { 
                 enabled: true, 
                 uniqueId: "MirAi_AutoSave", 
-                delay: 10000, 
+                delay: 10000, // Tự động lưu mỗi 10 giây
             },
             status: ["lines", "words", "cursor"], 
             toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "link", "image", "|", "preview", "side-by-side", "fullscreen"] 
         });
 
-        // Bắt phím tắt Ctrl+S để lưu nháp
+        // Bắt sự kiện nhấn Ctrl+S để lưu nháp
         document.addEventListener('keydown', e => {
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
@@ -282,7 +357,7 @@
             }
         });
 
-        // --- 2. HỆ THỐNG ĐĂNG NHẬP THÔNG MINH ---
+        // --- B. HỆ THỐNG ĐĂNG NHẬP THÔNG MINH ---
         document.addEventListener("DOMContentLoaded", () => {
             const token = localStorage.getItem('gh_token');
             // Nếu có token -> Tự động vào luôn
@@ -304,7 +379,7 @@
             setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        // Hàm login thủ công (qua Console)
+        // Hàm login thủ công (qua Console F12)
         window.login = function(pass) {
             if(pass === SECRET_PASS) { 
                 unlockInterface(); 
@@ -328,7 +403,7 @@
             localStorage.setItem('discord_webhook', document.getElementById('webhook').value);
         }
 
-        // --- 3. QUẢN LÝ TAB ---
+        // --- C. QUẢN LÝ TAB (CHUYỂN ĐỔI GIAO DIỆN) ---
         function switchTab(t) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.glass-box[id^="tab-"]').forEach(d => d.style.display = 'none');
@@ -341,7 +416,7 @@
             if(t === 'music') loadMusicList();
         }
 
-        // --- 4. HỆ THỐNG BẢN NHÁP (DRAFTS) ---
+        // --- D. HỆ THỐNG BẢN NHÁP (DRAFTS) ---
         function saveDraft() {
             const title = document.getElementById('chapTitle').value;
             const content = editor.value();
@@ -404,7 +479,9 @@
             loadDraftsUI();
         }
 
-        // --- 5. CÔNG CỤ HỖ TRỢ (IMPORT, UPLOAD, FORMAT) ---
+        // --- E. CÔNG CỤ HỖ TRỢ (IMPORT, UPLOAD ẢNH NÉN, FORMAT) ---
+        
+        // E1. Import file TXT
         function handleTxtImport() { 
             const r = new FileReader(); 
             r.onload = e => { 
@@ -414,36 +491,50 @@
             r.readAsText(document.getElementById('txtInput').files[0]); 
         }
 
+        // E2. Upload ảnh có nén (CompressorJS)
         async function handleImgUpload() { 
             const f = document.getElementById('imgInput').files[0]; 
             if(!f) return; 
             const t = document.getElementById('token').value; 
             
-            document.getElementById('imgStatus').innerText = "⏳ Đang upload ảnh..."; 
-            const r = new FileReader(); 
-            r.readAsDataURL(f);
+            document.getElementById('imgStatus').innerText = "⏳ Đang nén ảnh..."; 
             
-            r.onload = async function(){ 
-                try {
-                    const b64 = r.result.split(',')[1]; 
-                    const n = `images/${Date.now()}_${f.name}`; 
+            // Sử dụng CompressorJS
+            new Compressor(f, {
+                quality: 0.6, // Nén còn 60% chất lượng (vẫn nét nhưng nhẹ)
+                maxWidth: 1200, // Giới hạn chiều rộng
+                success(result) {
+                    document.getElementById('imgStatus').innerText = "⏳ Đang upload ảnh đã nén...";
                     
-                    await githubRequest(n, {message: "upload img", content: b64});
-                    
-                    const url = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${n}`; 
-                    
-                    // --- ĐOẠN FIX LỖI: CHÈN LINK VÀO EDITOR ---
-                    const cm = editor.codemirror; 
-                    const doc = cm.getDoc();
-                    const cursor = doc.getCursor();
-                    doc.replaceRange(`\n![Minh họa](${url})\n`, cursor);
-                    // ------------------------------------------
-                    
-                    document.getElementById('imgStatus').innerText = "✅ Đã chèn ảnh thành công!"; 
-                } catch(e) { alert("Lỗi up ảnh: " + e); } 
-            } 
+                    const r = new FileReader(); 
+                    r.readAsDataURL(result); // Đọc file đã nén
+                    r.onload = async function(){ 
+                        try {
+                            const b64 = r.result.split(',')[1]; 
+                            const n = `images/${Date.now()}_compressed.jpg`; // Đổi tên file để tránh trùng
+                            
+                            // Gửi lên GitHub
+                            await githubRequest(n, {message: "upload compressed img", content: b64});
+                            
+                            const url = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${n}`; 
+                            
+                            // Chèn link ảnh vào vị trí con trỏ trong Editor
+                            const cm = editor.codemirror; 
+                            const doc = cm.getDoc();
+                            const cursor = doc.getCursor();
+                            doc.replaceRange(`\n![Minh họa](${url})\n`, cursor);
+                            
+                            document.getElementById('imgStatus').innerText = `✅ Xong! (Gốc: ${(f.size/1024).toFixed(1)}KB -> Nén: ${(result.size/1024).toFixed(1)}KB)`; 
+                        } catch(e) { alert("Lỗi up ảnh: " + e); document.getElementById('imgStatus').innerText = "Lỗi!"; } 
+                    }
+                },
+                error(err) {
+                    alert("Lỗi nén ảnh: " + err.message);
+                },
+            });
         }
 
+        // E3. Auto Format (AI Logic bằng Regex)
         function runAutoFormat() {
             let txt = editor.value();
             // 1. Chuẩn hóa xuống dòng
@@ -459,7 +550,8 @@
             alert("✅ Đã định dạng văn bản chuẩn MirAi!");
         }
 
-        // --- 6. XỬ LÝ ĐĂNG BÀI & DISCORD ---
+        // --- F. XỬ LÝ ĐĂNG BÀI & DISCORD & HẸN GIỜ ---
+        
         async function sendToDiscord(title, isScheduled, time) {
             const wh = document.getElementById('webhook').value; 
             if(!wh) return;
@@ -491,29 +583,29 @@
             status.style.color = "blue";
 
             try {
-                // 1. Lấy danh sách hiện tại
+                // 1. Lấy danh sách chương hiện tại
                 const jsonRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
                     headers:{Authorization:`token ${t}`}
                 });
                 const jsonData = await jsonRes.json();
                 let list = JSON.parse(decodeURIComponent(escape(atob(jsonData.content))));
                 
-                // 2. Xử lý thời gian
+                // 2. Xử lý thời gian đăng
                 let pubTime = Date.now(); 
                 if(scheduleInput) pubTime = new Date(scheduleInput).getTime();
                 
-                // 3. Chuẩn bị file
+                // 3. Chuẩn bị file và thông tin
                 let path, sha = null;
                 const fileId = `chap_${Date.now()}`;
                 
                 if(editIdx !== "") { 
-                    // Chế độ Sửa
+                    // Chế độ Sửa chương cũ
                     path = list[editIdx].file;
                     sha = document.getElementById('edit-file-sha').value;
                     list[editIdx].title = title;
-                    list[editIdx].timestamp = pubTime;
+                    list[editIdx].timestamp = pubTime; // Cập nhật lại thời gian nếu muốn
                 } else { 
-                    // Chế độ Mới
+                    // Chế độ Đăng chương mới
                     path = `chapters/${fileId}.md`;
                     list.push({id: fileId, title: title, file: path, timestamp: pubTime});
                 }
@@ -534,14 +626,14 @@
                     body:JSON.stringify({message: "Update Chapter List", content: jsonB64, sha: jsonData.sha})
                 });
                 
-                // 6. Gửi Discord
+                // 6. Gửi thông báo Discord
                 await sendToDiscord(title, !!scheduleInput, pubTime);
 
                 status.innerText = "✅ THÀNH CÔNG! Đã đăng bài.";
                 status.style.color = "green";
                 
-                if(editIdx !== "") switchTab('list');
-                else resetForm();
+                if(editIdx !== "") switchTab('list'); // Nếu sửa xong thì về danh sách
+                else resetForm(); // Nếu đăng mới thì xóa form
 
             } catch(e) { 
                 status.innerText = "❌ Lỗi: " + e; 
@@ -549,7 +641,7 @@
             }
         }
 
-        // --- 7. CÁC HÀM QUẢN LÝ ---
+        // --- G. CÁC HÀM QUẢN LÝ (LIST, EDIT, DELETE) ---
         function resetForm() { 
             document.getElementById('chapTitle').value=''; 
             editor.value(''); 
@@ -575,7 +667,9 @@
                 if(window.chapters.length === 0) c.innerHTML = "Chưa có chương nào.";
                 
                 window.chapters.forEach((h, i) => {
+                    // Kiểm tra trạng thái hẹn giờ
                     let status = (h.timestamp && h.timestamp > Date.now()) ? "⏳ (Hẹn giờ)" : "✅";
+                    
                     c.innerHTML += `
                         <div class="chapter-row">
                             <div>#${i+1}: ${h.title} <small>${status}</small></div>
@@ -609,7 +703,7 @@
             const t = document.getElementById('token').value; 
             try {
                 const c = window.chapters[i]; 
-                // Xóa file truyện
+                // Xóa file truyện .md
                 const fR = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${c.file}`);
                 const fD = await fR.json(); 
                 await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${c.file}`, {
@@ -617,7 +711,7 @@
                     body:JSON.stringify({message:"Del", sha:fD.sha})
                 }); 
                 
-                // Cập nhật danh sách
+                // Cập nhật danh sách data.json
                 window.chapters.splice(i, 1);
                 const jB = btoa(unescape(encodeURIComponent(JSON.stringify(window.chapters, null, 2)))); 
                 await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
@@ -630,7 +724,7 @@
             } catch(e) { alert("Lỗi khi xóa: " + e); } 
         }
 
-        // --- 8. QUẢN LÝ NHẠC (MUSIC STATION) ---
+        // --- H. QUẢN LÝ NHẠC (MUSIC STATION) ---
         async function loadMusicList() { 
             const c = document.getElementById('music-list-container'); 
             c.innerHTML = "Đang tải danh sách nhạc..."; 
