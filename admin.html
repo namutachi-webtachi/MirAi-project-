@@ -130,7 +130,7 @@
     <div id="admin-panel" class="container">
         <header class="glass-box" style="text-align: center; margin-top: 30px;">
             <h2 style="color: var(--primary);">☠️ MIRAI COMMAND CENTER</h2>
-            <p style="color: #666;">Hệ thống quản trị tối thượng V7.0</p>
+            <p style="color: #666;">Hệ thống quản trị tối thượng V7.1</p>
             <a href="index.html" class="btn btn-outline">⬅ Quay về Trang chủ</a>
         </header>
 
@@ -431,8 +431,13 @@
                     await githubRequest(n, {message: "upload img", content: b64});
                     
                     const url = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${n}`; 
+                    
+                    // --- ĐOẠN FIX LỖI: CHÈN LINK VÀO EDITOR ---
                     const cm = editor.codemirror; 
-                    cm.getDoc().replaceRange(`\n![Minh họa](${url})\n`, cm.getDoc().getCursor()); 
+                    const doc = cm.getDoc();
+                    const cursor = doc.getCursor();
+                    doc.replaceRange(`\n![Minh họa](${url})\n`, cursor);
+                    // ------------------------------------------
                     
                     document.getElementById('imgStatus').innerText = "✅ Đã chèn ảnh thành công!"; 
                 } catch(e) { alert("Lỗi up ảnh: " + e); } 
@@ -575,8 +580,8 @@
                         <div class="chapter-row">
                             <div>#${i+1}: ${h.title} <small>${status}</small></div>
                             <div class="action-group">
-                                <button class="btn-action edit-btn" onclick="editChap(${i})">✏️</button>
-                                <button class="btn-action del-btn" onclick="delChap(${i})">🗑</button>
+                                <button class="btn-action edit-btn" onclick="editChap(${i})">✏️ Sửa</button>
+                                <button class="btn-action del-btn" onclick="delChap(${i})">🗑 Xóa</button>
                             </div>
                         </div>`;
                 });
@@ -642,7 +647,7 @@
                     c.innerHTML += `
                         <div class="chapter-row">
                             <div>🎵 ${s.title}</div>
-                            <button class="btn-action del-btn" onclick="delSong(${i})">🗑</button>
+                            <button class="btn-action del-btn" onclick="delSong(${i})">🗑 Xóa</button>
                         </div>`
                 });
             } catch { c.innerHTML = "Chưa có Playlist."; window.musicData = []; } 
