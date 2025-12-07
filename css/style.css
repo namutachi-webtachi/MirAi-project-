@@ -322,7 +322,7 @@ code { background: #e0e0e0; padding: 2px 5px; border-radius: 4px; font-family: m
 
 #bgm-icon {
     width: 60px; height: 60px; 
-    background: url('https://cdn.pixabay.com/photo/2013/07/12/18/41/disc-153701_1280.png') no-repeat center center; 
+    background: url('https://github.com/namutachi-webtachi/MirAi-project-/blob/main/images/vinyl.png') no-repeat center center; 
     background-size: contain; border-radius: 50%; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
     cursor: pointer; 
