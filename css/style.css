@@ -388,3 +388,27 @@ input:focus, textarea:focus {
     border-color: #0f0 !important;
     box-shadow: none !important;
 }
+/* =========================================
+   FIX MÀU LINK TRONG TRUYỆN (CHO DỄ ĐỌC)
+   ========================================= */
+
+/* Mặc định (Light Mode) */
+#content-area a {
+    color: #d63031; /* Màu đỏ đậm hoặc dùng var(--primary) */
+    font-weight: bold;
+    text-decoration: none;
+    border-bottom: 1px dashed currentColor;
+    transition: 0.3s;
+}
+
+/* Chế độ tối (Dark Mode) - QUAN TRỌNG */
+[data-theme="dark"] #content-area a {
+    color: #55efc4; /* Màu xanh ngọc Neon siêu nổi trên nền đen */
+    border-bottom-color: #55efc4;
+}
+
+/* Hiệu ứng khi di chuột vào */
+#content-area a:hover {
+    color: var(--accent); /* Đổi sang màu tím khi hover */
+    border-bottom-style: solid;
+}
