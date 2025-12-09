@@ -1,64 +1,69 @@
 /* =================================================================
-   MirAi Project - Main Stylesheet (Full Version)
+   MIRAI PROJECT - ULTIMATE STYLESHEET (V9.0)
+   Bao gồm: Core UI, Reader, Admin, Animations, Dark Mode, Features
    ================================================================= */
 
-/* 1. IMPORT FONTS */
+/* --- 1. IMPORT FONTS (NUNITO & MERRIWEATHER) --- */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Merriweather:wght@300;400;700&display=swap');
 
-/* 2. BIẾN MÀU SẮC (THEME) */
+/* --- 2. BIẾN MÀU SẮC (CSS VARIABLES) --- */
 :root {
-    --primary: #ff6b81; 
-    --accent: #a29bfe; 
-    --glass: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.6); 
-    --text: #2d3436; 
+    --primary: #ff6b81;          /* Màu chủ đạo (Hồng san hô) */
+    --accent: #a29bfe;           /* Màu phụ (Tím nhạt) */
+    --glass: rgba(255, 255, 255, 0.85); /* Màu kính nền sáng */
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --text: #2d3436;             /* Màu chữ tối */
     --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
 }
 
+/* Chế độ tối (Dark Mode Variables) */
 [data-theme="dark"] {
-    --primary: #ff4757; 
-    --accent: #70a1ff; 
-    --glass: rgba(30, 30, 30, 0.9);
-    --glass-border: rgba(255, 255, 255, 0.1); 
-    --text: #dfe4ea;
+    --primary: #ff4757;
+    --accent: #70a1ff;
+    --glass: rgba(30, 30, 30, 0.95); /* Màu kính nền tối */
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text: #dfe4ea;             /* Màu chữ sáng */
 }
 
-/* 3. CẤU TRÚC CƠ BẢN */
+/* --- 3. CẤU TRÚC CƠ BẢN (GLOBAL STYLES) --- */
 body {
     font-family: 'Nunito', sans-serif;
     color: var(--text);
-    background: #f1f2f6;
-    background-size: cover; 
-    background-attachment: fixed; 
+    background-color: #f1f2f6; /* Màu nền dự phòng khi ảnh chưa load */
+    background-size: cover;
+    background-attachment: fixed;
     background-position: center;
-    margin: 0; 
+    margin: 0;
     min-height: 100vh;
-    transition: background 0.3s, color 0.3s;
+    transition: background 0.3s, color 0.3s; /* Hiệu ứng chuyển màu mượt */
 }
 
-/* Thanh cuộn đẹp */
-::-webkit-scrollbar { 
-    width: 8px; 
+/* Tùy chỉnh thanh cuộn (Scrollbar) */
+::-webkit-scrollbar {
+    width: 8px;
 }
-::-webkit-scrollbar-thumb { 
-    background: var(--primary); 
-    border-radius: 10px; 
+::-webkit-scrollbar-track {
+    background: transparent;
 }
-
-/* Container chính */
-.container { 
-    max-width: 900px; 
-    margin: 0 auto; 
-    padding: 20px; 
-    position: relative; 
-    z-index: 1; 
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
 }
 
-/* Hiệu ứng kính mờ (Glassmorphism) */
+/* Container chính căn giữa */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* --- 4. HIỆU ỨNG KÍNH MỜ (GLASSMORPHISM) --- */
 .glass-box {
     background: var(--glass);
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* Hỗ trợ Safari */
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 30px;
@@ -67,299 +72,319 @@ body {
     animation: fadeIn 0.8s ease;
 }
 
-@keyframes fadeIn { 
-    from { opacity: 0; transform: translateY(20px); } 
-    to { opacity: 1; transform: translateY(0); } 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* 4. CÁC THÀNH PHẦN GIAO DIỆN (UI) */
-h1 { 
-    background: linear-gradient(to right, var(--primary), var(--accent)); 
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-    font-size: 2.5rem; 
-    margin: 0; 
-    text-align: center; 
+/* --- 5. CÁC THÀNH PHẦN UI (BUTTONS, INPUTS, TYPOGRAPHY) --- */
+h1 {
+    background: linear-gradient(to right, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.5rem;
+    margin: 0;
+    text-align: center;
 }
 
-.tagline { 
-    text-align: center; 
-    font-style: italic; 
-    opacity: 0.8; 
-    margin-bottom: 20px; 
+.tagline {
+    text-align: center;
+    font-style: italic;
+    opacity: 0.8;
+    margin-bottom: 20px;
 }
 
+/* Nút bấm (Button) */
 .btn {
-    padding: 10px 20px; 
-    border: none; 
-    border-radius: 50px; 
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px;
     background: linear-gradient(45deg, var(--primary), var(--accent));
-    color: white; 
-    font-weight: bold; 
-    cursor: pointer; 
-    transition: 0.3s;
-    display: inline-flex; 
-    align-items: center; 
-    gap: 5px; 
-    text-decoration: none; 
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    text-decoration: none;
     font-size: 0.9rem;
 }
 
-.btn:hover { 
-    transform: translateY(-3px); 
-    box-shadow: 0 5px 15px rgba(255, 107, 129, 0.4); 
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 107, 129, 0.4);
 }
 
-.btn-outline { 
-    background: transparent; 
-    border: 2px solid var(--primary); 
-    color: var(--primary); 
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
 }
 
-/* Ô tìm kiếm và Input */
-input, textarea, .search-box { 
-    width: 100%; 
-    padding: 12px 20px; 
-    border-radius: 8px; 
-    border: 1px solid #ccc; 
-    outline: none; 
-    transition: 0.3s; 
+/* Ô nhập liệu (Input & Textarea) */
+input, textarea, .search-box {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: 0.3s;
     font-family: inherit;
     font-size: 1rem;
     box-sizing: border-box;
     margin-bottom: 10px;
 }
 
-.search-box { border-radius: 30px; }
-
-input:focus, textarea:focus { 
-    border-color: var(--primary); 
-    box-shadow: 0 0 10px rgba(255, 107, 129, 0.2); 
+.search-box {
+    border-radius: 30px; /* Bo tròn hơn cho ô tìm kiếm */
 }
 
-/* 5. DANH SÁCH CHƯƠNG (Trang chủ) */
-.chapter-list { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-    gap: 15px; 
+input:focus, textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(255, 107, 129, 0.2);
+}
+
+/* --- 6. GIAO DIỆN TRANG CHỦ (CHAPTER LIST) --- */
+.chapter-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
 }
 
 .chap-card {
-    background: rgba(255,255,255,0.5); 
-    padding: 15px; 
-    border-radius: 12px; 
+    background: rgba(255, 255, 255, 0.5);
+    padding: 15px;
+    border-radius: 12px;
     text-decoration: none;
-    color: var(--text); 
-    font-weight: 600; 
-    transition: 0.3s; 
-    border-left: 4px solid transparent; 
+    color: var(--text);
+    font-weight: 600;
+    transition: 0.3s;
+    border-left: 4px solid transparent;
     display: block;
 }
 
-[data-theme="dark"] .chap-card { 
-    background: rgba(0,0,0,0.3); 
+[data-theme="dark"] .chap-card {
+    background: rgba(0, 0, 0, 0.3);
 }
 
-.chap-card:hover { 
-    background: white; 
-    border-left-color: var(--primary); 
-    transform: translateX(5px); 
-    color: var(--primary); 
+.chap-card:hover {
+    background: white;
+    border-left-color: var(--primary);
+    transform: translateX(5px);
+    color: var(--primary);
 }
 
-/* 6. TRANG ĐỌC (Reader) */
-.reader-controls { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 20px; 
+/* --- 7. GIAO DIỆN TRANG ĐỌC (READER) --- */
+.reader-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-/* Cấu hình Font chữ nội dung */
-#content-area { 
-    font-family: 'Nunito', sans-serif; 
-    font-size: 1.2rem; 
-    line-height: 1.8; 
-    text-align: justify; 
+/* Khu vực hiển thị nội dung truyện */
+#content-area {
+    font-family: 'Nunito', sans-serif; /* Font mặc định: Hiện đại */
+    font-size: 1.2rem;
+    line-height: 1.8;
+    text-align: justify;
 }
 
-/* Class này được JS thêm vào để đổi font Cổ điển */
-.font-serif #content-area { 
-    font-family: 'Merriweather', serif; 
+/* Class kích hoạt Font Cổ điển */
+.font-serif #content-area {
+    font-family: 'Merriweather', serif;
 }
 
-#content-area img { 
-    max-width: 100%; 
-    border-radius: 10px; 
-    display: block; 
-    margin: 15px auto; 
-    box-shadow: var(--shadow); 
+#content-area img {
+    max-width: 100%;
+    border-radius: 10px;
+    display: block;
+    margin: 15px auto;
+    box-shadow: var(--shadow);
 }
 
-/* Bảng Cài đặt (Popup) */
-.settings-panel { 
-    display: none; 
-    background: var(--glass); 
-    padding: 15px; 
-    border-radius: 10px; 
-    position: absolute; 
-    top: 60px; 
-    right: 20px; 
-    box-shadow: var(--shadow); 
-    z-index: 100; 
-    min-width: 200px;
+/* Popup Cài đặt */
+.settings-panel {
+    display: none;
+    background: var(--glass);
+    padding: 15px;
+    border-radius: 10px;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    box-shadow: var(--shadow);
+    z-index: 100;
+    min-width: 220px;
 }
-.settings-panel.active { display: block; }
+.settings-panel.active {
+    display: block;
+}
 
-/* 7. TRANG ADMIN (Admin Tools) */
+/* --- 8. GIAO DIỆN TRANG ADMIN (Hợp nhất vào đây luôn) --- */
+/* Màn hình đen Hacker */
 #black-screen {
-    height: 100vh; width: 100vw; 
-    display: flex; justify-content: center; align-items: center; 
-    color: #333; 
+    height: 100vh; width: 100vw;
+    display: flex; justify-content: center; align-items: center;
+    color: #333;
 }
 
-#admin-panel { 
-    display: none; 
-    padding-bottom: 50px; 
-    background: #f4f4f4; 
-    min-height: 100vh; 
-    overflow-y: auto; 
+#admin-panel {
+    display: none;
+    padding-bottom: 50px;
+    background: #f4f4f4;
+    min-height: 100vh;
+    overflow-y: auto;
 }
 
-.file-drop { 
-    border: 2px dashed #aaa; 
-    padding: 20px; 
-    text-align: center; 
-    border-radius: 10px; 
-    cursor: pointer; 
-    margin-bottom: 15px; 
-    transition: 0.3s; 
+/* Khu vực Upload File (Kéo thả) */
+.file-drop {
+    border: 2px dashed #aaa;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: 0.3s;
     font-weight: bold;
     background: white;
+    color: #555;
 }
-.file-drop:hover { 
-    border-color: var(--primary); 
-    background: rgba(255, 107, 129, 0.1); 
-}
-
-.tabs { 
-    display: flex; 
-    gap: 10px; 
-    margin-bottom: 20px; 
-    flex-wrap: wrap; 
+.file-drop:hover {
+    border-color: var(--primary);
+    background: rgba(255, 107, 129, 0.1);
+    color: var(--primary);
 }
 
-.tab-btn { 
-    flex: 1; 
-    padding: 12px; 
-    cursor: pointer; 
-    background: #ddd; 
-    border: none; 
-    border-radius: 8px; 
-    font-weight: bold; 
+/* Tabs điều hướng Admin */
+.tabs {
+    display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
 }
-.tab-btn.active { 
-    background: var(--primary); 
-    color: white; 
+.tab-btn {
+    flex: 1; padding: 12px; cursor: pointer;
+    background: #ddd; border: none; border-radius: 8px;
+    font-weight: bold; min-width: 100px;
 }
-
-.chapter-row { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    background: white; 
-    padding: 12px; 
-    margin-bottom: 8px; 
-    border-radius: 8px; 
-    border: 1px solid #eee; 
+.tab-btn.active {
+    background: var(--primary); color: white;
 }
 
-.action-group { display: flex; gap: 5px; }
-
-.btn-action { 
-    padding: 6px 12px; 
-    border-radius: 6px; 
-    cursor: pointer; 
-    border: none; 
-    color: white; 
-    font-weight: bold; 
-    margin-left: 5px; 
+/* Danh sách trong Admin */
+.chapter-row, .draft-item {
+    display: flex; justify-content: space-between; align-items: center;
+    background: white; padding: 12px; margin-bottom: 8px;
+    border-radius: 8px; border: 1px solid #eee;
+}
+.btn-action {
+    padding: 6px 12px; border-radius: 6px;
+    cursor: pointer; border: none;
+    color: white; font-weight: bold; margin-left: 5px;
 }
 .edit-btn { background: #f39c12; }
 .del-btn { background: #e74c3c; }
+.open-btn { background: #3498db; }
 
-/* Khung hướng dẫn Admin */
-.guide-box { border: 1px dashed #ccc; border-radius: 8px; margin-bottom: 15px; background: #f9f9f9; }
-.guide-header { padding: 12px; font-weight: bold; cursor: pointer; user-select: none; color: #34495e; }
-.guide-header:hover { background: #f0f0f0; }
-.guide-content { display: none; padding: 0 15px 15px 15px; border-top: 1px dashed #ccc; }
-.guide-content ul { padding-left: 20px; margin: 10px 0 0 0; }
-.guide-content li { margin-bottom: 8px; line-height: 1.5; }
-code { background: #e0e0e0; padding: 2px 5px; border-radius: 4px; font-family: monospace; }
+/* Hỗ trợ Dark Mode cho Admin */
+[data-theme="dark"] #admin-panel { background: #1a1a1a; color: #eee; }
+[data-theme="dark"] .file-drop { background: #333; color: #ccc; border-color: #555; }
+[data-theme="dark"] .chapter-row { background: #2d2d2d; border-color: #444; }
+[data-theme="dark"] input, [data-theme="dark"] textarea { background: #333; color: white; border-color: #555; }
 
-/* 8. TÍNH NĂNG MỞ RỘNG (Loading, Player, Progress Bar) */
+/* --- 9. TÍNH NĂNG MỞ RỘNG (FEATURES) --- */
+
+/* Màn hình Loading */
 #loading {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: var(--glass); z-index: 9999; 
-    display: flex; justify-content: center; align-items: center; 
-    font-size: 1.5rem; font-weight: bold; color: var(--primary); 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--glass); z-index: 9999;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 1.5rem; font-weight: bold; color: var(--primary);
     backdrop-filter: blur(20px);
 }
 
+/* Thanh tiến độ đọc (Progress Bar) */
 #progress-bar {
     position: fixed; top: 0; left: 0; height: 4px; z-index: 10000;
-    background: linear-gradient(to right, var(--primary), var(--accent)); 
-    width: 0%; 
+    background: linear-gradient(to right, var(--primary), var(--accent));
+    width: 0%;
     transition: width 0.1s linear;
 }
 
-/* Music Player Widget */
-#bgm-player { 
-    position: fixed; bottom: 20px; right: 20px; 
-    display: flex; flex-direction: column; align-items: center; 
-    z-index: 9999; 
+/* --- TRÌNH PHÁT NHẠC (BGM PLAYER) --- */
+#bgm-player {
+    position: fixed; bottom: 20px; right: 20px;
+    display: flex; flex-direction: column; align-items: center;
+    z-index: 9999;
 }
 
+/* Đĩa than vẽ bằng CSS Gradient (Không dùng ảnh -> Không lỗi) */
 #bgm-icon {
-    width: 60px; height: 60px; 
-    background: url('https://github.com/namutachi-webtachi/MirAi-project-/blob/main/images/vinyl.png') no-repeat center center; 
-    background-size: contain; border-radius: 50%; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
-    cursor: pointer; 
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    background: repeating-radial-gradient(
+        #111 0, 
+        #111 2px, 
+        #333 3px, 
+        #333 4px
+    );
+    position: relative;
+    border: 2px solid #000;
+    transition: transform 0.5s;
 }
+
+/* Nhãn đĩa màu đỏ ở giữa */
+#bgm-icon::after {
+    content: ''; position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 20px; height: 20px; background: var(--primary);
+    border-radius: 50%; border: 2px solid #000;
+}
+
+/* Hiệu ứng xoay khi nhạc chạy */
 #bgm-icon.playing { animation: spin 4s linear infinite; }
 
-#player-controls { 
-    margin-top: -15px; 
-    background: rgba(0, 0, 0, 0.7); 
-    padding: 5px 15px; 
-    border-radius: 20px; 
-    display: flex; gap: 10px; 
-    backdrop-filter: blur(5px); 
-    transition: 0.3s; 
+/* Bảng điều khiển nhạc */
+#player-controls {
+    margin-top: -15px; /* Đè lên đĩa than một chút */
+    background: rgba(0, 0, 0, 0.8);
+    padding: 5px 15px;
+    border-radius: 20px;
+    display: flex; gap: 10px;
+    backdrop-filter: blur(5px);
+    transition: 0.3s;
+    border: 1px solid #444;
 }
-#player-controls:hover { transform: scale(1.1); background: var(--primary); }
+#player-controls:hover { transform: scale(1.1); background: var(--primary); border-color: transparent; }
 
-#bgm-btn, #next-btn { 
-    cursor: pointer; color: white; font-size: 1.2rem; user-select: none; 
+#bgm-btn, #next-btn {
+    cursor: pointer; color: white; font-size: 1.2rem; user-select: none;
 }
 
-/* Thông báo bài hát */
-#song-toast { 
-    position: absolute; bottom: 80px; right: 0; 
-    background: var(--primary); color: white; 
-    padding: 8px 15px; border-radius: 8px; 
-    font-size: 0.8rem; font-weight: bold; 
-    white-space: nowrap; opacity: 0; 
-    transform: translateY(10px); transition: 0.3s; 
-    pointer-events: none; 
+/* Thông báo tên bài hát (Toast) */
+#song-toast {
+    position: absolute; bottom: 85px; right: 0;
+    background: var(--primary); color: white;
+    padding: 8px 15px; border-radius: 8px;
+    font-size: 0.8rem; font-weight: bold;
+    white-space: nowrap; opacity: 0;
+    transform: translateY(10px); transition: 0.3s;
+    pointer-events: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 #song-toast.show { opacity: 1; transform: translateY(0); }
 
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* Matrix Mode (Hacker) */
+/* Matrix Hacker Mode */
 .matrix-mode { background: #000 !important; }
-.matrix-mode * { 
-    color: #0f0 !important; 
+.matrix-mode * {
+    color: #0f0 !important;
     font-family: 'Courier New', Courier, monospace !important;
+    background: transparent !important;
+    border-color: #0f0 !important;
+    box-shadow: none !important;
+}
