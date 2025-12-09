@@ -1,70 +1,66 @@
-// sw.js - Phiên bản "Network First" cho dữ liệu
-const CACHE_NAME = 'mirai-v6-fix-scheduler'; // Đổi tên để ép trình duyệt xóa cache cũ
+// =================================================================
+// MirAi Service Worker V7 (Network First - Fix Cache Loop)
+// =================================================================
 
-// Những file tĩnh (ít thay đổi) -> Cache chặt để load nhanh
-const STATIC_ASSETS = [
+const CACHE_NAME = 'mirai-v7-nuke-cache'; // Đổi tên để ép xóa cache cũ
+const URLS_TO_CACHE = [
     '/MirAi-project-/',
     'index.html',
     'reader.html',
     'css/style.css',
+    'js/script.js',
     'config.js',
-    'manifest.json',
-    'images/icons/icon-192x192.png'
+    'manifest.json'
 ];
 
-// 1. Cài đặt Service Worker
+// 1. Cài đặt và kích hoạt ngay lập tức
 self.addEventListener('install', event => {
-    self.skipWaiting(); // Kích hoạt ngay lập tức, không chờ
+    self.skipWaiting(); // Bắt buộc SW mới chạy ngay, không chờ
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
-            return cache.addAll(STATIC_ASSETS);
+            console.log('Opened cache');
+            return cache.addAll(URLS_TO_CACHE);
         })
     );
 });
 
-// 2. Kích hoạt và Xóa cache cũ
+// 2. Xóa sạch các bản Cache cũ khi kích hoạt
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
-                cacheNames.map(cache => {
-                    if (cache !== CACHE_NAME) {
-                        console.log('Xóa cache cũ:', cache);
-                        return caches.delete(cache);
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_NAME) {
+                        console.log('Đang xóa cache cũ:', cacheName);
+                        return caches.delete(cacheName);
                     }
                 })
             );
         })
     );
+    self.clients.claim(); // Chiếm quyền điều khiển ngay lập tức
 });
 
-// 3. Xử lý tải dữ liệu (QUAN TRỌNG NHẤT)
+// 3. Chiến thuật: NETWORK FIRST (Ưu tiên mạng)
+// Luôn tải từ mạng trước. Nếu có mạng -> Lưu bản mới vào cache -> Trả về cho người dùng.
+// Chỉ khi mất mạng -> Mới lấy từ Cache.
 self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
-
-    // NẾU LÀ FILE DỮ LIỆU (data.json, script.js, html) -> ƯU TIÊN MẠNG (Network First)
-    // Để đảm bảo luôn thấy chương mới và logic hẹn giờ đúng
-    if (url.pathname.endsWith('data.json') || url.pathname.endsWith('script.js') || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
-        event.respondWith(
-            fetch(event.request)
-                .then(response => {
-                    // Tải được từ mạng -> Lưu bản mới vào cache -> Trả về
-                    const clonedResponse = response.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clonedResponse));
+    event.respondWith(
+        fetch(event.request)
+            .then(response => {
+                // Tải thành công -> Copy vào cache để dùng cho lần sau
+                if (!response || response.status !== 200 || response.type !== 'basic') {
                     return response;
-                })
-                .catch(() => {
-                    // Mất mạng -> Mới dùng cache cũ
-                    return caches.match(event.request);
-                })
-        );
-    } 
-    // NẾU LÀ ẢNH, FONT, CSS -> ƯU TIÊN CACHE (Cache First) cho nhanh
-    else {
-        event.respondWith(
-            caches.match(event.request).then(response => {
-                return response || fetch(event.request);
+                }
+                const responseToCache = response.clone();
+                caches.open(CACHE_NAME).then(cache => {
+                    cache.put(event.request, responseToCache);
+                });
+                return response;
             })
-        );
-    }
+            .catch(() => {
+                // Mất mạng hoặc lỗi server -> Dùng cache
+                return caches.match(event.request);
+            })
+    );
 });
