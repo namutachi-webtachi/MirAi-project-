@@ -3,30 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MirAi Command Center V15</title>
+    <title>MirAi Command Center V16</title>
     
-    <!-- 1. LIÊN KẾT CSS -->
+    <!-- CSS CHUNG & EDITOR -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
     
     <style>
-        /* CSS RIÊNG CHO ADMIN */
+        /* --- CSS RIÊNG CHO ADMIN --- */
         body { background-color: #000; margin: 0; overflow: hidden; font-family: 'Consolas', monospace; transition: 0.3s; }
         
+        /* Màn hình khóa */
         #black-screen { 
-            position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
             display: flex; justify-content: center; align-items: center; 
-            color: #0f0; font-size: 1.2rem; background: black; z-index: 99999;
+            color: #0f0; font-size: 1.2rem; background: black; z-index: 99999; 
             transition: opacity 0.5s; cursor: pointer; text-align: center;
         }
 
+        /* Panel chính */
         #admin-panel { 
             display: none; padding-bottom: 120px; background: #f4f4f4; 
             min-height: 100vh; overflow-y: auto; animation: fadeIn 0.5s; 
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Dark Mode */
+        /* Dark Mode Admin */
         [data-theme="dark"] #admin-panel { background: #1e1e1e; color: #e0e0e0; }
         [data-theme="dark"] .glass-box { background: rgba(40, 40, 40, 0.95); border-color: #555; }
         [data-theme="dark"] input, [data-theme="dark"] textarea, [data-theme="dark"] select { background: #2d2d2d; color: #fff; border-color: #555; }
@@ -53,21 +55,29 @@
 
         input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; font-family: inherit; font-size: 1rem; box-sizing: border-box; }
 
+        /* Editor Wrapper */
         .EasyMDEContainer { background: white; border-radius: 8px; margin-bottom: 15px; }
         .editor-toolbar { border-radius: 8px 8px 0 0; border-color: #ddd; }
         .CodeMirror { border-radius: 0 0 8px 8px; border-color: #ddd; min-height: 450px; font-size: 1.05rem; }
 
+        /* Items */
         .draft-item, .chapter-row, .ach-item { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .draft-item { border-left: 4px solid #f39c12; }
         .chapter-row { border-left: 4px solid var(--primary); }
         .ach-item { border-left: 4px solid #f1c40f; }
 
+        /* Buttons */
         .btn-action { padding: 6px 12px; border-radius: 6px; cursor: pointer; border: none; color: white; font-weight: bold; margin-left: 5px; font-size: 0.85rem; }
-        .edit-btn { background: #f39c12; } .del-btn { background: #e74c3c; } .open-btn { background: #3498db; } .copy-btn { background: #9b59b6; width: auto; display: inline-block; padding: 5px 15px; font-size: 0.8rem; }
+        .edit-btn { background: #f39c12; } 
+        .del-btn { background: #e74c3c; } 
+        .open-btn { background: #3498db; }
+        .copy-btn { background: #9b59b6; width: auto; display: inline-block; padding: 5px 15px; font-size: 0.8rem; }
 
+        /* Toast */
         #welcome-toast { position: fixed; top: 20px; right: 20px; background: #27ae60; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-weight: bold; transform: translateX(200%); transition: 0.5s; z-index: 10000; }
         #welcome-toast.show { transform: translateX(0); }
 
+        /* Guide & Prompt Box */
         .guide-box, .prompt-container { border: 1px dashed #ccc; background: #f9f9f9; border-radius: 8px; margin-bottom: 15px; overflow: hidden; }
         [data-theme="dark"] .guide-box, [data-theme="dark"] .prompt-container { background: #333; border-color: #555; }
         .guide-header { padding: 12px; cursor: pointer; font-weight: bold; user-select: none; display: flex; justify-content: space-between; }
@@ -77,13 +87,16 @@
         code { background: #e0e0e0; padding: 2px 5px; border-radius: 4px; font-family: monospace; color: #c0392b; font-weight: bold; }
         [data-theme="dark"] code { background: #444; color: #e74c3c; }
         
+        /* Prompt Styling */
         .prompt-container { padding: 15px; }
         .prompt-title { font-weight: bold; color: var(--primary); display: block; margin-bottom: 5px; }
         .prompt-text { width: 100%; height: 80px; font-size: 0.85rem; font-family: monospace; resize: vertical; margin-bottom: 10px; }
 
+        /* Logic Translator */
         .logic-input { font-family: 'Consolas', monospace; color: #d63031; font-weight: bold; }
         [data-theme="dark"] .logic-input { color: #55efc4; }
 
+        /* Admin Player */
         #admin-player { position: fixed; bottom: 20px; left: 20px; background: rgba(0, 0, 0, 0.8); color: white; padding: 10px 20px; border-radius: 30px; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10000; backdrop-filter: blur(5px); border: 1px solid var(--primary); transition: 0.3s; }
         #admin-player:hover { transform: scale(1.05); }
         #ap-icon { font-size: 1.5rem; animation: spin 4s linear infinite; animation-play-state: paused; }
@@ -96,6 +109,8 @@
 <body>
 
     <div id="welcome-toast">👋 Welcome back, Commander.</div>
+    
+    <!-- MÀN HÌNH KHÓA -->
     <div id="black-screen"><p>🛑 SYSTEM HALTED.<br><br>Gõ F12 hoặc <b>CHẠM</b> để đăng nhập.</p></div>
 
     <div id="admin-panel" class="container">
@@ -126,29 +141,20 @@
         <!-- TAB 1: EDITOR -->
         <div id="tab-editor" class="glass-box">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 id="editor-title" style="margin: 0;">📝 Soạn Thảo Chương Mới</h3>
+                <h3 id="editor-title" style="margin: 0;">📝 Soạn Thảo</h3>
                 <span id="auto-save-status" style="font-size: 0.8rem; opacity: 0.7;">Sẵn sàng</span>
             </div>
             <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
             <input type="hidden" id="edit-index" value=""><input type="hidden" id="edit-file-sha" value="">
-            <input type="text" id="chapTitle" placeholder="Tiêu đề chương (Ví dụ: Chương 1: Khởi đầu)">
+            <input type="text" id="chapTitle" placeholder="Tiêu đề chương">
             
             <div class="guide-box">
-                <div class="guide-header" onclick="toggleGuide('gc-editor')">📚 Phím tắt & Quy tắc (Bấm xem) <span>▼</span></div>
-                <div class="guide-content" id="gc-editor">
-                    <ul>
-                        <li><b>Ctrl + S:</b> Lưu bản nháp ngay lập tức.</li>
-                        <li><b>[Tên]:</b> Tự động in đậm lời thoại (khi bấm Auto Format).</li>
-                        <li><b>(...)</b>: Tự động in nghiêng suy nghĩ.</li>
-                        <li><b>***</b>: Tạo dòng kẻ ngang chuyển cảnh.</li>
-                    </ul>
-                </div>
+                <div class="guide-header" onclick="toggleGuide('gc-editor')">📚 Phím tắt (Bấm xem) <span>▼</span></div>
+                <div class="guide-content" id="gc-editor"><ul><li><b>Ctrl + S:</b> Lưu bản nháp.</li><li><b>[Tên]:</b> Tự động in đậm.</li><li><b>(...)</b>: Tự động in nghiêng.</li><li><b>***</b>: Kẻ ngang.</li></ul></div>
             </div>
-
+            
             <div style="margin-bottom: 15px;">
-                <a href="https://aistudio.google.com/prompts/1wYeI98PvvZuZZZTvg8D1SbIfJR6KveFO" target="_blank" class="btn" style="width: 100%; background: linear-gradient(45deg, #4285F4, #9B72CB); text-align: center; justify-content: center; box-sizing: border-box;">
-                    🧠 Mở AI Studio (Edit Truyện)
-                </a>
+                <a href="https://aistudio.google.com/prompts/1wYeI98PvvZuZZZTvg8D1SbIfJR6KveFO" target="_blank" class="btn" style="width: 100%; background: linear-gradient(45deg, #4285F4, #9B72CB); text-align: center; justify-content: center; box-sizing: border-box;">🧠 Mở AI Studio (Edit Truyện)</a>
             </div>
 
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -165,8 +171,9 @@
                 <input type="datetime-local" id="scheduleTime" style="margin-top: 5px;">
                 <small style="display: block; margin-top: 5px; opacity: 0.7;">Để trống = Đăng ngay lập tức.</small>
             </div>
+            
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn" onclick="saveDraft()" style="background: #f39c12; flex: 1;">💾 Lưu Nháp (Ctrl+S)</button>
+                <button class="btn" onclick="saveDraft()" style="background: #f39c12; flex: 1;">💾 Lưu Nháp</button>
                 <button id="publishBtn" class="btn" onclick="publishChapter()" style="flex: 1;">🚀 ĐĂNG BÀI</button>
             </div>
             <button id="cancelBtn" class="btn" onclick="resetForm()" style="width: 100%; margin-top: 10px; background: #7f8c8d; display: none;">Hủy Chế Độ Sửa</button>
@@ -176,35 +183,33 @@
         <div id="tab-drafts" class="glass-box" style="display: none;"><h3>💾 Kho Bản Nháp</h3><div id="draft-list"></div></div>
         <div id="tab-list" class="glass-box" style="display: none;"><h3>📋 Danh sách chương</h3><button class="btn btn-outline" onclick="loadChapterList()" style="width: 100%; margin-bottom: 15px;">🔄 Làm mới danh sách</button><div id="list-container">Loading...</div></div>
         
+        <!-- TAB 4: MUSIC -->
         <div id="tab-music" class="glass-box" style="display: none;">
             <h3>🎵 Upload Nhạc</h3>
             <div class="guide-box"><div class="guide-header" onclick="toggleGuide('gc-music')">🎧 Hướng dẫn (Bấm mở) <span>▼</span></div><div class="guide-content" id="gc-music">Upload file MP3, nhạc sẽ tự vào Playlist.</div></div>
-            <input type="text" id="songTitle" placeholder="Tên bài hát"><div class="file-drop" onclick="document.getElementById('mp3Input').click()">💿 Chọn MP3 <input type="file" id="mp3Input" accept=".mp3" hidden></div><button class="btn" onclick="uploadMusic()" style="width: 100%;">⬆️ Upload vào Playlist</button><p id="musicStatus" style="text-align: center; margin-top: 10px; font-weight: bold;"></p><hr style="margin: 20px 0;"><button class="btn btn-outline" onclick="loadMusicList()" style="width: 100%; margin-bottom: 15px;">🔄 Refresh List</button><div id="music-list-container">Loading...</div>
+            <input type="text" id="songTitle" placeholder="Tên bài hát">
+            <div class="file-drop" onclick="document.getElementById('mp3Input').click()">💿 Chọn MP3 <input type="file" id="mp3Input" accept=".mp3" hidden></div>
+            <button class="btn" onclick="uploadMusic()" style="width: 100%;">⬆️ Upload</button>
+            <p id="musicStatus" style="text-align: center; margin-top: 10px; font-weight: bold;"></p>
+            <hr style="margin: 20px 0;">
+            <button class="btn btn-outline" onclick="loadMusicList()" style="width: 100%; margin-bottom: 15px;">🔄 Refresh List</button>
+            <div id="music-list-container">Loading...</div>
         </div>
 
         <!-- TAB 5: AI LAB -->
         <div id="tab-ailab" class="glass-box" style="display: none;">
             <h3>🧠 AI Lab - Phòng Thí Nghiệm</h3>
-            
             <div class="prompt-container">
                 <span class="prompt-title">🧑‍💻 Thợ Code (Dev Lead)</span>
                 <textarea class="prompt-text" id="prompt-dev">Role: Senior Frontend Developer. Project: MirAi Project (Static Site/JAMstack). Stack: HTML, CSS, JS, GitHub API. Nhiệm vụ: Viết code sạch, tối ưu, không dùng backend. Trả lời: "Đã nhận lệnh".</textarea>
                 <button class="btn-action copy-btn" onclick="copyPrompt('prompt-dev')">📋 Copy Prompt</button>
             </div>
-            
             <div class="prompt-container">
                 <span class="prompt-title">🎨 Art Director (Vẽ tranh)</span>
                 <textarea class="prompt-text" id="prompt-art">Bạn là Art Director cho MirAi. CẤU TRÚC: (Quality Tags), (Art Style: makoto shinkai), (Nhân vật: Minh/Vy), (Bối cảnh). INPUT: Đoạn văn tiếng Việt. OUTPUT: Positive & Negative prompt.</textarea>
                 <button class="btn-action copy-btn" onclick="copyPrompt('prompt-art')">📋 Copy Prompt</button>
             </div>
-
             <hr style="margin: 20px 0; border-top: 1px dashed #ccc;">
-            
-            <div class="guide-box">
-                <div class="guide-header" onclick="toggleGuide('gc-lora')">🧬 Bí kíp Train LoRA "Nhân bản" (Bấm xem) <span>▼</span></div>
-                <div class="guide-content" id="gc-lora"><p><b>Quy trình tạo dữ liệu Training từ 1 ảnh gốc:</b></p><ol><li>Dùng <b>Colab Stable Diffusion</b> (Tab Img2Img).</li><li>Kéo ảnh gốc vào. Chỉnh <b>Denoising Strength: 0.3 - 0.4</b>.</li><li>Bật <b>ControlNet (Reference_only)</b> để giữ nét mặt.</li><li>Đổi Prompt góc độ/ánh sáng -> Generate 50 ảnh -> Lọc lấy 15 ảnh ngon.</li><li>Mang 15 ảnh đi Train LoRA trên Colab Kohya_ss.</li></ol></div>
-            </div>
-            
             <div class="guide-box">
                 <div class="guide-header" onclick="toggleGuide('gc-logic')">🧪 Logic Lab (Máy Dịch) <span>▼</span></div>
                 <div class="guide-content" id="gc-logic">
@@ -221,12 +226,12 @@
             <h3>🏆 Quản Lý Thành Tựu</h3>
             <div class="guide-box"><div class="guide-header" onclick="toggleGuide('gc-ach')">🏅 Hướng dẫn (Bấm mở) <span>▼</span></div><div class="guide-content" id="gc-ach"><ul><li>B1: Sang <b>AI Lab</b> dịch logic.</li><li>B2: Điền thông tin bên dưới.</li><li>B3: Paste mã vào ô cuối.</li></ul></div></div>
             <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <label>Mã ID:</label><input type="text" id="achId" placeholder="VD: night_owl">
-                <label>Biểu tượng:</label><input type="text" id="achIcon" placeholder="VD: 🦉">
-                <label>Tên hiển thị:</label><input type="text" id="achTitle" placeholder="VD: Cú Đêm">
+                <label>ID:</label><input type="text" id="achId" placeholder="VD: night_owl">
+                <label>Icon:</label><input type="text" id="achIcon" placeholder="VD: 🦉">
+                <label>Tên:</label><input type="text" id="achTitle" placeholder="VD: Cú Đêm">
                 <label>Mô tả:</label><input type="text" id="achDesc" placeholder="VD: Đọc truyện lúc nửa đêm">
                 <label style="color: var(--primary);">⚙️ Điều kiện (Code):</label><input type="text" id="achCondition" placeholder="Paste code vào đây...">
-                <button class="btn" onclick="addAchievement()" style="width: 100%; margin-top: 10px;">➕ Thêm Thành Tựu</button>
+                <button class="btn" onclick="addAchievement()" style="width: 100%; margin-top: 10px;">➕ Thêm</button>
             </div>
             <button class="btn btn-outline" onclick="loadAchievements()" style="width: 100%; margin-bottom: 15px;">🔄 Refresh List</button>
             <div id="ach-list-container">Loading...</div>
@@ -238,13 +243,16 @@
         <div id="ap-icon">💿</div><div id="ap-info"><div id="ap-title">Loading...</div></div><div id="ap-controls"><button onclick="toggleAdminMusic()" id="ap-play-btn">▶️</button><button onclick="nextAdminMusic()">⏭️</button></div>
     </div>
 
-    <!-- JS -->
+    <!-- LIB -->
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>
     
+    <!-- JS LOGIC -->
     <script>
         const SECRET_PASS = "2006";
+        
+        // EDITOR SETUP
         var editor = new EasyMDE({ 
             element: document.getElementById("content"), spellChecker: false, placeholder: "Viết gì đó thật cháy đi Commander...", autosave: { enabled: true, uniqueId: "MirAi_AutoSave", delay: 10000 },
             status: ["lines", { className: "words", defaultValue: function(el){el.innerHTML="0 words"}, onUpdate: function(el){ var txt = editor.value().replace(/!\[.*?\]\(.*?\)/g, "").replace(/\[.*?\]\(.*?\)/g, "").replace(/[#*`~>]/g, "").replace(/[.,:;!?(){}"'\[\]\-]/g, " "); var wc = txt.trim().split(/\s+/).filter(n => n != "").length; el.innerHTML = wc + " words"; }}, "cursor"], 
@@ -252,7 +260,7 @@
         });
         document.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveDraft(); } });
 
-        // AUTH
+        // AUTH & INIT
         document.addEventListener("DOMContentLoaded", () => {
             if (localStorage.getItem('admin_theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
             const token = localStorage.getItem('gh_token');
@@ -261,6 +269,7 @@
             loadDraftsUI();
         });
         document.getElementById('black-screen').addEventListener('click', () => { let pass = prompt("🔒 Mật mã:"); if (pass === SECRET_PASS) { unlockInterface(); saveConfig(); showWelcome(); initAdminMusic(); } else if (pass) { alert("SAI!"); } });
+        
         function showWelcome() { const t = document.getElementById('welcome-toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
         window.login = function(pass) { if(pass === SECRET_PASS) { unlockInterface(); saveConfig(); showWelcome(); initAdminMusic(); } else console.log("WRONG PASS"); }
         function unlockInterface() { document.getElementById('black-screen').style.display = 'none'; document.getElementById('admin-panel').style.display = 'block'; document.body.style.backgroundColor = "#f4f4f4"; document.body.style.overflow = "auto"; if(typeof CONFIG !== 'undefined') document.body.style.backgroundImage = `url('${CONFIG.bgImage}')`; document.getElementById('admin-player').style.display = 'flex'; }
@@ -269,21 +278,25 @@
         function toggleGuide(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
         function switchTab(t) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.querySelectorAll('.glass-box[id^="tab-"]').forEach(d => d.style.display = 'none'); document.getElementById(`tab-${t === 'new' ? 'editor' : (t === 'ailab' ? 'tab-ailab' : 'tab-' + t)}`).style.display = 'block'; document.querySelector(`button[onclick="switchTab('${t}')"]`).classList.add('active'); if(t === 'list') loadChapterList(); if(t === 'music') loadMusicList(); if(t === 'achievements') loadAchievements(); }
 
-        // FUNCTIONS
+        // DRAFTS
         function saveDraft() { const title = document.getElementById('chapTitle').value; const content = editor.value(); if(!title && !content) return alert("Viết gì đó đã!"); const drafts = JSON.parse(localStorage.getItem('mirai_drafts') || "[]"); const newDraft = { id: Date.now(), title: title || "Không tiêu đề", content, date: new Date().toLocaleString() }; const idx = drafts.findIndex(d => d.title === title); if(idx !== -1 && title) drafts[idx] = newDraft; else drafts.unshift(newDraft); localStorage.setItem('mirai_drafts', JSON.stringify(drafts)); document.getElementById('auto-save-status').innerText = "✅ Đã lưu " + new Date().toLocaleTimeString(); document.getElementById('auto-save-status').style.color = "green"; loadDraftsUI(); }
         function loadDraftsUI() { const drafts = JSON.parse(localStorage.getItem('mirai_drafts') || "[]"); const c = document.getElementById('draft-list'); c.innerHTML = drafts.length ? "" : "<p>Chưa có bản nháp.</p>"; drafts.forEach((d, i) => { c.innerHTML += `<div class="draft-item"><div><b>${d.title}</b> <br> <small>${d.date}</small></div><div><button class="btn-action open-btn" onclick="openDraft(${i})">Mở</button><button class="btn-action del-btn" onclick="deleteDraft(${i})">Xóa</button></div></div>`; }); }
         function openDraft(i) { const drafts = JSON.parse(localStorage.getItem('mirai_drafts') || "[]"); document.getElementById('chapTitle').value = drafts[i].title; editor.value(drafts[i].content); switchTab('new'); }
         function deleteDraft(i) { if(!confirm("Xóa nháp?")) return; const drafts = JSON.parse(localStorage.getItem('mirai_drafts') || "[]"); drafts.splice(i, 1); localStorage.setItem('mirai_drafts', JSON.stringify(drafts)); loadDraftsUI(); }
         
+        // TOOLS
         function handleTxtImport() { const r = new FileReader(); r.onload = e => { let txt = e.target.result.replace(/\r\n/g,"\n").replace(/\n/g,"\n\n"); editor.value(txt); }; r.readAsText(document.getElementById('txtInput').files[0]); }
         async function handleImgUpload() { const f = document.getElementById('imgInput').files[0]; if(!f) return; const t = document.getElementById('token').value; document.getElementById('imgStatus').innerText = "⏳ Nén ảnh..."; new Compressor(f, { quality: 0.6, maxWidth: 1200, mimeType: 'image/jpeg', success(result) { document.getElementById('imgStatus').innerText = "⏳ Uploading..."; const r = new FileReader(); r.readAsDataURL(result); r.onload = async function() { try { const b64 = r.result.split(',')[1]; const n = `images/${Date.now()}_opt.jpg`; await githubRequest(n, {message: "up img", content: b64}); const url = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${n}`; editor.codemirror.getDoc().replaceRange(`\n![Minh họa](${url})\n`, editor.codemirror.getDoc().getCursor()); document.getElementById('imgStatus').innerText = "✅ Done!"; } catch(e) { alert("Lỗi: " + e); document.getElementById('imgStatus').innerText=""; } }; }, error(err) { alert(err.message); } }); }
         function runAutoFormat() { let txt = editor.value().replace(/\r\n/g,"\n").replace(/\n{2,}/g,"\n\n").replace(/(?<!\n)\n(?!\n)/g,"\n\n").replace(/^\[(.*?)\]:\s*(.*)$/gm, '**[$1]:** $2').replace(/\((.*?)\)/g, '*($1)*').replace(/^\s*\*\*\*\s*$/gm, '---'); editor.value(txt); alert("✅ Đã định dạng!"); }
         function copyPrompt(id) { const t = document.getElementById(id); t.select(); document.execCommand('copy'); alert("Đã copy Prompt!"); }
         function translateLogic() { let text = document.getElementById('humanLogic').value.toLowerCase(); const dict = [ { k:['giờ','thời gian'], v:'env.hour' }, { k:['số chương','đã đọc','đọc được'], v:'env.readCount' }, { k:['cuộn','lướt'], v:'env.scroll' }, { k:['chương số','id chương'], v:'env.chapId' }, { k:['lớn hơn hoặc bằng','từ'], v:'>=' }, { k:['nhỏ hơn hoặc bằng'], v:'<=' }, { k:['lớn hơn','trên','hơn'], v:'>' }, { k:['nhỏ hơn','dưới'], v:'<' }, { k:['bằng'], v:'==' }, { k:['và'], v:'&&' }, { k:['hoặc'], v:'||' }, { k:['phần trăm','%','chương','giờ'], v:'' } ]; dict.forEach(r => { r.k.forEach(key => { text = text.replace(new RegExp(key, 'gi'), r.v); }); }); document.getElementById('logicResult').value = text.replace(/\s+/g, ' ').trim(); }
 
+        // PUBLISH
         async function sendToDiscord(ti, sch, time) { const wh = document.getElementById('webhook').value; if(!wh) return; let msg = sch ? `⏳ **LÊN LỊCH:** "${ti}" lúc: \`${new Date(time).toLocaleString()}\`!` : `🎉 **CHƯƠNG MỚI:** **"${ti}"** đã lên sóng!\n👉 Đọc ngay: https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}`; try { await fetch(wh, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:msg, username:"MirAi Bot"})}); } catch(e){} }
         async function publishChapter() { const t=document.getElementById('token').value, ti=document.getElementById('chapTitle').value, c=editor.value(), i=document.getElementById('edit-index').value, sch=document.getElementById('scheduleTime').value, s=document.getElementById('status'); if(!t||!ti||!c)return alert("Thiếu info!"); s.innerText = "⏳ Đang xử lý..."; s.style.color="blue"; try { const jR = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {headers:{Authorization:`token ${t}`}}); const jD = await jR.json(); let list = JSON.parse(decodeURIComponent(escape(atob(jD.content)))); let pt = Date.now(); if(sch) pt = new Date(sch).getTime(); let p, h=null; const fid = `chap_${Date.now()}`; if(i!=="") { p=list[i].file; h=document.getElementById('edit-file-sha').value; list[i].title=ti; list[i].timestamp=pt; } else { p=`chapters/${fid}.md`; list.push({id:fid, title:ti, file:p, timestamp:pt}); } const b64 = btoa(unescape(encodeURIComponent(c))), b = {message: `Upd ${ti}`, content: b64}; if(h) b.sha = h; await githubRequest(p, b); const jB = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2)))); await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify({message: "Upd List", content: jB, sha: jD.sha})}); await sendToDiscord(ti, !!sch, pt); s.innerText = "✅ THÀNH CÔNG!"; s.style.color="green"; if(i!=="") switchTab('list'); else resetForm(); } catch(e) { s.innerText = "❌ Lỗi: " + e; s.style.color="red"; } }
         function resetForm() { document.getElementById('chapTitle').value=''; editor.value(''); document.getElementById('edit-index').value=''; document.getElementById('edit-file-sha').value=''; document.getElementById('publishBtn').innerText="🚀 ĐĂNG BÀI"; document.getElementById('cancelBtn').style.display="none"; document.getElementById('editor-title').innerText="📝 Soạn Thảo"; document.getElementById('scheduleTime').value=''; }
+        
+        // LOADERS & ACTIONS
         async function loadChapterList() { const t=document.getElementById('token').value; if(!t)return; try{ const res=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`); const d=await res.json(); window.chapters=JSON.parse(decodeURIComponent(escape(atob(d.content)))); window.jsonSha=d.sha; const c=document.getElementById('list-container'); c.innerHTML=''; window.chapters.forEach((h, i)=>{ let st=(h.timestamp && h.timestamp>Date.now())?"⏳":"✅"; c.innerHTML+=`<div class="chapter-row"><div>#${i+1}: ${h.title} <small>${st}</small></div><div class="action-group"><button class="btn-action edit-btn" onclick="editChap(${i})">✏️</button><button class="btn-action del-btn" onclick="delChap(${i})">🗑</button></div></div>`; }); }catch(e){document.getElementById('list-container').innerHTML="Lỗi: "+e;} }
         async function editChap(i) { const c=window.chapters[i]; switchTab('new'); try{ const res=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${c.file}?t=${Date.now()}`); const d=await res.json(); document.getElementById('chapTitle').value=c.title; editor.value(decodeURIComponent(escape(atob(d.content)))); document.getElementById('edit-index').value=i; document.getElementById('edit-file-sha').value=d.sha; document.getElementById('editor-title').innerText="✏️ Sửa: "+c.title; document.getElementById('publishBtn').innerText="💾 CẬP NHẬT"; document.getElementById('cancelBtn').style.display="block"; }catch(e){alert("Lỗi: "+e);} }
         async function delChap(i) { if(!confirm("Xóa vĩnh viễn?")) return; const t=document.getElementById('token').value; try{ const c=window.chapters[i]; const fR=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${c.file}`); const fD=await fR.json(); await githubRequest(c.file, {message:"Del", sha:fD.sha}, 'DELETE'); window.chapters.splice(i, 1); const jB=btoa(unescape(encodeURIComponent(JSON.stringify(window.chapters, null, 2)))); await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify({message:"Del item", content:jB, sha:window.jsonSha})}); alert("Đã xóa!"); loadChapterList(); }catch(e){alert("Lỗi: "+e);} }
