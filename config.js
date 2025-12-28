@@ -9,7 +9,7 @@ const CONFIG = {
     // 2. Social Media (Thêm link của bro vào đây)
     social: {
         facebook: "https://www.facebook.com/profile.php?id=61584772166691", 
-        discord: "https://discord.gg/r4Y9gUNQ"
+        discord: "https://discord.gg/JJmschXhFG"
     },
 
     // 3. Cấu hình Bình luận (Giscus)
