@@ -3,136 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MirAi Command Center V26 (Secure)</title>
+    <title>MirAi Command Center V26</title>
     
     <!-- LIB CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     
-    <style>
-        :root {
-            /* Light Theme Default */
-            --bg: #f3f4f6;
-            --sidebar-bg: #ffffff;
-            --card-bg: #ffffff;
-            --text: #1f2937;
-            --text-muted: #6b7280;
-            --border: #e5e7eb;
-            --primary: #ff6b81;
-            --accent: #2ecc71;
-            --hover: #f9fafb;
-        }
-
-        [data-theme="dark"] {
-            --bg: #111827;
-            --sidebar-bg: #1f2937;
-            --card-bg: #1f2937;
-            --text: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border: #374151;
-            --primary: #ff6b81;
-            --accent: #10b981;
-            --hover: #374151;
-        }
-
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; transition: 0.3s; }
-
-        /* --- SIDEBAR (DỌC) --- */
-        #sidebar {
-            width: 260px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border);
-            display: flex; flex-direction: column;
-            padding: 20px;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-        
-        .brand { font-size: 1.2rem; font-weight: 800; color: var(--primary); margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
-        .brand i { font-size: 1.5rem; }
-
-        .nav-item {
-            padding: 12px 15px;
-            margin-bottom: 5px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-weight: 600;
-            display: flex; align-items: center; gap: 12px;
-            transition: 0.2s;
-        }
-        .nav-item:hover { background: var(--hover); color: var(--text); }
-        .nav-item.active { background: rgba(255, 107, 129, 0.1); color: var(--primary); }
-        .nav-item i { width: 20px; text-align: center; }
-
-        .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; }
-
-        /* --- MAIN CONTENT --- */
-        #main { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
-        
-        .view-section { display: none; animation: fadeIn 0.3s ease; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
-        
-        /* --- COMPONENTS --- */
-        input, select, textarea {
-            width: 100%; padding: 12px; margin-bottom: 15px;
-            border: 1px solid var(--border); border-radius: 8px;
-            background: var(--bg); color: var(--text);
-            font-family: inherit; transition: 0.2s;
-        }
-        input:focus { outline: 2px solid var(--primary); border-color: transparent; }
-
-        .btn {
-            padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;
-            font-weight: 600; display: inline-flex; align-items: center; gap: 8px;
-            transition: 0.2s;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
-        
-        /* Editor Tweaks */
-        .EasyMDEContainer { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-        .editor-toolbar { border-color: var(--border); background: var(--card-bg); opacity: 0.8; }
-        .editor-toolbar i { color: var(--text); }
-        .CodeMirror { background: var(--card-bg); color: var(--text); border-color: var(--border); font-family: 'JetBrains Mono', monospace; min-height: 500px; }
-        .CodeMirror-cursor { border-left: 1px solid var(--text); }
-
-        /* List Items */
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border); }
-        .list-item:last-child { border-bottom: none; }
-        
-        /* Toast Notification */
-        #toast {
-            position: fixed; bottom: 30px; right: 30px;
-            background: #10b981; color: white; padding: 15px 25px;
-            border-radius: 8px; font-weight: bold;
-            transform: translateY(150%); transition: 0.3s; z-index: 9999;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        #toast.show { transform: translateY(0); }
-
-        /* Lock Screen */
-        #lock-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 10000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: var(--primary); font-family: 'JetBrains Mono', monospace;
-        }
-        
-        /* Mini Player in Sidebar */
-        #mini-player {
-            margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.05);
-            border-radius: 10px; text-align: center; border: 1px solid var(--border);
-        }
-        #mp-title { font-size: 0.8rem; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    </style>
+    <!-- CUSTOM CSS (Module hóa) -->
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
 
@@ -161,7 +40,6 @@
             <div class="nav-item" onclick="switchView('settings')"><i class="fas fa-cog"></i> Cấu hình</div>
             <div class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-sign-out-alt"></i> Thoát</div>
             
-            <!-- MINI PLAYER -->
             <div id="mini-player" style="display:none">
                 <div id="mp-title">Đang tải...</div>
                 <button class="btn btn-primary" onclick="toggleAdminMusic()" style="padding: 5px 10px; font-size: 0.8rem;">⏯️</button>
@@ -186,14 +64,34 @@
             <div class="card">
                 <input type="text" id="chapTitle" placeholder="Tiêu đề chương (VD: Chương 1: Khởi đầu)" style="font-size: 1.2rem; font-weight: bold;">
                 
-                <!-- Toolbar phụ -->
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button class="btn btn-outline" onclick="document.getElementById('imgInput').click()"><i class="fas fa-image"></i> Ảnh</button>
+                <!-- TOOLBAR XỊN SÒ (Đã tích hợp Snippets & KPI) -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
+                    <button class="btn btn-outline" onclick="document.getElementById('imgInput').click()" title="Upload Ảnh"><i class="fas fa-image"></i></button>
                     <input type="file" id="imgInput" hidden accept="image/*" onchange="handleImgUpload()">
+                    <button class="btn btn-outline" onclick="runAutoFormat()" title="Format lại"><i class="fas fa-magic"></i></button>
                     
-                    <button class="btn btn-outline" onclick="runAutoFormat()"><i class="fas fa-magic"></i> AI Format</button>
-                    
-                    <div style="flex: 1;"></div> <!-- Spacer -->
+                    <!-- Menu Chèn Nhanh -->
+                    <div style="position: relative;">
+                        <button class="btn btn-outline" onclick="toggleSnippets()">⚡ Chèn...</button>
+                        <div id="snippet-menu" class="dropdown-menu">
+                            <div onclick="insertText('\n❖ ── ✦ ── ❖\n')">💠 Phân cách (Hoa văn)</div>
+                            <div onclick="insertText('\n---\n')">➖ Phân cách (Kẻ ngang)</div>
+                            <div onclick="insertText('> **Note:** ')">📝 Ghi chú tác giả</div>
+                            <div onclick="insertText('*oc* ')">💭 Suy nghĩ nhân vật</div>
+                        </div>
+                    </div>
+
+                    <!-- Thanh KPI -->
+                    <div class="stats-container" title="Mục tiêu: 2000 từ">
+                        <div class="stats-info">
+                            <span id="word-count" style="color: var(--text);">0 từ</span>
+                            <span id="read-time" style="color: var(--text-muted); font-size: 0.75rem;">(~0p đọc)</span>
+                        </div>
+                        <div class="progress-bg">
+                            <div id="word-progress" class="progress-fill"></div>
+                        </div>
+                    </div>
+
                     <input type="datetime-local" id="scheduleTime" style="width: auto; margin:0;" title="Hẹn giờ đăng">
                 </div>
 
@@ -203,7 +101,6 @@
                 </div>
             </div>
 
-            <!-- Hidden Inputs -->
             <input type="hidden" id="edit-index" value="">
             <input type="hidden" id="edit-file-sha" value="">
         </div>
@@ -217,21 +114,17 @@
             <div class="card" id="list-container">Đang tải dữ liệu...</div>
         </div>
 
-        <!-- VIEW: SETTINGS (CẤU HÌNH BẢO MẬT) -->
+        <!-- VIEW: SETTINGS -->
         <div id="view-settings" class="view-section">
              <div class="card">
                 <h3>🔑 Cấu hình kết nối & Bảo mật</h3>
-                <label for="token">GitHub Token:</label>
+                <label>GitHub Token:</label>
                 <input type="password" id="token" placeholder="ghp_..." onchange="saveConfig()">
-                
                 <div style="margin-bottom: 15px;">
                     <input type="checkbox" id="rememberToken" onchange="saveConfig()" style="width: auto; margin-right: 5px;">
-                    <label for="rememberToken" style="font-size: 0.9rem; color: var(--text-muted);">
-                        Lưu Token vào trình duyệt (⚠️ **NGUY HIỂM!** Ai có mật khẩu Admin sẽ thấy token của bro)
-                    </label>
+                    <label for="rememberToken" style="font-size: 0.9rem; color: var(--text-muted);">Lưu Token vào trình duyệt (⚠️ Cẩn thận)</label>
                 </div>
-
-                <label for="webhook">Discord Webhook:</label>
+                <label>Discord Webhook:</label>
                 <input type="password" id="webhook" placeholder="https://discord.com/api/..." onchange="saveConfig()">
              </div>
         </div>
@@ -283,472 +176,7 @@
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>
-
-    <script>
-        const SECRET_PASS = "2006"; // Mật khẩu đăng nhập
-        let editor;
-
-        // --- 1. CORE & UI ---
-        document.addEventListener("DOMContentLoaded", () => {
-            // Theme Init
-            if(localStorage.getItem('admin_theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
-            
-            // Editor Init
-            editor = new EasyMDE({
-                element: document.getElementById("content"),
-                spellChecker: false,
-                status: ["lines", "words"],
-                placeholder: "Paste nội dung từ Google Docs vào đây (Ctrl+V)...",
-                autosave: { enabled: true, uniqueId: "MirAi_Draft", delay: 5000 },
-            });
-
-            // 🔥 SMART PASTE MIDDLEWARE (TỰ ĐỘNG LỌC RÁC GOOGLE DOCS)
-            editor.codemirror.on("paste", (cm, event) => {
-                event.preventDefault();
-                let text = event.clipboardData.getData("text/plain");
-                if (!text) return;
-
-                // Logic Format Thần Thánh
-                let processed = text.trim()
-                    .replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n")
-                    .replace(/…/g, "...")
-                    .replace(/^\[(.*?)\]:\s*(.*)$/gm, '**[$1]:** $2') // [Tên]: -> Đậm
-                    .replace(/\((.*?)\)/g, '*($1)*') // (nghĩ) -> Nghiêng
-                    .replace(/^\s*\*\*\*\s*$/gm, '---'); // *** -> Kẻ ngang
-
-                cm.replaceSelection(processed);
-                showToast("⚡ Đã Smart Paste & Format!");
-            });
-
-            // Load Config (CHỈ LOAD TOKEN NẾU ĐƯỢC CHỌN LƯU)
-            const savedToken = localStorage.getItem('gh_token');
-            const rememberMe = localStorage.getItem('remember_token') === 'true';
-
-            if (savedToken && rememberMe) {
-                document.getElementById('token').value = savedToken;
-                document.getElementById('rememberToken').checked = true;
-            }
-            document.getElementById('webhook').value = localStorage.getItem('discord_webhook') || '';
-            
-            // Nếu có token hoặc webhook thì mở khóa luôn (tiện cho việc test)
-            // Hoặc có thể yêu cầu nhập pass trước rồi mới check token
-            // Hiện tại vẫn dùng pass 2006
-        });
-
-        // --- AUTH & UI ---
-        document.getElementById('lock-screen').addEventListener('click', login);
-        window.addEventListener('keydown', (e) => { if(e.key === 'F12') login(); });
-
-        function login() {
-            let pass = prompt("🔑 Mật mã:");
-            if (pass === SECRET_PASS) {
-                unlockInterface();
-                // Nếu có token lưu sẵn, tự động fill vào
-                const savedToken = localStorage.getItem('gh_token');
-                const rememberMe = localStorage.getItem('remember_token') === 'true';
-                if (savedToken && rememberMe) {
-                    document.getElementById('token').value = savedToken;
-                    document.getElementById('rememberToken').checked = true;
-                }
-            } else if (pass) {
-                alert("SAI MẬT MÃ!");
-            }
-        }
-
-        function unlockInterface() {
-            document.getElementById('lock-screen').style.display = 'none';
-            document.getElementById('main').style.display = 'flex'; // Hiển thị main content
-            initAdminMusic();
-        }
-
-        function saveConfig() {
-            const tokenInput = document.getElementById('token').value;
-            const rememberCheckbox = document.getElementById('rememberToken').checked;
-            
-            // Lưu Token (chỉ khi checkbox được tích)
-            if (rememberCheckbox) {
-                localStorage.setItem('gh_token', tokenInput);
-                localStorage.setItem('remember_token', 'true');
-                showToast("💾 Đã lưu Token & cấu hình!");
-            } else {
-                localStorage.removeItem('gh_token'); // Xóa token nếu bỏ tích
-                localStorage.setItem('remember_token', 'false');
-                showToast("⚠️ Token sẽ không được lưu!");
-            }
-            localStorage.setItem('discord_webhook', document.getElementById('webhook').value);
-        }
-
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active'); // Highlight sidebar
-
-            if(viewId === 'list') loadChapterList();
-            if(viewId === 'music') loadMusicList();
-            if(viewId === 'achievements') loadAchievements();
-        }
-
-        function toggleTheme() {
-            const isDark = document.body.getAttribute('data-theme') === 'dark';
-            document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            localStorage.setItem('admin_theme', isDark ? 'light' : 'dark');
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        // --- 3. EDITOR & PUBLISH ---
-        function runAutoFormat() {
-            let txt = editor.value();
-            let processed = txt.replace(/^\[(.*?)\]:\s*(.*)$/gm, '**[$1]:** $2').replace(/\((.*?)\)/g, '*($1)*');
-            editor.value(processed);
-            showToast("✨ Đã Format lại thủ công");
-        }
-
-        async function handleImgUpload() {
-            const f = document.getElementById('imgInput').files[0];
-            if(!f) return;
-            showToast("⏳ Đang nén & Up ảnh...");
-            
-            new Compressor(f, {
-                quality: 0.6, maxWidth: 1200,
-                success(result) {
-                    const r = new FileReader();
-                    r.readAsDataURL(result);
-                    r.onload = async function() {
-                        try {
-                            const b64 = r.result.split(',')[1];
-                            const path = `images/${Date.now()}_img.jpg`;
-                            await githubRequest(path, {message: "up img", content: b64});
-                            const url = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${path}`;
-                            editor.codemirror.replaceSelection(`\n![Ảnh](${url})\n`);
-                            showToast("🖼️ Ảnh đã lên!");
-                        } catch(e) { alert("Lỗi: " + e); }
-                    };
-                },
-                error(err) { alert("Lỗi nén ảnh: " + err.message); }
-            });
-        }
-
-        async function publishChapter() {
-            const title = document.getElementById('chapTitle').value;
-            const content = editor.value();
-            const token = document.getElementById('token').value; // Lấy token trực tiếp từ input
-            if(!title || !content || !token) return alert("Thiếu tiêu đề, nội dung hoặc GitHub Token!");
-
-            document.getElementById('publishBtn').innerText = "⏳ Đang xử lý...";
-            
-            try {
-                // 1. Get List
-                const listRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`, {headers:{Authorization:`token ${token}`}});
-                const listData = await listRes.json();
-                let chapters = JSON.parse(decodeURIComponent(escape(atob(listData.content))));
-
-                // 2. Prepare File
-                const editIndex = document.getElementById('edit-index').value;
-                const schedule = document.getElementById('scheduleTime').value;
-                const timestamp = schedule ? new Date(schedule).getTime() : Date.now();
-                
-                let filePath, sha = null;
-                if(editIndex !== "") {
-                    filePath = chapters[editIndex].file;
-                    // Lấy SHA của file MD để update (quan trọng)
-                    const fileInfoRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${filePath}`, {headers:{Authorization:`token ${token}`}});
-                    const fileInfo = await fileInfoRes.json();
-                    sha = fileInfo.sha;
-
-                    chapters[editIndex].title = title;
-                    chapters[editIndex].timestamp = timestamp;
-                } else {
-                    filePath = `chapters/chap_${Date.now()}.md`;
-                    chapters.push({id: `chap_${Date.now()}`, title: title, file: filePath, timestamp: timestamp});
-                }
-
-                // 3. Upload MD
-                const b64Content = btoa(unescape(encodeURIComponent(content)));
-                let body = {message: `Update ${title}`, content: b64Content};
-                if(sha) body.sha = sha;
-                await githubRequest(filePath, body);
-
-                // 4. Update List
-                const b64List = btoa(unescape(encodeURIComponent(JSON.stringify(chapters, null, 2))));
-                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
-                    method: 'PUT', headers: {Authorization: `token ${token}`},
-                    body: JSON.stringify({message: "Update List", content: b64List, sha: listData.sha})
-                });
-
-                // 5. Notify
-                const wh = document.getElementById('webhook').value;
-                if(wh && !editIndex) {
-                    fetch(wh, {
-                        method: "POST", headers: {"Content-Type":"application/json"},
-                        body: JSON.stringify({content: `🎉 **CHƯƠNG MỚI:** ${title}\n👉 Link: https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}`})
-                    });
-                }
-
-                showToast("🚀 ĐĂNG BÀI THÀNH CÔNG!");
-                resetEditor();
-            } catch(e) { alert("Lỗi: " + e); console.error(e); }
-            document.getElementById('publishBtn').innerText = "🚀 ĐĂNG BÀI";
-        }
-
-        // --- 4. LIST & EDIT ---
-        async function loadChapterList() {
-            const c = document.getElementById('list-container');
-            c.innerHTML = "⏳ Đang tải...";
-            const token = document.getElementById('token').value; // Lấy token trực tiếp từ input
-            if(!token) { c.innerHTML = "Vui lòng nhập GitHub Token!"; return; }
-
-            try {
-                const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`, {headers:{Authorization:`token ${token}`}});
-                if (!res.ok) throw new Error("Lỗi tải data.json, kiểm tra Token/Repo!");
-                const data = await res.json();
-                window.chaptersCache = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                window.jsonSha = data.sha; // Lưu SHA của data.json
-
-                c.innerHTML = "";
-                window.chaptersCache.forEach((item, i) => {
-                    let status = (item.timestamp && item.timestamp > Date.now()) ? '<span style="color:#f39c12">⏳ Hẹn giờ</span>' : '<span style="color:#2ecc71">✅ Đã đăng</span>';
-                    let div = document.createElement('div');
-                    div.className = 'list-item';
-                    div.innerHTML = `
-                        <div><b>#${i+1}: ${item.title}</b> <br> <small>${status}</small></div>
-                        <div>
-                            <button class="btn btn-outline" onclick="editChapter(${i})"><i class="fas fa-pen"></i></button>
-                            <button class="btn btn-outline" style="color:#e74c3c; border-color:#e74c3c" onclick="deleteChapter(${i})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    `;
-                    c.appendChild(div);
-                });
-            } catch(e) { c.innerHTML = "Lỗi tải danh sách: " + e.message; }
-        }
-
-        async function editChapter(i) {
-            const item = window.chaptersCache[i];
-            switchView('editor');
-            showToast("⏳ Đang tải nội dung...");
-            const token = document.getElementById('token').value; // Lấy token trực tiếp từ input
-            if(!token) { showToast("Vui lòng nhập GitHub Token!"); return; }
-            
-            try {
-                const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${item.file}?t=${Date.now()}`, {headers:{Authorization:`token ${token}`}});
-                if (!res.ok) throw new Error("Lỗi tải nội dung chương, kiểm tra Token/File!");
-                const fileData = await res.json();
-                const text = decodeURIComponent(escape(atob(fileData.content)));
-                
-                document.getElementById('chapTitle').value = item.title;
-                editor.value(text);
-                document.getElementById('edit-index').value = i;
-                document.getElementById('edit-file-sha').value = fileData.sha; // LƯU SHA CỦA FILE MD
-                document.getElementById('publishBtn').innerText = "💾 CẬP NHẬT";
-                
-                showToast("✏️ Đang sửa chương: " + item.title);
-            } catch(e) { alert("Lỗi: " + e.message); }
-        }
-
-        function resetEditor() {
-            document.getElementById('chapTitle').value = "";
-            editor.value("");
-            document.getElementById('edit-index').value = "";
-            document.getElementById('edit-file-sha').value = ""; // Reset SHA
-            document.getElementById('publishBtn').innerText = "🚀 ĐĂNG BÀI";
-            document.getElementById('scheduleTime').value = "";
-            showToast("Đã reset Editor.");
-        }
-
-        async function deleteChapter(i) {
-            if(!confirm("⚠️ CẢNH BÁO: Xóa là mất vĩnh viễn!\nBro có chắc muốn xóa chương này không?")) return;
-
-            const item = window.chaptersCache[i];
-            const token = document.getElementById('token').value;
-            if(!token) { alert("Vui lòng nhập GitHub Token!"); return; }
-            showToast("⏳ Đang xóa file trên GitHub...");
-
-            try {
-                // BƯỚC 1: Xóa file .md (Cần lấy SHA của file đó trước)
-                const fileRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${item.file}`, {
-                    headers: { Authorization: `token ${token}` }
-                });
-
-                if (fileRes.ok) {
-                    const fileData = await fileRes.json();
-                    await githubRequest(item.file, { message: `Delete ${item.title}`, sha: fileData.sha }, 'DELETE');
-                } else {
-                    console.warn("File MD không tồn tại, chỉ xóa trong danh sách. Lỗi: " + fileRes.statusText);
-                }
-
-                // BƯỚC 2: Cập nhật data.json (Xóa khỏi danh sách mục lục)
-                // Lấy SHA mới nhất của data.json để tránh xung đột
-                const listRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`, {
-                    headers: { Authorization: `token ${token}` }
-                });
-                if (!listRes.ok) throw new Error("Lỗi tải data.json để cập nhật sau xóa!");
-                const listData = await listRes.json();
-                
-                let currentChapters = JSON.parse(decodeURIComponent(escape(atob(listData.content))));
-                currentChapters = currentChapters.filter(c => c.id !== item.id);
-
-                const b64List = btoa(unescape(encodeURIComponent(JSON.stringify(currentChapters, null, 2))));
-                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
-                    method: 'PUT',
-                    headers: { Authorization: `token ${token}` },
-                    body: JSON.stringify({
-                        message: `Remove ${item.title}`,
-                        content: b64List,
-                        sha: listData.sha
-                    })
-                });
-
-                showToast("🗑️ Đã xóa thành công!");
-                loadChapterList();
-            } catch (e) {
-                alert("Lỗi khi xóa: " + e.message);
-            }
-        }
-
-        // --- 5. MUSIC & ACH (GIỮ NGUYÊN LOGIC CŨ, ĐÃ CẬP NHẬT UI) ---
-        async function loadMusicList() { 
-            const c=document.getElementById('music-list-container'); c.innerHTML="Loading..."; 
-            const t=document.getElementById('token').value; 
-            if(!t) {c.innerHTML="Vui lòng nhập GitHub Token!"; return;}
-            try { 
-                const res=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/music.json?t=${Date.now()}`, {headers:{Authorization:`token ${t}`}}); 
-                if (!res.ok) { window.musicData=[]; c.innerHTML="Trống"; return; } 
-                const d=await res.json(); 
-                window.musicData=JSON.parse(decodeURIComponent(escape(atob(d.content)))); 
-                window.musicSha=d.sha; 
-                c.innerHTML=''; 
-                window.musicData.forEach((s,i)=>{ c.innerHTML+=`<div class="list-item"><div>🎵 ${s.title}</div><button class="btn btn-outline" style="color:#e74c3c; border-color:#e74c3c" onclick="delSong(${i})"><i class="fas fa-trash"></i></button></div>` }); 
-            } catch(e) { c.innerHTML="Lỗi: "+e.message; window.musicData=[]; } 
-        }
-
-        async function uploadMusic() { 
-            const t=document.getElementById('token').value, ti=document.getElementById('songTitle').value, f=document.getElementById('mp3Input').files[0]; 
-            if(!t||!ti||!f)return alert("Thiếu thông tin hoặc GitHub Token!"); 
-            showToast("⏳ Uploading Music..."); 
-            const r=new FileReader(); r.readAsDataURL(f); 
-            r.onload=async function(){ 
-                try { 
-                    const b64=r.result.split(',')[1], p=`images/music/${Date.now()}_${f.name}`; 
-                    await githubRequest(p, {message:"Up Song", content:b64}); 
-                    if (!window.musicData) await loadMusicList(); // Ensure musicData is loaded
-                    window.musicData.push({title:ti, url:p}); 
-                    const jB={message:"Up List", content:btoa(unescape(encodeURIComponent(JSON.stringify(window.musicData,null,2))))}; 
-                    if (window.musicSha) jB.sha=window.musicSha; 
-                    await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/music.json`, {method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify(jB)}); 
-                    showToast("🎵 Đã Upload nhạc!"); document.getElementById('songTitle').value=''; loadMusicList(); 
-                } catch(e) { alert("Lỗi: " + e.message); } 
-            } 
-        }
-
-        async function delSong(i) { 
-            if (!confirm("Xóa nhạc?")) return; 
-            const t=document.getElementById('token').value; 
-            if(!t) { alert("Vui lòng nhập GitHub Token!"); return; }
-            showToast("⏳ Đang xóa nhạc...");
-            try {
-                const songToDelete = window.musicData[i];
-                // Xóa file MP3 khỏi repo trước (cần SHA)
-                const fileRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${songToDelete.url}`, {headers:{Authorization:`token ${t}`}});
-                if (fileRes.ok) {
-                    const fileData = await fileRes.json();
-                    await githubRequest(songToDelete.url, {message:"Del Song File", sha:fileData.sha}, 'DELETE');
-                } else {
-                    console.warn("File nhạc không tồn tại trên repo. Chỉ xóa khỏi playlist.");
-                }
-
-                window.musicData.splice(i, 1); 
-                const jB={message:"Del Song from List", content:btoa(unescape(encodeURIComponent(JSON.stringify(window.musicData, null, 2)))), sha:window.musicSha}; 
-                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/music.json`, {method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify(jB)}); 
-                showToast("🗑️ Đã xóa nhạc!"); loadMusicList(); 
-            } catch(e) { alert("Lỗi: " + e.message); } 
-        }
-
-        async function loadAchievements() { 
-            const c=document.getElementById('ach-list-container'); c.innerHTML="Loading..."; 
-            const t=document.getElementById('token').value; 
-            if(!t) {c.innerHTML="Vui lòng nhập GitHub Token!"; return;}
-            try { 
-                const res=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/achievements.json?t=${Date.now()}`, {headers:{Authorization:`token ${t}`}}); 
-                if (!res.ok) { window.achData=[]; c.innerHTML="Trống"; return; } 
-                const d=await res.json(); 
-                window.achData=JSON.parse(decodeURIComponent(escape(atob(d.content)))); 
-                window.achSha=d.sha; 
-                c.innerHTML=''; 
-                window.achData.forEach((a,i)=>{ c.innerHTML+=`<div class="list-item"><div>${a.icon} <b>${a.title}</b><br><small style="color:var(--primary); font-family:monospace">${a.condition}</small></div><button class="btn btn-outline" style="color:#e74c3c; border-color:#e74c3c" onclick="delAchievement(${i})"><i class="fas fa-trash"></i></button></div>`; }); 
-            } catch(e) { c.innerHTML="Lỗi: "+e.message; } 
-        }
-
-        async function addAchievement() { 
-            const id=document.getElementById('achId').value, icon=document.getElementById('achIcon').value, title=document.getElementById('achTitle').value, desc=document.getElementById('achDesc').value, cond=document.getElementById('achCondition').value, t=document.getElementById('token').value; 
-            if (!id||!title||!t) return alert("Thiếu thông tin hoặc GitHub Token!"); 
-            showToast("⏳ Đang thêm thành tựu...");
-            if (!window.achData) window.achData=[]; 
-            window.achData.push({id, icon, title, desc, condition: cond}); 
-            const jB={message:"Upd Ach", content:btoa(unescape(encodeURIComponent(JSON.stringify(window.achData,null,2))))}; 
-            if (window.achSha) jB.sha=window.achSha; 
-            await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/achievements.json`, {method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify(jB)}); 
-            showToast("🏆 Đã thêm thành tựu!"); loadAchievements(); 
-        }
-
-        async function delAchievement(i) { 
-            if (!confirm("Xóa thành tựu?")) return; 
-            const t=document.getElementById('token').value; 
-            if(!t) { alert("Vui lòng nhập GitHub Token!"); return; }
-            showToast("⏳ Đang xóa thành tựu...");
-            window.achData.splice(i, 1); 
-            const jB={message:"Del Ach", content:btoa(unescape(encodeURIComponent(JSON.stringify(window.achData,null,2)))), sha:window.achSha}; 
-            await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/achievements.json`, {method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify(jB)}); 
-            showToast("🗑️ Đã xóa thành tựu!"); loadAchievements(); 
-        }
-        
-        // --- 6. UTILS ---
-        async function githubRequest(path, body, method='PUT') {
-            const token = document.getElementById('token').value;
-            if(!token) throw new Error("GitHub Token chưa được nhập!"); // Bắt lỗi nếu token rỗng
-            return fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {
-                method: method,
-                headers: {Authorization: `token ${token}`},
-                body: JSON.stringify(body)
-            });
-        }
-
-        function translateLogic() {
-            let t = document.getElementById('humanLogic').value.toLowerCase();
-            const map = { 'giờ': 'env.hour', 'thời gian': 'env.hour', 'số chương': 'env.readCount', 'đã đọc': 'env.readCount', 'đọc được': 'env.readCount', 'cuộn': 'env.scroll', 'lướt': 'env.scroll', 'chương số': 'env.chapId', 'id chương': 'env.chapId', 'lớn hơn hoặc bằng': '>=', 'từ': '>=', 'nhỏ hơn hoặc bằng': '<=', 'lớn hơn': '>', 'trên': '>', 'hơn': '>', 'nhỏ hơn': '<', 'dưới': '<', 'bằng': '==', 'và': '&&', 'hoặc': '||', 'phần trăm': '', '%': '', 'chương': '', 'giờ': '' };
-            for(let k in map) t = t.replace(new RegExp(k, 'gi'), map[k]); // Use 'gi' for global, case-insensitive
-            document.getElementById('logicResult').value = t.replace(/\s+/g, ' ').trim();
-        }
-
-        // Mini Player Logic
-        const adminBgm = new Audio(); let adminPlaylist = []; let adminTrackIdx = 0;
-        async function initAdminMusic() { 
-            try {
-                const res = await fetch(`music.json?t=${Date.now()}`);
-                if(res.ok) {
-                    adminPlaylist = await res.json();
-                    if(adminPlaylist.length > 0) {
-                        document.getElementById('mini-player').style.display = 'block';
-                        adminBgm.src = adminPlaylist[0].url;
-                        document.getElementById('mp-title').innerText = adminPlaylist[0].title;
-                    }
-                }
-            } catch(e){}
-        }
-        function toggleAdminMusic() { adminBgm.paused ? adminBgm.play() : adminBgm.pause(); }
-        function nextAdminMusic() { 
-            adminTrackIdx = (adminTrackIdx + 1) % adminPlaylist.length;
-            adminBgm.src = adminPlaylist[adminTrackIdx].url;
-            document.getElementById('mp-title').innerText = adminPlaylist[adminTrackIdx].title;
-            adminBgm.play();
-        }
-
-    </script>
+    <!-- CUSTOM JS (Module hóa) -->
+    <script src="js/admin.js"></script>
 </body>
 </html>
