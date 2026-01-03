@@ -185,17 +185,30 @@ async function deleteChapter(i) {
     if(!confirm("Xóa vĩnh viễn?")) return;
     const item = window.chaptersCache[i], t = document.getElementById('token').value;
     try {
+        // 1. Xóa File .md (Nếu tồn tại)
         const fRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${item.file}`, {headers:{Authorization:`token ${t}`}});
-        if(fRes.ok) await githubRequest(item.file, {message:`Del ${item.title}`, sha:(await fRes.json()).sha}, 'DELETE');
+        if(fRes.ok) {
+            const fData = await fRes.json(); // Đọc xong lưu vào biến
+            await githubRequest(item.file, {message:`Del ${item.title}`, sha: fData.sha}, 'DELETE');
+        }
         
+        // 2. Cập nhật data.json (FIX LỖI Ở ĐÂY)
         const lRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {headers:{Authorization:`token ${t}`}});
-        let list = JSON.parse(decodeURIComponent(escape(atob((await lRes.json()).content)))).filter(c => c.id !== item.id);
-        await githubRequest('data.json', {message:`Rm ${item.title}`, content: btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2)))), sha:(await lRes.json()).sha});
+        const lData = await lRes.json(); // <--- ĐỌC 1 LẦN DUY NHẤT LƯU VÀO BIẾN
+        
+        // Dùng lData để lấy content
+        let list = JSON.parse(decodeURIComponent(escape(atob(lData.content)))).filter(c => c.id !== item.id);
+        
+        // Dùng lData để lấy SHA (Không gọi .json() lần nữa)
+        await githubRequest('data.json', {
+            message: `Rm ${item.title}`, 
+            content: btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2)))), 
+            sha: lData.sha
+        });
         
         showToast("🗑️ Đã xóa!"); loadChapterList();
-    } catch(e) { alert(e); }
+    } catch(e) { alert("Lỗi: " + e); }
 }
-
 // --- MUSIC & UTILS ---
 // (Logic nhạc và AI Lab giữ nguyên, đã rút gọn trong githubRequest)
 function translateLogic() {
