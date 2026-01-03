@@ -9,86 +9,87 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* CSS TÙY CHỈNH CHO TRANG HUB */
+    /* CSS TÙY CHỈNH CHO TRANG HUB */
 
-        /* [MỚI] ĐỊNH NGHĨA LẠI MÀU CHO LIGHT MODE DỊU MẮT HƠN */
-        :root {
-            --bg-body: #f0f2f5;       /* Nền xám nhạt (giống Facebook) */
-            --bg-card: #ffffff;       /* Card vẫn trắng để nổi bật */
-            --text-main: #333333;     /* Chữ xám đậm */
-            --text-muted: #888888;
-            --border: #e5e7eb;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Bóng đổ nhẹ hơn */
-        }
-        
-        /* Dark mode giữ nguyên từ style.css */
+    /* [FIX] Đảm bảo các biến màu được áp dụng đúng */
+    body {
+        /* Nạp các biến màu từ style.css */
+        background-color: var(--bg-body);
+        color: var(--text-main);
+    }
+    
+    /* Layout */
+    .hub-container {
+        max-width: 960px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
 
-        /* Layout */
-        .hub-container {
-            max-width: 960px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+    /* Header */
+    .hub-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    .hub-header h1 {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 5px;
+    }
+    .hub-header .tagline {
+        color: var(--text-muted); /* Dùng biến màu */
+    }
 
-        /* Header */
-        .hub-header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-        .hub-header h1 {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
+    /* Grid Modules */
+    .databook-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 25px;
+    }
 
-        /* Grid Modules */
-        .databook-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
-        }
-        .module-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            text-align: center;
-            transition: all 0.3s;
-            box-shadow: var(--shadow);
-            text-decoration: none;
-            color: inherit;
-        }
-        .module-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--primary);
-        }
+    .module-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 30px 20px;
+        background: var(--bg-card); /* Dùng biến màu */
+        border: 1px solid var(--border); /* Dùng biến màu */
+        border-radius: 16px;
+        text-align: center;
+        transition: all 0.3s;
+        box-shadow: var(--shadow); /* Dùng biến màu */
+        text-decoration: none;
+        color: inherit;
+    }
+    .module-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--primary);
+    }
 
-        .module-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: var(--primary);
-            width: 70px;
-            height: 70px;
-            background: rgba(255, 107, 129, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .module-title {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--text-main);
-        }
-        .module-desc {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-top: 8px;
-        }
-    </style>
+    .module-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        color: var(--primary);
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 107, 129, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .module-title {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--text-main); /* Dùng biến màu */
+    }
+
+    .module-desc {
+        font-size: 0.9rem;
+        color: var(--text-muted); /* Dùng biến màu */
+        margin-top: 8px;
+    }
+</style>
 </head>
 <body>
 
