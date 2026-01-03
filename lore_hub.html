@@ -4,139 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MirAi Databook</title>
-    <!-- DÙNG LẠI CSS GỐC -->
-    <link rel="stylesheet" href="css/style.css"> 
+    <!-- CSS RIÊNG BIỆT CHO LORE -->
+    <link rel="stylesheet" href="css/lore.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-    /* CSS TÙY CHỈNH CHO TRANG HUB */
-
-    /* [FIX] Đảm bảo các biến màu được áp dụng đúng */
-    body {
-        /* Nạp các biến màu từ style.css */
-        background-color: var(--bg-body);
-        color: var(--text-main);
-    }
-    
-    /* Layout */
-    .hub-container {
-        max-width: 960px;
-        margin: 40px auto;
-        padding: 0 20px;
-    }
-
-    /* Header */
-    .hub-header {
-        text-align: center;
-        margin-bottom: 50px;
-    }
-    .hub-header h1 {
-        font-size: 2.5rem;
-        color: var(--primary);
-        margin-bottom: 5px;
-    }
-    .hub-header .tagline {
-        color: var(--text-muted); /* Dùng biến màu */
-    }
-
-    /* Grid Modules */
-    .databook-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 25px;
-    }
-
-    .module-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 30px 20px;
-        background: var(--bg-card); /* Dùng biến màu */
-        border: 1px solid var(--border); /* Dùng biến màu */
-        border-radius: 16px;
-        text-align: center;
-        transition: all 0.3s;
-        box-shadow: var(--shadow); /* Dùng biến màu */
-        text-decoration: none;
-        color: inherit;
-    }
-    .module-card:hover {
-        transform: translateY(-8px);
-        border-color: var(--primary);
-    }
-
-    .module-icon {
-        font-size: 2.5rem;
-        margin-bottom: 15px;
-        color: var(--primary);
-        width: 70px;
-        height: 70px;
-        background: rgba(255, 107, 129, 0.1);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .module-title {
-        font-weight: 700;
-        font-size: 1.2rem;
-        color: var(--text-main); /* Dùng biến màu */
-    }
-
-    .module-desc {
-        font-size: 0.9rem;
-        color: var(--text-muted); /* Dùng biến màu */
-        margin-top: 8px;
-    }
-</style>
 </head>
-<body>
+<body class="lore-body">
 
-    <div class="hub-container">
+    <div class="lore-container">
         <!-- HEADER -->
-        <div class="hub-header">
+        <header class="lore-header">
             <h1>MIRAI DATABOOK</h1>
-            <p class="tagline">Cơ sở dữ liệu về Vũ trụ MirAi.</p>
-            
-            <!-- [MỚI] Cụm nút điều khiển -->
-            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-                <a href="index.html" class="btn btn-outline">⬅ Quay về truyện chính</a>
-                <button class="btn" onclick="toggleTheme()">🌙 Đổi Giao Diện</button>
-            </div>
-        </div>
+            <p>Cơ sở dữ liệu về Vũ trụ MirAi.</p>
+            <a href="index.html" class="btn">⬅ Quay về truyện chính</a>
+            <!-- Nút Dark Mode sẽ được JS thêm vào đây -->
+        </header>
 
         <!-- GRID MODULES -->
-        <div class="databook-grid">
+        <main class="databook-grid">
             <a href="list.html?db=wiki" class="module-card">
                 <div class="module-icon"><i class="fas fa-users"></i></div>
-                <div class="module-title">Wiki Nhân Vật</div>
-                <div class="module-desc">Hồ sơ, thông số, sở thích.</div>
+                <div>
+                    <div class="module-title">Wiki Nhân Vật</div>
+                    <div class="module-desc">Hồ sơ, thông số, sở thích.</div>
+                </div>
             </a>
             <a href="list.html?db=tech" class="module-card">
                 <div class="module-icon"><i class="fas fa-cogs"></i></div>
-                <div class="module-title">Cây Công Nghệ</div>
-                <div class="module-desc">Lịch sử, mã nguồn mở, cơ chế vật lý.</div>
+                <div>
+                    <div class="module-title">Cây Công Nghệ</div>
+                    <div class="module-desc">Lịch sử, mã nguồn mở, cơ chế vật lý.</div>
+                </div>
             </a>
             <a href="list.html?db=prequel" class="module-card">
                 <div class="module-icon"><i class="fas fa-history"></i></div>
-                <div class="module-title">Tiền Truyện</div>
-                <div class="module-desc">Sự kiện quá khứ, lý giải thắc mắc.</div>
+                <div>
+                    <div class="module-title">Tiền Truyện</div>
+                    <div class="module-desc">Sự kiện quá khứ, lý giải thắc mắc.</div>
+                </div>
             </a>
             <a href="list.html?db=arcs" class="module-card">
                 <div class="module-icon"><i class="fas fa-sitemap"></i></div>
-                <div class="module-title">Tổng Quan Cốt Truyện</div>
-                <div class="module-desc">Tóm tắt các Arc và mối quan hệ.</div>
+                <div>
+                    <div class="module-title">Tổng Quan Cốt Truyện</div>
+                    <div class="module-desc">Tóm tắt các Arc và mối quan hệ.</div>
+                </div>
             </a>
-        </div>
+        </main>
     </div>
 
-    <!-- SCRIPT ĐỂ KÍCH HOẠT DARK MODE VÀ CÁC NÚT -->
-    <script src="config.js"></script>
-    <script src="js/script.js"></script> <!-- Link script chính để dùng hàm toggleTheme() -->
+    <!-- SCRIPT ĐỂ KÍCH HOẠT DARK MODE -->
     <script>
-        // Gọi hàm applyUserSettings từ script.js để tự động áp dụng theme đã lưu
-        document.addEventListener('DOMContentLoaded', applyUserSettings);
+        // Logic Dark/Light Mode riêng cho trang Lore
+        const themeBtn = document.createElement('button');
+        themeBtn.className = 'btn';
+        themeBtn.innerHTML = '🌙';
+        themeBtn.onclick = () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('lore_theme', newTheme); // Lưu riêng
+        };
+        document.querySelector('.lore-header').appendChild(themeBtn);
+
+        // Áp dụng theme đã lưu
+        const savedTheme = localStorage.getItem('lore_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
     </script>
 </body>
 </html>
