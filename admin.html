@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MirAi Command Center V26</title>
+    <title>MirAi Command Center V26 (Secure)</title>
     
     <!-- LIB CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
@@ -158,6 +158,7 @@
         
         <div class="sidebar-footer">
             <div class="nav-item" onclick="toggleTheme()"><i class="fas fa-adjust"></i> Giao diện</div>
+            <div class="nav-item" onclick="switchView('settings')"><i class="fas fa-cog"></i> Cấu hình</div>
             <div class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-sign-out-alt"></i> Thoát</div>
             
             <!-- MINI PLAYER -->
@@ -216,13 +217,21 @@
             <div class="card" id="list-container">Đang tải dữ liệu...</div>
         </div>
 
-        <!-- VIEW: SETTINGS (Ẩn trong code, hiện khi cần) -->
+        <!-- VIEW: SETTINGS (CẤU HÌNH BẢO MẬT) -->
         <div id="view-settings" class="view-section">
              <div class="card">
-                <h3>🔑 Cấu hình kết nối</h3>
-                <label>GitHub Token:</label>
+                <h3>🔑 Cấu hình kết nối & Bảo mật</h3>
+                <label for="token">GitHub Token:</label>
                 <input type="password" id="token" placeholder="ghp_..." onchange="saveConfig()">
-                <label>Discord Webhook:</label>
+                
+                <div style="margin-bottom: 15px;">
+                    <input type="checkbox" id="rememberToken" onchange="saveConfig()" style="width: auto; margin-right: 5px;">
+                    <label for="rememberToken" style="font-size: 0.9rem; color: var(--text-muted);">
+                        Lưu Token vào trình duyệt (⚠️ **NGUY HIỂM!** Ai có mật khẩu Admin sẽ thấy token của bro)
+                    </label>
+                </div>
+
+                <label for="webhook">Discord Webhook:</label>
                 <input type="password" id="webhook" placeholder="https://discord.com/api/..." onchange="saveConfig()">
              </div>
         </div>
@@ -276,7 +285,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>
 
     <script>
-        const SECRET_PASS = "2006";
+        const SECRET_PASS = "2006"; // Mật khẩu đăng nhập
         let editor;
 
         // --- 1. CORE & UI ---
@@ -311,13 +320,63 @@
                 showToast("⚡ Đã Smart Paste & Format!");
             });
 
-            // Load Config
-            if(localStorage.getItem('gh_token')) {
-                document.getElementById('token').value = localStorage.getItem('gh_token');
-                document.getElementById('webhook').value = localStorage.getItem('discord_webhook') || '';
-                unlockInterface();
+            // Load Config (CHỈ LOAD TOKEN NẾU ĐƯỢC CHỌN LƯU)
+            const savedToken = localStorage.getItem('gh_token');
+            const rememberMe = localStorage.getItem('remember_token') === 'true';
+
+            if (savedToken && rememberMe) {
+                document.getElementById('token').value = savedToken;
+                document.getElementById('rememberToken').checked = true;
             }
+            document.getElementById('webhook').value = localStorage.getItem('discord_webhook') || '';
+            
+            // Nếu có token hoặc webhook thì mở khóa luôn (tiện cho việc test)
+            // Hoặc có thể yêu cầu nhập pass trước rồi mới check token
+            // Hiện tại vẫn dùng pass 2006
         });
+
+        // --- AUTH & UI ---
+        document.getElementById('lock-screen').addEventListener('click', login);
+        window.addEventListener('keydown', (e) => { if(e.key === 'F12') login(); });
+
+        function login() {
+            let pass = prompt("🔑 Mật mã:");
+            if (pass === SECRET_PASS) {
+                unlockInterface();
+                // Nếu có token lưu sẵn, tự động fill vào
+                const savedToken = localStorage.getItem('gh_token');
+                const rememberMe = localStorage.getItem('remember_token') === 'true';
+                if (savedToken && rememberMe) {
+                    document.getElementById('token').value = savedToken;
+                    document.getElementById('rememberToken').checked = true;
+                }
+            } else if (pass) {
+                alert("SAI MẬT MÃ!");
+            }
+        }
+
+        function unlockInterface() {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('main').style.display = 'flex'; // Hiển thị main content
+            initAdminMusic();
+        }
+
+        function saveConfig() {
+            const tokenInput = document.getElementById('token').value;
+            const rememberCheckbox = document.getElementById('rememberToken').checked;
+            
+            // Lưu Token (chỉ khi checkbox được tích)
+            if (rememberCheckbox) {
+                localStorage.setItem('gh_token', tokenInput);
+                localStorage.setItem('remember_token', 'true');
+                showToast("💾 Đã lưu Token & cấu hình!");
+            } else {
+                localStorage.removeItem('gh_token'); // Xóa token nếu bỏ tích
+                localStorage.setItem('remember_token', 'false');
+                showToast("⚠️ Token sẽ không được lưu!");
+            }
+            localStorage.setItem('discord_webhook', document.getElementById('webhook').value);
+        }
 
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -342,26 +401,6 @@
             t.innerText = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        // --- 2. AUTH ---
-        document.getElementById('lock-screen').addEventListener('click', login);
-        window.addEventListener('keydown', (e) => { if(e.key === 'F12') login(); });
-
-        function login() {
-            let pass = prompt("🔑 Mật mã:");
-            if (pass === SECRET_PASS) unlockInterface();
-        }
-
-        function unlockInterface() {
-            document.getElementById('lock-screen').style.display = 'none';
-            initAdminMusic();
-        }
-
-        function saveConfig() {
-            localStorage.setItem('gh_token', document.getElementById('token').value);
-            localStorage.setItem('discord_webhook', document.getElementById('webhook').value);
-            showToast("💾 Đã lưu cấu hình");
         }
 
         // --- 3. EDITOR & PUBLISH ---
@@ -390,17 +429,18 @@
                             const url = `https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${path}`;
                             editor.codemirror.replaceSelection(`\n![Ảnh](${url})\n`);
                             showToast("🖼️ Ảnh đã lên!");
-                        } catch(e) { alert(e); }
+                        } catch(e) { alert("Lỗi: " + e); }
                     };
-                }
+                },
+                error(err) { alert("Lỗi nén ảnh: " + err.message); }
             });
         }
 
         async function publishChapter() {
             const title = document.getElementById('chapTitle').value;
             const content = editor.value();
-            const token = document.getElementById('token').value;
-            if(!title || !content || !token) return alert("Thiếu tiêu đề hoặc nội dung!");
+            const token = document.getElementById('token').value; // Lấy token trực tiếp từ input
+            if(!title || !content || !token) return alert("Thiếu tiêu đề, nội dung hoặc GitHub Token!");
 
             document.getElementById('publishBtn').innerText = "⏳ Đang xử lý...";
             
@@ -418,7 +458,11 @@
                 let filePath, sha = null;
                 if(editIndex !== "") {
                     filePath = chapters[editIndex].file;
-                    sha = document.getElementById('edit-file-sha').value;
+                    // Lấy SHA của file MD để update (quan trọng)
+                    const fileInfoRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${filePath}`, {headers:{Authorization:`token ${token}`}});
+                    const fileInfo = await fileInfoRes.json();
+                    sha = fileInfo.sha;
+
                     chapters[editIndex].title = title;
                     chapters[editIndex].timestamp = timestamp;
                 } else {
@@ -450,7 +494,7 @@
 
                 showToast("🚀 ĐĂNG BÀI THÀNH CÔNG!");
                 resetEditor();
-            } catch(e) { alert("Lỗi: " + e); }
+            } catch(e) { alert("Lỗi: " + e); console.error(e); }
             document.getElementById('publishBtn').innerText = "🚀 ĐĂNG BÀI";
         }
 
@@ -458,14 +502,19 @@
         async function loadChapterList() {
             const c = document.getElementById('list-container');
             c.innerHTML = "⏳ Đang tải...";
+            const token = document.getElementById('token').value; // Lấy token trực tiếp từ input
+            if(!token) { c.innerHTML = "Vui lòng nhập GitHub Token!"; return; }
+
             try {
-                const res = await fetch(`data.json?t=${Date.now()}`);
+                const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`, {headers:{Authorization:`token ${token}`}});
+                if (!res.ok) throw new Error("Lỗi tải data.json, kiểm tra Token/Repo!");
                 const data = await res.json();
-                window.chaptersCache = data;
-                
+                window.chaptersCache = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                window.jsonSha = data.sha; // Lưu SHA của data.json
+
                 c.innerHTML = "";
-                data.forEach((item, i) => {
-                    let status = (item.timestamp > Date.now()) ? '<span style="color:#f39c12">⏳ Hẹn giờ</span>' : '<span style="color:#2ecc71">✅ Đã đăng</span>';
+                window.chaptersCache.forEach((item, i) => {
+                    let status = (item.timestamp && item.timestamp > Date.now()) ? '<span style="color:#f39c12">⏳ Hẹn giờ</span>' : '<span style="color:#2ecc71">✅ Đã đăng</span>';
                     let div = document.createElement('div');
                     div.className = 'list-item';
                     div.innerHTML = `
@@ -477,96 +526,192 @@
                     `;
                     c.appendChild(div);
                 });
-            } catch(e) { c.innerHTML = "Lỗi tải danh sách"; }
+            } catch(e) { c.innerHTML = "Lỗi tải danh sách: " + e.message; }
         }
 
         async function editChapter(i) {
             const item = window.chaptersCache[i];
             switchView('editor');
             showToast("⏳ Đang tải nội dung...");
+            const token = document.getElementById('token').value; // Lấy token trực tiếp từ input
+            if(!token) { showToast("Vui lòng nhập GitHub Token!"); return; }
             
-            const res = await fetch(`${item.file}?t=${Date.now()}`);
-            const text = await res.text();
-            
-            document.getElementById('chapTitle').value = item.title;
-            editor.value(text);
-            document.getElementById('edit-index').value = i;
-            document.getElementById('publishBtn').innerText = "💾 CẬP NHẬT";
-            
-            // Note: Cần lấy SHA file MD nếu muốn chuẩn 100%, nhưng ở đây ta bỏ qua để code gọn
+            try {
+                const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${item.file}?t=${Date.now()}`, {headers:{Authorization:`token ${token}`}});
+                if (!res.ok) throw new Error("Lỗi tải nội dung chương, kiểm tra Token/File!");
+                const fileData = await res.json();
+                const text = decodeURIComponent(escape(atob(fileData.content)));
+                
+                document.getElementById('chapTitle').value = item.title;
+                editor.value(text);
+                document.getElementById('edit-index').value = i;
+                document.getElementById('edit-file-sha').value = fileData.sha; // LƯU SHA CỦA FILE MD
+                document.getElementById('publishBtn').innerText = "💾 CẬP NHẬT";
+                
+                showToast("✏️ Đang sửa chương: " + item.title);
+            } catch(e) { alert("Lỗi: " + e.message); }
         }
 
         function resetEditor() {
             document.getElementById('chapTitle').value = "";
             editor.value("");
             document.getElementById('edit-index').value = "";
+            document.getElementById('edit-file-sha').value = ""; // Reset SHA
             document.getElementById('publishBtn').innerText = "🚀 ĐĂNG BÀI";
-        }
-//xóa chương
-       async function deleteChapter(i) {
-    // 1. Hỏi cho chắc (Chống lỡ tay)
-    if(!confirm("⚠️ CẢNH BÁO: Xóa là mất vĩnh viễn!\nBro có chắc muốn xóa chương này không?")) return;
-
-    const item = window.chaptersCache[i];
-    const token = document.getElementById('token').value;
-    showToast("⏳ Đang xóa file trên GitHub...");
-
-    try {
-        // BƯỚC 1: Xóa file .md (Cần lấy SHA của file đó trước)
-        // Gọi API lấy info file để lấy SHA
-        const fileRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${item.file}`, {
-            headers: { Authorization: `token ${token}` }
-        });
-
-        // Nếu file tồn tại thì xóa, nếu không (lỗi 404) thì bỏ qua bước này
-        if (fileRes.ok) {
-            const fileData = await fileRes.json();
-            // Gọi API xóa file MD
-            await githubRequest(item.file, { message: `Delete ${item.title}`, sha: fileData.sha }, 'DELETE');
-        } else {
-            console.warn("File MD không tồn tại, chỉ xóa trong danh sách.");
+            document.getElementById('scheduleTime').value = "";
+            showToast("Đã reset Editor.");
         }
 
-        // BƯỚC 2: Cập nhật data.json (Xóa khỏi danh sách mục lục)
-        // Phải gọi lại API data.json để lấy SHA mới nhất (tránh xung đột)
-        const listRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`, {
-            headers: { Authorization: `token ${token}` }
-        });
-        const listData = await listRes.json();
+        async function deleteChapter(i) {
+            if(!confirm("⚠️ CẢNH BÁO: Xóa là mất vĩnh viễn!\nBro có chắc muốn xóa chương này không?")) return;
+
+            const item = window.chaptersCache[i];
+            const token = document.getElementById('token').value;
+            if(!token) { alert("Vui lòng nhập GitHub Token!"); return; }
+            showToast("⏳ Đang xóa file trên GitHub...");
+
+            try {
+                // BƯỚC 1: Xóa file .md (Cần lấy SHA của file đó trước)
+                const fileRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${item.file}`, {
+                    headers: { Authorization: `token ${token}` }
+                });
+
+                if (fileRes.ok) {
+                    const fileData = await fileRes.json();
+                    await githubRequest(item.file, { message: `Delete ${item.title}`, sha: fileData.sha }, 'DELETE');
+                } else {
+                    console.warn("File MD không tồn tại, chỉ xóa trong danh sách. Lỗi: " + fileRes.statusText);
+                }
+
+                // BƯỚC 2: Cập nhật data.json (Xóa khỏi danh sách mục lục)
+                // Lấy SHA mới nhất của data.json để tránh xung đột
+                const listRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`, {
+                    headers: { Authorization: `token ${token}` }
+                });
+                if (!listRes.ok) throw new Error("Lỗi tải data.json để cập nhật sau xóa!");
+                const listData = await listRes.json();
+                
+                let currentChapters = JSON.parse(decodeURIComponent(escape(atob(listData.content))));
+                currentChapters = currentChapters.filter(c => c.id !== item.id);
+
+                const b64List = btoa(unescape(encodeURIComponent(JSON.stringify(currentChapters, null, 2))));
+                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
+                    method: 'PUT',
+                    headers: { Authorization: `token ${token}` },
+                    body: JSON.stringify({
+                        message: `Remove ${item.title}`,
+                        content: b64List,
+                        sha: listData.sha
+                    })
+                });
+
+                showToast("🗑️ Đã xóa thành công!");
+                loadChapterList();
+            } catch (e) {
+                alert("Lỗi khi xóa: " + e.message);
+            }
+        }
+
+        // --- 5. MUSIC & ACH (GIỮ NGUYÊN LOGIC CŨ, ĐÃ CẬP NHẬT UI) ---
+        async function loadMusicList() { 
+            const c=document.getElementById('music-list-container'); c.innerHTML="Loading..."; 
+            const t=document.getElementById('token').value; 
+            if(!t) {c.innerHTML="Vui lòng nhập GitHub Token!"; return;}
+            try { 
+                const res=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/music.json?t=${Date.now()}`, {headers:{Authorization:`token ${t}`}}); 
+                if (!res.ok) { window.musicData=[]; c.innerHTML="Trống"; return; } 
+                const d=await res.json(); 
+                window.musicData=JSON.parse(decodeURIComponent(escape(atob(d.content)))); 
+                window.musicSha=d.sha; 
+                c.innerHTML=''; 
+                window.musicData.forEach((s,i)=>{ c.innerHTML+=`<div class="list-item"><div>🎵 ${s.title}</div><button class="btn btn-outline" style="color:#e74c3c; border-color:#e74c3c" onclick="delSong(${i})"><i class="fas fa-trash"></i></button></div>` }); 
+            } catch(e) { c.innerHTML="Lỗi: "+e.message; window.musicData=[]; } 
+        }
+
+        async function uploadMusic() { 
+            const t=document.getElementById('token').value, ti=document.getElementById('songTitle').value, f=document.getElementById('mp3Input').files[0]; 
+            if(!t||!ti||!f)return alert("Thiếu thông tin hoặc GitHub Token!"); 
+            showToast("⏳ Uploading Music..."); 
+            const r=new FileReader(); r.readAsDataURL(f); 
+            r.onload=async function(){ 
+                try { 
+                    const b64=r.result.split(',')[1], p=`images/music/${Date.now()}_${f.name}`; 
+                    await githubRequest(p, {message:"Up Song", content:b64}); 
+                    if (!window.musicData) await loadMusicList(); // Ensure musicData is loaded
+                    window.musicData.push({title:ti, url:p}); 
+                    const jB={message:"Up List", content:btoa(unescape(encodeURIComponent(JSON.stringify(window.musicData,null,2))))}; 
+                    if (window.musicSha) jB.sha=window.musicSha; 
+                    await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/music.json`, {method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify(jB)}); 
+                    showToast("🎵 Đã Upload nhạc!"); document.getElementById('songTitle').value=''; loadMusicList(); 
+                } catch(e) { alert("Lỗi: " + e.message); } 
+            } 
+        }
+
+        async function delSong(i) { 
+            if (!confirm("Xóa nhạc?")) return; 
+            const t=document.getElementById('token').value; 
+            if(!t) { alert("Vui lòng nhập GitHub Token!"); return; }
+            showToast("⏳ Đang xóa nhạc...");
+            try {
+                const songToDelete = window.musicData[i];
+                // Xóa file MP3 khỏi repo trước (cần SHA)
+                const fileRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${songToDelete.url}`, {headers:{Authorization:`token ${t}`}});
+                if (fileRes.ok) {
+                    const fileData = await fileRes.json();
+                    await githubRequest(songToDelete.url, {message:"Del Song File", sha:fileData.sha}, 'DELETE');
+                } else {
+                    console.warn("File nhạc không tồn tại trên repo. Chỉ xóa khỏi playlist.");
+                }
+
+                window.musicData.splice(i, 1); 
+                const jB={message:"Del Song from List", content:btoa(unescape(encodeURIComponent(JSON.stringify(window.musicData, null, 2)))), sha:window.musicSha}; 
+                await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/music.json`, {method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify(jB)}); 
+                showToast("🗑️ Đã xóa nhạc!"); loadMusicList(); 
+            } catch(e) { alert("Lỗi: " + e.message); } 
+        }
+
+        async function loadAchievements() { 
+            const c=document.getElementById('ach-list-container'); c.innerHTML="Loading..."; 
+            const t=document.getElementById('token').value; 
+            if(!t) {c.innerHTML="Vui lòng nhập GitHub Token!"; return;}
+            try { 
+                const res=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/achievements.json?t=${Date.now()}`, {headers:{Authorization:`token ${t}`}}); 
+                if (!res.ok) { window.achData=[]; c.innerHTML="Trống"; return; } 
+                const d=await res.json(); 
+                window.achData=JSON.parse(decodeURIComponent(escape(atob(d.content)))); 
+                window.achSha=d.sha; 
+                c.innerHTML=''; 
+                window.achData.forEach((a,i)=>{ c.innerHTML+=`<div class="list-item"><div>${a.icon} <b>${a.title}</b><br><small style="color:var(--primary); font-family:monospace">${a.condition}</small></div><button class="btn btn-outline" style="color:#e74c3c; border-color:#e74c3c" onclick="delAchievement(${i})"><i class="fas fa-trash"></i></button></div>`; }); 
+            } catch(e) { c.innerHTML="Lỗi: "+e.message; } 
+        }
+
+        async function addAchievement() { 
+            const id=document.getElementById('achId').value, icon=document.getElementById('achIcon').value, title=document.getElementById('achTitle').value, desc=document.getElementById('achDesc').value, cond=document.getElementById('achCondition').value, t=document.getElementById('token').value; 
+            if (!id||!title||!t) return alert("Thiếu thông tin hoặc GitHub Token!"); 
+            showToast("⏳ Đang thêm thành tựu...");
+            if (!window.achData) window.achData=[]; 
+            window.achData.push({id, icon, title, desc, condition: cond}); 
+            const jB={message:"Upd Ach", content:btoa(unescape(encodeURIComponent(JSON.stringify(window.achData,null,2))))}; 
+            if (window.achSha) jB.sha=window.achSha; 
+            await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/achievements.json`, {method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify(jB)}); 
+            showToast("🏆 Đã thêm thành tựu!"); loadAchievements(); 
+        }
+
+        async function delAchievement(i) { 
+            if (!confirm("Xóa thành tựu?")) return; 
+            const t=document.getElementById('token').value; 
+            if(!t) { alert("Vui lòng nhập GitHub Token!"); return; }
+            showToast("⏳ Đang xóa thành tựu...");
+            window.achData.splice(i, 1); 
+            const jB={message:"Del Ach", content:btoa(unescape(encodeURIComponent(JSON.stringify(window.achData,null,2)))), sha:window.achSha}; 
+            await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/achievements.json`, {method:'PUT', headers:{Authorization:`token ${t}`}, body:JSON.stringify(jB)}); 
+            showToast("🗑️ Đã xóa thành tựu!"); loadAchievements(); 
+        }
         
-        // Decode danh sách cũ
-        let currentChapters = JSON.parse(decodeURIComponent(escape(atob(listData.content))));
-
-        // Lọc bỏ chương cần xóa (Giữ lại những thằng ID khác thằng này)
-        currentChapters = currentChapters.filter(c => c.id !== item.id);
-
-        // Mã hóa lại và đẩy lên
-        const b64List = btoa(unescape(encodeURIComponent(JSON.stringify(currentChapters, null, 2))));
-        await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
-            method: 'PUT',
-            headers: { Authorization: `token ${token}` },
-            body: JSON.stringify({
-                message: `Remove ${item.title}`,
-                content: b64List,
-                sha: listData.sha
-            })
-        });
-
-        showToast("🗑️ Đã xóa thành công!");
-        loadChapterList(); // Load lại danh sách
-
-    } catch (e) {
-        alert("Lỗi khi xóa: " + e);
-        document.getElementById('list-container').innerHTML = "Lỗi kết nối, vui lòng refresh!";
-    }
-}
-
-        // --- 5. MUSIC & ACH (GIỮ NGUYÊN LOGIC CŨ) ---
-        // (Tôi đã tích hợp UI mới, logic JS bro có thể copy từ bản cũ sang nếu cần, 
-        // hoặc dùng lại logic upload/delete đơn giản đã có trong bản này)
-        
+        // --- 6. UTILS ---
         async function githubRequest(path, body, method='PUT') {
             const token = document.getElementById('token').value;
+            if(!token) throw new Error("GitHub Token chưa được nhập!"); // Bắt lỗi nếu token rỗng
             return fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {
                 method: method,
                 headers: {Authorization: `token ${token}`},
@@ -576,9 +721,9 @@
 
         function translateLogic() {
             let t = document.getElementById('humanLogic').value.toLowerCase();
-            const map = { 'giờ': 'env.hour', 'đọc': 'env.readCount', 'lớn hơn': '>', 'nhỏ hơn': '<', 'bằng': '==', 'và': '&&' };
-            for(let k in map) t = t.replace(new RegExp(k, 'g'), map[k]);
-            document.getElementById('logicResult').value = t;
+            const map = { 'giờ': 'env.hour', 'thời gian': 'env.hour', 'số chương': 'env.readCount', 'đã đọc': 'env.readCount', 'đọc được': 'env.readCount', 'cuộn': 'env.scroll', 'lướt': 'env.scroll', 'chương số': 'env.chapId', 'id chương': 'env.chapId', 'lớn hơn hoặc bằng': '>=', 'từ': '>=', 'nhỏ hơn hoặc bằng': '<=', 'lớn hơn': '>', 'trên': '>', 'hơn': '>', 'nhỏ hơn': '<', 'dưới': '<', 'bằng': '==', 'và': '&&', 'hoặc': '||', 'phần trăm': '', '%': '', 'chương': '', 'giờ': '' };
+            for(let k in map) t = t.replace(new RegExp(k, 'gi'), map[k]); // Use 'gi' for global, case-insensitive
+            document.getElementById('logicResult').value = t.replace(/\s+/g, ' ').trim();
         }
 
         // Mini Player Logic
