@@ -502,12 +502,64 @@
             document.getElementById('edit-index').value = "";
             document.getElementById('publishBtn').innerText = "🚀 ĐĂNG BÀI";
         }
+//xóa chương
+       async function deleteChapter(i) {
+    // 1. Hỏi cho chắc (Chống lỡ tay)
+    if(!confirm("⚠️ CẢNH BÁO: Xóa là mất vĩnh viễn!\nBro có chắc muốn xóa chương này không?")) return;
 
-        async function deleteChapter(i) {
-            if(!confirm("Xóa vĩnh viễn?")) return;
-            // Logic xóa tương tự bản cũ...
-            showToast("⚠️ Tính năng đang bảo trì (để an toàn)");
+    const item = window.chaptersCache[i];
+    const token = document.getElementById('token').value;
+    showToast("⏳ Đang xóa file trên GitHub...");
+
+    try {
+        // BƯỚC 1: Xóa file .md (Cần lấy SHA của file đó trước)
+        // Gọi API lấy info file để lấy SHA
+        const fileRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${item.file}`, {
+            headers: { Authorization: `token ${token}` }
+        });
+
+        // Nếu file tồn tại thì xóa, nếu không (lỗi 404) thì bỏ qua bước này
+        if (fileRes.ok) {
+            const fileData = await fileRes.json();
+            // Gọi API xóa file MD
+            await githubRequest(item.file, { message: `Delete ${item.title}`, sha: fileData.sha }, 'DELETE');
+        } else {
+            console.warn("File MD không tồn tại, chỉ xóa trong danh sách.");
         }
+
+        // BƯỚC 2: Cập nhật data.json (Xóa khỏi danh sách mục lục)
+        // Phải gọi lại API data.json để lấy SHA mới nhất (tránh xung đột)
+        const listRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json?t=${Date.now()}`, {
+            headers: { Authorization: `token ${token}` }
+        });
+        const listData = await listRes.json();
+        
+        // Decode danh sách cũ
+        let currentChapters = JSON.parse(decodeURIComponent(escape(atob(listData.content))));
+
+        // Lọc bỏ chương cần xóa (Giữ lại những thằng ID khác thằng này)
+        currentChapters = currentChapters.filter(c => c.id !== item.id);
+
+        // Mã hóa lại và đẩy lên
+        const b64List = btoa(unescape(encodeURIComponent(JSON.stringify(currentChapters, null, 2))));
+        await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/data.json`, {
+            method: 'PUT',
+            headers: { Authorization: `token ${token}` },
+            body: JSON.stringify({
+                message: `Remove ${item.title}`,
+                content: b64List,
+                sha: listData.sha
+            })
+        });
+
+        showToast("🗑️ Đã xóa thành công!");
+        loadChapterList(); // Load lại danh sách
+
+    } catch (e) {
+        alert("Lỗi khi xóa: " + e);
+        document.getElementById('list-container').innerHTML = "Lỗi kết nối, vui lòng refresh!";
+    }
+}
 
         // --- 5. MUSIC & ACH (GIỮ NGUYÊN LOGIC CŨ) ---
         // (Tôi đã tích hợp UI mới, logic JS bro có thể copy từ bản cũ sang nếu cần, 
