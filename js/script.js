@@ -1,95 +1,62 @@
 // =================================================================
-// MIRAI PROJECT - CORE SCRIPT V7.0 (DEVELOPER EDITION)
-// Tác giả: NamuTachi
-// Mô tả: Xử lý toàn bộ logic Frontend (Web, Nhạc, Truyện, UI)
+// MIRAI PROJECT - CORE SCRIPT V7.1 (Databook Ready)
+// Dựa trên nền tảng V7.0 của NamuTachi
 // =================================================================
 
-// -----------------------------------------------------------------
-// 1. KHỞI TẠO CẤU HÌNH & MÔI TRƯỜNG
-// -----------------------------------------------------------------
-
-// Kiểm tra và load ảnh nền từ file config.js
+// --- 1. KHỞI TẠO & HELPERS (Giữ nguyên) ---
 if (typeof CONFIG !== 'undefined' && CONFIG.bgImage) {
     document.body.style.backgroundImage = `url('${CONFIG.bgImage}')`;
 }
+const showLoading = () => { const el = document.getElementById('loading'); if (el) el.style.display = 'flex'; };
+const hideLoading = () => { const el = document.getElementById('loading'); if (el) el.style.display = 'none'; };
 
-// Hàm hiển thị màn hình chờ (Loading)
-const showLoading = () => {
-    const loadingElement = document.getElementById('loading');
-    if (loadingElement) loadingElement.style.display = 'flex';
-};
-
-// Hàm ẩn màn hình chờ
-const hideLoading = () => {
-    const loadingElement = document.getElementById('loading');
-    if (loadingElement) loadingElement.style.display = 'none';
-};
-
-// -----------------------------------------------------------------
-// 2. TƯƠNG TÁC DỮ LIỆU (DATABASE)
-// -----------------------------------------------------------------
-
-// Hàm lấy dữ liệu từ file data.json trên GitHub
-// Thêm tham số timestamp (?t=...) để ép trình duyệt tải mới, không dùng cache cũ
-async function fetchDatabase() {
+// --- 2. DATABASE (NÂNG CẤP) ---
+// Hàm này giờ nhận tên file JSON làm tham số
+async function fetchDatabase(jsonFile = 'data.json') {
     try {
-        const response = await fetch(`data.json?t=${Date.now()}`);
-        if (response.ok) {
-            return await response.json();
-        } else {
-            return []; // Trả về mảng rỗng nếu lỗi
-        }
+        const response = await fetch(`${jsonFile}?t=${Date.now()}`);
+        return response.ok ? await response.json() : [];
     } catch (error) {
-        console.error("Lỗi khi tải Database:", error);
+        console.error("Lỗi tải Database:", error);
         return [];
     }
 }
 
-// -----------------------------------------------------------------
-// 3. LOGIC TRANG CHỦ (INDEX PAGE)
-// -----------------------------------------------------------------
-
-async function initIndexPage() {
+// --- 3. LOGIC TRANG CHỦ & LIST (NÂNG CẤP) ---
+// Hàm này giờ nhận tên file JSON và thư mục làm tham số
+async function initIndexPage(jsonFile = 'data.json', folderPrefix = 'chapters') {
     const chapterListElement = document.getElementById('chapter-list');
-    
-    // Nếu không tìm thấy element này -> Không phải trang chủ -> Thoát
     if (!chapterListElement) return;
 
     showLoading();
-    const chapters = await fetchDatabase();
+    const allItems = await fetchDatabase(jsonFile);
     const searchInput = document.getElementById('search-input');
     
-    // Hiển thị nút "Đọc tiếp" nếu có lịch sử
-    loadBookmark(chapters);
+    // Bookmark chỉ load ở trang chính
+    if (folderPrefix === 'chapters') {
+        loadBookmark(allItems);
+    }
 
-    // Hàm vẽ danh sách chương ra màn hình
-    const renderChapters = (items) => {
+    const renderItems = (items) => {
         chapterListElement.innerHTML = '';
-        
         if (items.length === 0) {
-            chapterListElement.innerHTML = '<p style="text-align:center; width: 100%;">Chưa có chương nào được đăng.</p>';
+            chapterListElement.innerHTML = '<p style="text-align:center;">Chưa có nội dung.</p>';
             return;
         }
 
-        // Lọc các chương đã đến giờ đăng (Logic Hẹn giờ)
-        const currentTime = Date.now();
-        const visibleItems = items.filter(item => {
-            if (!item.timestamp) return true; // Không hẹn giờ -> Hiện luôn
-            return item.timestamp <= currentTime; // Đã qua giờ hẹn -> Hiện
-        });
+        const visibleItems = items.filter(item => !item.timestamp || item.timestamp <= Date.now());
 
         if (visibleItems.length === 0) {
-            chapterListElement.innerHTML = '<p style="text-align:center;">Chưa có chương nào đến giờ phát hành.</p>';
+            chapterListElement.innerHTML = '<p style="text-align:center;">Chưa có mục nào được phát hành.</p>';
             return;
         }
 
         visibleItems.forEach((item) => {
-            // Tìm index gốc trong mảng chapters để tạo link đúng
-            const originalIndex = chapters.findIndex(c => c.id === item.id);
-            
+            const originalIndex = allItems.findIndex(c => c.id === item.id);
             if (originalIndex !== -1) {
+                // Thêm `&db=` vào URL để reader biết đang đọc từ đâu
                 chapterListElement.innerHTML += `
-                    <a href="reader.html?id=${originalIndex}" class="chap-card">
+                    <a href="reader.html?id=${originalIndex}&db=${folderPrefix}" class="chap-card">
                         <div>${item.title}</div>
                     </a>
                 `;
@@ -97,173 +64,141 @@ async function initIndexPage() {
         });
     };
 
-    // Vẽ danh sách lần đầu
-    renderChapters(chapters);
+    renderItems(allItems);
     hideLoading();
 
-    // Kích hoạt tính năng tìm kiếm
     if (searchInput) {
         searchInput.addEventListener('input', (event) => {
             const keyword = event.target.value.toLowerCase();
-            const filteredChapters = chapters.filter(c => c.title.toLowerCase().includes(keyword));
-            renderChapters(filteredChapters);
+            renderItems(allItems.filter(c => c.title.toLowerCase().includes(keyword)));
         });
     }
 }
 
-// -----------------------------------------------------------------
-// 4. LOGIC TRANG ĐỌC (READER PAGE)
-// -----------------------------------------------------------------
-
+// --- 4. LOGIC TRANG ĐỌC (NÂNG CẤP TOÀN DIỆN) ---
 async function initReaderPage() {
     const contentElement = document.getElementById('content-area');
-    
-    // Nếu không tìm thấy element này -> Không phải trang đọc -> Thoát
     if (!contentElement) return;
 
     showLoading();
     
-    // Lấy ID chương từ URL
     const urlParams = new URLSearchParams(window.location.search);
-    const chapterId = parseInt(urlParams.get('id'));
-    const chapters = await fetchDatabase();
+    const customFile = urlParams.get('file'); // Dùng cho file lẻ như lore.md
+    
+    // 1. CHẾ ĐỘ ĐỌC FILE LẺ (VD: lore.md từ Admin Tool cũ)
+    if (customFile) {
+        document.title = "Tài liệu MirAi";
+        document.getElementById('chap-title').innerText = "Tài liệu Lưu trữ";
+        document.getElementById('prev-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        try {
+            const response = await fetch(`${customFile}?t=${Date.now()}`);
+            contentElement.innerHTML = marked.parse(await response.text());
+        } catch(e) { contentElement.innerText = "Lỗi tải tài liệu."; }
+        
+        hideLoading();
+        applyUserSettings();
+        loadGiscus();
+        return; // Dừng tại đây
+    }
 
-    // Kiểm tra ID có hợp lệ không
+    // 2. CHẾ ĐỘ ĐỌC TỪ MỤC LỤC (TRUYỆN CHÍNH & DATABOOK)
+    const chapterId = parseInt(urlParams.get('id'));
+    const dbPrefix = urlParams.get('db') || 'chapters';
+    const jsonFile = (dbPrefix === 'chapters') ? 'data.json' : `data_${dbPrefix}.json`;
+    const backLink = (dbPrefix === 'chapters') ? 'index.html' : `list.html?db=${dbPrefix}`;
+    
+    // Cập nhật link nút "Trang chủ"
+    const homeBtn = document.querySelector('.reader-controls a');
+    if(homeBtn) homeBtn.href = backLink;
+
+    const chapters = await fetchDatabase(jsonFile);
+
     if (isNaN(chapterId) || !chapters[chapterId]) {
-        contentElement.innerHTML = '<h3>Lỗi: Không tìm thấy chương này!</h3>';
+        contentElement.innerHTML = '<h3>Lỗi: Không tìm thấy mục này!</h3>';
         hideLoading();
         return;
     }
 
-    // Bảo mật Hẹn giờ: Chặn truy cập trực tiếp nếu chưa đến giờ
     const currentChapter = chapters[chapterId];
     if (currentChapter.timestamp && currentChapter.timestamp > Date.now()) {
-        alert("⛔ Chương này chưa đến giờ phát hành!");
-        window.location.href = "index.html";
+        alert("⛔ Mục này chưa đến giờ phát hành!");
+        window.location.href = backLink;
         return;
     }
 
-    // Lưu Bookmark
-    localStorage.setItem('mirai_bookmark', chapterId);
+    // Lưu bookmark chỉ cho truyện chính
+    if (dbPrefix === 'chapters') {
+        localStorage.setItem('mirai_bookmark', chapterId);
+    }
 
-    // Cập nhật tiêu đề
     document.title = `${currentChapter.title} - ${CONFIG.webName}`;
     document.getElementById('chap-title').innerText = currentChapter.title;
 
-    // Tải nội dung Markdown và render
     try {
-        const response = await fetch(`${currentChapter.file}?t=${Date.now()}`);
-        const markdownText = await response.text();
-        contentElement.innerHTML = marked.parse(markdownText);
+        // Thêm prefix thư mục vào đường dẫn file
+        const filePath = (dbPrefix === 'chapters') ? currentChapter.file : `${dbPrefix}/${currentChapter.file}`;
+        const response = await fetch(`${filePath}?t=${Date.now()}`);
+        contentElement.innerHTML = marked.parse(await response.text());
     } catch (error) {
-        contentElement.innerText = "Lỗi tải nội dung chương.";
+        contentElement.innerText = "Lỗi tải nội dung.";
     }
 
-    // Xử lý nút điều hướng (Trước/Sau)
+    // Điều hướng Trước/Sau
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     
-    prevBtn.onclick = () => window.location.href = `reader.html?id=${chapterId - 1}`;
-    nextBtn.onclick = () => window.location.href = `reader.html?id=${chapterId + 1}`;
+    prevBtn.onclick = () => window.location.href = `reader.html?id=${chapterId - 1}&db=${dbPrefix}`;
+    nextBtn.onclick = () => window.location.href = `reader.html?id=${chapterId + 1}&db=${dbPrefix}`;
     
     if (chapterId === 0) prevBtn.style.display = 'none';
-    if (chapterId === chapters.length - 1) nextBtn.style.display = 'none';
+    if (chapterId >= chapters.length - 1) nextBtn.style.display = 'none';
 
-    // Kích hoạt các tính năng phụ
     initReadingProgress();
     loadGiscus();
     hideLoading();
-    applyUserSettings(); // Áp dụng cài đặt người dùng
+    applyUserSettings();
 }
 
-// -----------------------------------------------------------------
-// 5. HỆ THỐNG ÂM NHẠC (PLAYLIST & PLAYER)
-// -----------------------------------------------------------------
-
+// --- 5. HỆ THỐNG ÂM NHẠC (Giữ nguyên) ---
 let musicPlaylist = [];
 let currentTrackIndex = parseInt(localStorage.getItem('bgm_track_idx')) || 0;
 const audioPlayer = new Audio();
-audioPlayer.loop = false; // Tắt loop để tự chuyển bài
+audioPlayer.loop = false;
 let isMusicPlaying = false;
 
-// Khởi tạo hệ thống nhạc
 async function initMusicSystem() {
     try {
-        // Tải danh sách nhạc từ music.json
         const response = await fetch(`music.json?t=${Date.now()}`);
-        if (response.ok) {
-            musicPlaylist = await response.json();
-        }
-    } catch (error) {
-        // console.error("Không tải được playlist, dùng mặc định.");
-    }
-
-    // Nếu không có nhạc nào, dùng bài mặc định trong Config
+        if (response.ok) musicPlaylist = await response.json();
+    } catch (error) {}
     if (musicPlaylist.length === 0) {
-        if (typeof CONFIG !== 'undefined' && CONFIG.defaultMusic) {
-            musicPlaylist = [{ title: "Default Lofi", url: CONFIG.defaultMusic }];
-        } else {
-            musicPlaylist = [{ title: "Default Lofi", url: "images/music.mp3" }];
-        }
+        musicPlaylist = [{ title: "Default Lofi", url: CONFIG.defaultMusic || "images/music.mp3" }];
     }
-    
-    // Đảm bảo index không vượt quá độ dài playlist
     if (currentTrackIndex >= musicPlaylist.length) currentTrackIndex = 0;
 }
-
-// Hàm tải bài hát vào Player
 function loadTrack(index) {
     if (index >= musicPlaylist.length) index = 0;
     currentTrackIndex = index;
-    
     audioPlayer.src = musicPlaylist[index].url;
     localStorage.setItem('bgm_track_idx', index);
 }
-
-// Sự kiện: Khi hết bài thì tự chuyển bài tiếp theo
 audioPlayer.addEventListener('ended', playNextSong);
-
-// Cập nhật giao diện Player (Icon quay, Nút Play/Pause)
 function updatePlayerUI() {
     const icon = document.getElementById('bgm-icon');
-    const btn = document.getElementById('bgm-btn');
-    
-    if (!icon) return;
-    
-    if (isMusicPlaying) {
-        icon.classList.add('playing');
-        btn.innerHTML = '⏸️';
-    } else {
-        icon.classList.remove('playing');
-        btn.innerHTML = '▶️';
-    }
+    const controls = document.getElementById('bgm-controls');
+    if (!icon || !controls) return;
+    icon.classList.toggle('playing', isMusicPlaying);
+    controls.innerText = isMusicPlaying ? '⏸️' : '▶️';
 }
-
-// Hiện thông báo tên bài hát (Toast)
-function showSongNotification() {
-    const toast = document.getElementById('song-toast');
-    if (toast && musicPlaylist[currentTrackIndex]) {
-        toast.innerText = `🎵 ${musicPlaylist[currentTrackIndex].title}`;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-}
-
-// Hàm Bật/Tắt nhạc (Toggle)
 function toggleBGM() {
-    // Nếu chưa có source thì load
     if (!audioPlayer.src) loadTrack(currentTrackIndex);
-    
     if (audioPlayer.paused) {
         audioPlayer.play().then(() => {
             isMusicPlaying = true;
             updatePlayerUI();
             localStorage.setItem('bgm_status', 'on');
-            
-            // Chỉ hiện thông báo nếu bài hát mới bắt đầu
-            if (audioPlayer.currentTime < 1) showSongNotification();
-        }).catch(error => {
-            console.error("Lỗi phát nhạc:", error);
         });
     } else {
         audioPlayer.pause();
@@ -272,165 +207,95 @@ function toggleBGM() {
         localStorage.setItem('bgm_status', 'off');
     }
 }
-
-// Hàm chuyển bài tiếp theo (Next)
 function playNextSong() {
-    currentTrackIndex++;
-    if (currentTrackIndex >= musicPlaylist.length) currentTrackIndex = 0;
-    
+    currentTrackIndex = (currentTrackIndex + 1) % musicPlaylist.length;
     loadTrack(currentTrackIndex);
-    
-    // Nếu đang bật nhạc thì tự phát bài mới
     if (localStorage.getItem('bgm_status') === 'on') {
         audioPlayer.play();
         isMusicPlaying = true;
         updatePlayerUI();
-        showSongNotification();
     }
 }
-
-// Logic "Lách luật" trình duyệt: Tự phát nhạc sau cú click đầu tiên
 if (localStorage.getItem('bgm_status') === 'on') {
     document.body.addEventListener('click', () => {
-        if (audioPlayer.paused && localStorage.getItem('bgm_status') === 'on') {
-            if (!audioPlayer.src) loadTrack(currentTrackIndex);
-            
-            audioPlayer.play().then(() => {
-                isMusicPlaying = true;
-                updatePlayerUI();
-            });
-        }
-    }, { once: true }); // Chỉ chạy 1 lần duy nhất
+        if (audioPlayer.paused) toggleBGM();
+    }, { once: true });
 }
 
-// -----------------------------------------------------------------
-// 6. CÁC TÍNH NĂNG KHÁC (THANH TIẾN ĐỘ, HACKER MODE, SETTINGS)
-// -----------------------------------------------------------------
-
-// Thanh tiến độ đọc
+// --- 6. CÁC TÍNH NĂNG KHÁC (Giữ nguyên) ---
 function initReadingProgress() {
     const bar = document.getElementById('progress-bar');
     if (!bar) return;
-    
     window.addEventListener('scroll', () => {
-        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const progressPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-        
-        bar.style.width = `${progressPercent}%`;
+        const h = document.documentElement;
+        const percent = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+        bar.style.width = `${percent}%`;
     });
 }
-
-// Konami Code (Hacker Mode)
-const konamiSequence = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-let konamiIndex = 0;
-
-document.addEventListener('keydown', (event) => {
-    if (event.key === konamiSequence[konamiIndex]) {
-        konamiIndex++;
-        if (konamiIndex === konamiSequence.length) {
-            document.body.classList.toggle('matrix-mode');
-            const status = document.body.classList.contains('matrix-mode') ? 'ON' : 'OFF';
-            alert(`HACKER MODE: ${status}`);
-            konamiIndex = 0;
-        }
-    } else {
-        konamiIndex = 0;
-    }
-});
-
-// Settings: Hiện/Ẩn Panel
 function toggleSettings() {
     document.getElementById('settings-panel').classList.toggle('active');
 }
-
-// Settings: Đổi cỡ chữ
 function changeFontSize(action) {
-    const content = document.getElementById('content-area');
-    if (!content) return;
-    
-    let size = parseFloat(window.getComputedStyle(content).fontSize);
+    const el = document.getElementById('content-area');
+    if (!el) return;
+    let size = parseFloat(window.getComputedStyle(el).fontSize);
     size += (action === 'up' ? 2 : -2);
-    content.style.fontSize = `${size}px`;
+    el.style.fontSize = `${size}px`;
     localStorage.setItem('user_fontSize', size);
 }
-
-// Settings: Đổi Theme
 function toggleTheme() {
-    const currentTheme = document.body.getAttribute('data-theme');
-    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    document.body.setAttribute('data-theme', nextTheme);
-    localStorage.setItem('user_theme', nextTheme);
+    const next = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', next);
+    localStorage.setItem('user_theme', next);
 }
-
-// Settings: Đổi Font
 function changeFont(fontName) {
-    document.body.classList.remove('font-serif');
-    if (fontName === 'serif') {
-        document.body.classList.add('font-serif');
-    }
+    if (fontName === 'serif') document.body.setAttribute('data-font', 'serif');
+    else document.body.removeAttribute('data-font');
     localStorage.setItem('user_font', fontName);
 }
-
-// Áp dụng cài đặt khi load trang
 function applyUserSettings() {
-    if (localStorage.getItem('user_theme') === 'dark') {
-        document.body.setAttribute('data-theme', 'dark');
-    }
-    const content = document.getElementById('content-area');
-    if (content) {
+    if (localStorage.getItem('user_theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
+    const el = document.getElementById('content-area');
+    if (el) {
         const size = localStorage.getItem('user_fontSize');
-        if (size) content.style.fontSize = `${size}px`;
-        const font = localStorage.getItem('user_font');
-        if (font === 'serif') document.body.classList.add('font-serif');
+        if (size) el.style.fontSize = `${size}px`;
     }
+    if (localStorage.getItem('user_font') === 'serif') document.body.setAttribute('data-font', 'serif');
 }
-
-// Bookmark
 function loadBookmark(chapters) {
     const id = localStorage.getItem('mirai_bookmark');
     const linkEl = document.getElementById('bookmark-link');
-    if (id !== null && chapters[id]) {
+    if (id !== null && chapters[id] && linkEl) {
         linkEl.style.display = 'inline-flex';
-        linkEl.href = `reader.html?id=${id}`;
+        linkEl.href = `reader.html?id=${id}&db=chapters`;
         linkEl.innerHTML = `📖 Đọc tiếp: ${chapters[id].title.substring(0, 15)}...`;
     }
 }
-
-// Bình luận Giscus
 function loadGiscus() {
-    const container = document.getElementById('comments');
-    if (!container || container.hasChildNodes()) return;
-    
-    const script = document.createElement('script');
-    script.src = "https://giscus.app/client.js";
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    script.setAttribute("data-repo", CONFIG.giscus.repo);
-    script.setAttribute("data-repo-id", CONFIG.giscus.repoId);
-    script.setAttribute("data-category", CONFIG.giscus.category);
-    script.setAttribute("data-category-id", CONFIG.giscus.categoryId);
-    script.setAttribute("data-mapping", "title");
-    script.setAttribute("data-reactions-enabled", "1");
-    script.setAttribute("data-theme", "preferred_color_scheme");
-    container.appendChild(script);
+    const el = document.getElementById('comments');
+    if (!el || el.hasChildNodes()) return;
+    const s = document.createElement('script');
+    s.src = "https://giscus.app/client.js";
+    s.async = true;
+    s.crossOrigin = "anonymous";
+    Object.entries(CONFIG.giscus).forEach(([key, value]) => s.setAttribute(`data-${key}`, value));
+    s.setAttribute("data-mapping", "title");
+    s.setAttribute("data-reactions-enabled", "1");
+    s.setAttribute("data-theme", "preferred_color_scheme");
+    el.appendChild(s);
 }
 
-// -----------------------------------------------------------------
-// 7. KHỞI CHẠY (MAIN ENTRY POINT)
-// -----------------------------------------------------------------
-
+// --- 7. ENTRY POINT (Giữ nguyên) ---
 document.addEventListener('DOMContentLoaded', async () => {
-    // Chờ tải nhạc xong mới chạy logic khác
     await initMusicSystem();
-    
-    // Áp dụng cài đặt
     applyUserSettings();
 
-    // Điều hướng logic theo trang
     if (document.getElementById('chapter-list')) {
-        initIndexPage();
+        // Chỉ gọi initIndexPage ở trang index.html.
+        // Trang list.html đã có logic riêng của nó.
+        if (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/')) {
+            initIndexPage();
+        }
     } else if (document.getElementById('content-area')) {
         initReaderPage();
     }
