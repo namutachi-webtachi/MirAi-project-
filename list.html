@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MirAi Project - Thư Viện</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff6b81">
+</head>
+<body>
+    <div id="loading">Đang tải thư viện...</div>
+
+    <div class="container">
+        <!-- Header (Sẽ được JS tùy chỉnh) -->
+        <div class="glass-box" style="text-align: center;">
+            <h1 id="web-name">Đang tải...</h1>
+            <p class="tagline" id="sub-title">Thư viện lưu trữ MirAi</p>
+            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                <button class="btn" onclick="toggleTheme()">🌙 Giao diện</button>
+                <a href="lore_hub.html" id="back-button" class="btn btn-outline">⬅ Quay về Databook</a>
+            </div>
+        </div>
+
+       <!-- Search & List -->
+        <div class="glass-box">
+            <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm kiếm mục...">
+            <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 20px 0;">
+            <h3 id="list-title">📖 Mục lục</h3>
+            <div id="chapter-list" class="chapter-list"></div>
+        </div>
+    </div>
+    
+    <!-- Player & Footer (Giữ nguyên) -->
+    <div id="bgm-player" onclick="toggleBGM()">
+        <div id="bgm-icon"></div>
+        <div id="bgm-controls">▶️</div>
+    </div>
+    <footer style="text-align: center; margin-top: 50px; padding: 20px;">
+        <p style="font-size: 0.8rem; opacity: 0.7;">&copy; 2026 MirAi Project - NamuTachi</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+        // LOGIC ĐA NĂNG CHO list.html
+        document.addEventListener("DOMContentLoaded", async () => {
+            // 1. Lấy tên database từ URL (VD: ?db=wiki)
+            const urlParams = new URLSearchParams(window.location.search);
+            const dbName = urlParams.get('db');
+
+            if (!dbName) {
+                document.getElementById('web-name').innerText = "Lỗi";
+                document.getElementById('chapter-list').innerHTML = "Không tìm thấy thư viện.";
+                hideLoading();
+                return;
+            }
+
+            // 2. Cập nhật tiêu đề và các text
+            const titleMap = {
+                'wiki': 'Wiki Nhân Vật',
+                'tech': 'Cây Công Nghệ',
+                'prequel': 'Tiền Truyện',
+                'arcs': 'Tổng Quan Cốt Truyện'
+            };
+            const pageTitle = titleMap[dbName] || 'Thư Viện';
+            document.title = pageTitle + " - MirAi";
+            document.getElementById('web-name').innerText = pageTitle;
+            document.getElementById('list-title').innerText = `📖 Các mục trong ${pageTitle}`;
+
+            // 3. Gọi hàm initIndexPage đã được nâng cấp trong script.js
+            // Ta sẽ truyền vào tên file JSON và tên thư mục tương ứng
+            const jsonFile = `data_${dbName}.json`;
+            const folderPrefix = dbName;
+            
+            // Hàm này nằm trong script.js, ta chỉ cần gọi nó
+            await initIndexPage(jsonFile, folderPrefix);
+        });
+    </script>
+</body>
+</html>
