@@ -4,71 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MirAi Databook</title>
-    <!-- CSS RIÊNG BIỆT CHO LORE -->
-    <link rel="stylesheet" href="css/lore.css"> 
+    <!-- DÙNG CHUNG STYLE VỚI TRANG CHỦ -->
+    <link rel="stylesheet" href="css/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* CSS THÊM VÀO ĐỂ CÓ GRID ICON */
+        .databook-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .module-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px;
+            background: var(--bg-body); /* Nền giống ô search */
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .module-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        .module-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .module-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+    </style>
 </head>
-<body class="lore-body">
+<body>
 
-    <div class="lore-container">
-        <!-- HEADER -->
-        <header class="lore-header">
-            <h1>MIRAI DATABOOK</h1>
-            <p>Cơ sở dữ liệu về Vũ trụ MirAi.</p>
-            <a href="index.html" class="btn">⬅ Quay về truyện chính</a>
-            <!-- Nút Dark Mode sẽ được JS thêm vào đây -->
-        </header>
+    <div class="container">
+        <!-- HEADER (Y HỆT TRANG CHỦ) -->
+        <div class="glass-box" style="text-align: center;">
+            <h1 id="web-name">MIRAI DATABOOK</h1>
+            <p class="tagline" id="sub-title">Cơ sở dữ liệu về Vũ trụ MirAi.</p>
+            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                <button class="btn" onclick="toggleTheme()">🌙 Giao diện</button>
+                <a href="index.html" class="btn btn-outline">⬅ Quay về truyện chính</a>
+            </div>
+        </div>
 
         <!-- GRID MODULES -->
-        <main class="databook-grid">
-            <a href="list.html?db=wiki" class="module-card">
-                <div class="module-icon"><i class="fas fa-users"></i></div>
-                <div>
+        <div class="glass-box">
+            <h3>📚 Thư Viện</h3>
+            <div class="databook-grid" style="margin-top: 20px;">
+                <a href="list.html?db=wiki" class="module-card">
+                    <div class="module-icon"><i class="fas fa-users"></i></div>
                     <div class="module-title">Wiki Nhân Vật</div>
                     <div class="module-desc">Hồ sơ, thông số, sở thích.</div>
-                </div>
-            </a>
-            <a href="list.html?db=tech" class="module-card">
-                <div class="module-icon"><i class="fas fa-cogs"></i></div>
-                <div>
+                </a>
+                <a href="list.html?db=tech" class="module-card">
+                    <div class="module-icon"><i class="fas fa-cogs"></i></div>
                     <div class="module-title">Cây Công Nghệ</div>
                     <div class="module-desc">Lịch sử, mã nguồn mở, cơ chế vật lý.</div>
-                </div>
-            </a>
-            <a href="list.html?db=prequel" class="module-card">
-                <div class="module-icon"><i class="fas fa-history"></i></div>
-                <div>
+                </a>
+                <a href="list.html?db=prequel" class="module-card">
+                    <div class="module-icon"><i class="fas fa-history"></i></div>
                     <div class="module-title">Tiền Truyện</div>
                     <div class="module-desc">Sự kiện quá khứ, lý giải thắc mắc.</div>
-                </div>
-            </a>
-            <a href="list.html?db=arcs" class="module-card">
-                <div class="module-icon"><i class="fas fa-sitemap"></i></div>
-                <div>
+                </a>
+                <a href="list.html?db=arcs" class="module-card">
+                    <div class="module-icon"><i class="fas fa-sitemap"></i></div>
                     <div class="module-title">Tổng Quan Cốt Truyện</div>
                     <div class="module-desc">Tóm tắt các Arc và mối quan hệ.</div>
-                </div>
-            </a>
-        </main>
+                </a>
+            </div>
+        </div>
     </div>
 
-    <!-- SCRIPT ĐỂ KÍCH HOẠT DARK MODE -->
+    <!-- SCRIPT ĐỂ KÍCH HOẠT DARK MODE & NÚT -->
+    <script src="config.js"></script>
+    <script src="js/script.js"></script>
     <script>
-        // Logic Dark/Light Mode riêng cho trang Lore
-        const themeBtn = document.createElement('button');
-        themeBtn.className = 'btn';
-        themeBtn.innerHTML = '🌙';
-        themeBtn.onclick = () => {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const newTheme = isDark ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('lore_theme', newTheme); // Lưu riêng
-        };
-        document.querySelector('.lore-header').appendChild(themeBtn);
-
-        // Áp dụng theme đã lưu
-        const savedTheme = localStorage.getItem('lore_theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.addEventListener('DOMContentLoaded', applyUserSettings);
     </script>
 </body>
 </html>
