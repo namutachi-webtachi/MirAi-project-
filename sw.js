@@ -1,66 +1,100 @@
 // =================================================================
-// MirAi Service Worker V7 (Network First - Fix Cache Loop)
+// MirAi Service Worker V9 (Hybrid Strategy - God Tier)
 // =================================================================
 
-const CACHE_NAME = 'mirai-v7-nuke-cache'; // Đổi tên để ép xóa cache cũ
-const URLS_TO_CACHE = [
+const CACHE_VERSION = 'mirai-v9-god-tier';
+const CACHE_STATIC = `static-${CACHE_VERSION}`;
+const CACHE_IMAGES = `images-${CACHE_VERSION}`;
+const CACHE_PAGES = `pages-${CACHE_VERSION}`;
+
+// Danh sách file cốt lõi cần tải ngay lập tức
+const CORE_ASSETS = [
     '/MirAi-project-/',
     'index.html',
     'reader.html',
     'css/style.css',
+    'css/admin.css',
     'js/script.js',
+    'js/admin.js',
     'config.js',
     'manifest.json'
 ];
 
-// 1. Cài đặt và kích hoạt ngay lập tức
+// 1. INSTALL: Cài đặt và cache file cốt lõi
 self.addEventListener('install', event => {
-    self.skipWaiting(); // Bắt buộc SW mới chạy ngay, không chờ
+    self.skipWaiting(); // Kích hoạt ngay, không chờ
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            console.log('Opened cache');
-            return cache.addAll(URLS_TO_CACHE);
-        })
+        caches.open(CACHE_STATIC).then(cache => cache.addAll(CORE_ASSETS))
     );
 });
 
-// 2. Xóa sạch các bản Cache cũ khi kích hoạt
+// 2. ACTIVATE: Dọn dẹp cache cũ
 self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('Đang xóa cache cũ:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
+        caches.keys().then(keys => Promise.all(
+            keys.map(key => {
+                if (![CACHE_STATIC, CACHE_IMAGES, CACHE_PAGES].includes(key)) {
+                    return caches.delete(key);
+                }
+            })
+        ))
     );
-    self.clients.claim(); // Chiếm quyền điều khiển ngay lập tức
+    self.clients.claim();
 });
 
-// 3. Chiến thuật: NETWORK FIRST (Ưu tiên mạng)
-// Luôn tải từ mạng trước. Nếu có mạng -> Lưu bản mới vào cache -> Trả về cho người dùng.
-// Chỉ khi mất mạng -> Mới lấy từ Cache.
+// 3. FETCH: Bộ điều hướng thông minh (The Brain)
 self.addEventListener('fetch', event => {
-    event.respondWith(
-        fetch(event.request)
-            .then(response => {
-                // Tải thành công -> Copy vào cache để dùng cho lần sau
-                if (!response || response.status !== 200 || response.type !== 'basic') {
-                    return response;
-                }
-                const responseToCache = response.clone();
-                caches.open(CACHE_NAME).then(cache => {
-                    cache.put(event.request, responseToCache);
+    const req = event.request;
+    const url = new URL(req.url);
+
+    // 🛑 BỎ QUA: Chrome Extension, API GitHub, và Admin Panel (để luôn update)
+    if (!url.protocol.startsWith('http') || 
+        url.hostname === 'api.github.com' || 
+        url.pathname.includes('admin.html')) {
+        return; 
+    }
+
+    // 🎯 CHIẾN THUẬT 1: ẢNH & NHẠC -> CACHE FIRST (Tải 1 lần dùng mãi)
+    if (req.destination === 'image' || req.destination === 'audio' || url.pathname.endsWith('.mp3')) {
+        event.respondWith(
+            caches.open(CACHE_IMAGES).then(async cache => {
+                const cachedResponse = await cache.match(req);
+                if (cachedResponse) return cachedResponse;
+                const networkResponse = await fetch(req);
+                cache.put(req, networkResponse.clone());
+                return networkResponse;
+            })
+        );
+        return;
+    }
+
+    // 🎯 CHIẾN THUẬT 2: CSS/JS/FONTS -> STALE-WHILE-REVALIDATE (Hiện cũ, tải mới ngầm)
+    if (req.destination === 'style' || req.destination === 'script' || req.destination === 'font') {
+        event.respondWith(
+            caches.open(CACHE_STATIC).then(async cache => {
+                const cachedResponse = await cache.match(req);
+                const fetchPromise = fetch(req).then(networkResponse => {
+                    cache.put(req, networkResponse.clone());
+                    return networkResponse;
                 });
-                return response;
+                return cachedResponse || fetchPromise;
             })
-            .catch(() => {
-                // Mất mạng hoặc lỗi server -> Dùng cache
-                return caches.match(event.request);
+        );
+        return;
+    }
+
+    // 🎯 CHIẾN THUẬT 3: HTML (TRANG WEB) -> NETWORK FIRST (Ưu tiên mới nhất)
+    if (req.mode === 'navigate') {
+        event.respondWith(
+            fetch(req).then(networkResponse => {
+                return caches.open(CACHE_PAGES).then(cache => {
+                    cache.put(req, networkResponse.clone());
+                    return networkResponse;
+                });
+            }).catch(() => {
+                return caches.match(req) || caches.match('index.html'); // Offline thì về trang chủ
             })
-    );
+        );
+        return;
+    }
 });
