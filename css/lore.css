@@ -1,119 +1,34 @@
 /* =========================================================
-   MODULE: LORE DATABOOK STYLESHEET (Độc lập)
+   STYLESHEET RIÊNG CHO DATABOOK
    ========================================================= */
+@import url('theme.css'); /* NHÚNG CÁI HỒN CHUNG VÀO ĐÂY */
 
-/* --- 1. BIẾN MÀU & FONT --- */
-:root {
-    /* Light Mode */
-    --lore-bg: #f0f2f5;
-    --lore-card-bg: #ffffff;
-    --lore-text: #1c1e21;
-    --lore-text-muted: #65676b;
-    --lore-border: #ccd0d5;
-    --lore-primary: #8a4baf; /* Màu tím cho khác biệt */
-    --lore-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.05);
-}
-[data-theme="dark"] {
-    --lore-bg: #18191a;
-    --lore-card-bg: #242526;
-    --lore-text: #e4e6eb;
-    --lore-text-muted: #b0b3b8;
-    --lore-border: #3a3b3c;
-    --lore-primary: #c792ea; /* Tím pastel */
-    --lore-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.3);
-}
-
-/* --- 2. LAYOUT CHUNG --- */
-body.lore-body {
-    background-color: var(--lore-bg);
-    color: var(--lore-text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+/* --- LAYOUT CHUNG --- */
+body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    font-family: var(--font-ui);
     margin: 0;
     transition: background-color 0.3s, color 0.3s;
 }
-.lore-container {
-    max-width: 1024px;
-    margin: 50px auto;
-    padding: 0 20px;
-}
+.container { max-width: 960px; margin: 40px auto; padding: 0 20px; }
 
-/* --- 3. HEADER --- */
-.lore-header {
-    text-align: center;
-    margin-bottom: 50px;
+/* --- HEADER --- */
+.hub-header { text-align: center; margin-bottom: 40px; }
+.hub-header h1 { font-size: 2.5rem; color: var(--primary); }
+.hub-header .tagline { color: var(--text-muted); }
+.hub-header .btn { /* Định nghĩa lại nút nếu cần */
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 20px; border-radius: 50px; border: 2px solid var(--border);
+    background: transparent; color: var(--text-muted); font-weight: 600;
+    text-decoration: none; transition: 0.2s;
 }
-.lore-header h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--lore-primary);
-    margin: 0;
-    letter-spacing: -1px;
-}
-.lore-header p {
-    color: var(--lore-text-muted);
-    font-size: 1.1rem;
-}
-.lore-header .btn {
-    margin-top: 20px;
-    padding: 10px 25px;
-    border-radius: 8px;
-    border: 1px solid var(--lore-border);
-    background: var(--lore-card-bg);
-    color: var(--lore-text);
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.2s;
-}
-.lore-header .btn:hover {
-    border-color: var(--lore-primary);
-    color: var(--lore-primary);
-    transform: translateY(-2px);
-}
+.hub-header .btn:hover { border-color: var(--primary); color: var(--primary); }
 
-/* --- 4. GRID MODULES --- */
-.databook-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 30px;
-}
-.module-card {
-    display: flex;
-    flex-direction: column;
-    padding: 25px;
-    background: var(--lore-card-bg);
-    border: 1px solid var(--lore-border);
-    border-radius: 16px;
-    text-align: left;
-    transition: all 0.3s;
-    box-shadow: var(--lore-shadow);
-    text-decoration: none;
-    color: inherit;
-}
-.module-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
-}
-.module-icon {
-    font-size: 2rem;
-    margin-bottom: 15px;
-    color: var(--lore-primary);
-    width: 50px;
-    height: 50px;
-    background: transparent;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--lore-border);
-}
-.module-title {
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: var(--lore-text);
-}
-.module-desc {
-    font-size: 0.95rem;
-    color: var(--lore-text-muted);
-    margin-top: 8px;
-    line-height: 1.6;
-}
+/* --- GRID MODULES --- */
+.databook-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; }
+.module-card { display: flex; flex-direction: column; align-items: center; padding: 30px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; text-align: center; transition: 0.3s; box-shadow: var(--shadow); text-decoration: none; }
+.module-card:hover { transform: translateY(-8px); border-color: var(--primary); }
+.module-icon { font-size: 2.5rem; margin-bottom: 15px; color: var(--primary); width: 70px; height: 70px; background: rgba(255, 107, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.module-title { font-weight: 700; font-size: 1.2rem; color: var(--text-main); }
+.module-desc { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
