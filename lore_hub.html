@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MirAi Databook</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .databook-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .module-card { display: block; padding: 30px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; text-align: center; transition: 0.3s; box-shadow: var(--shadow); }
+        .module-card:hover { transform: translateY(-5px); border-color: var(--primary); color: var(--primary); }
+        .module-icon { font-size: 3rem; margin-bottom: 15px; color: var(--primary); }
+        .module-title { font-weight: bold; font-size: 1.2rem; }
+        .module-desc { font-size: 0.9rem; color: var(--text-muted); margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="glass-box" style="text-align: center;">
+            <a href="index.html" class="btn btn-outline" style="margin-bottom: 10px;">⬅ Quay về truyện chính</a>
+            <h1>📚 MIRAI DATABOOK</h1>
+            <p class="tagline">Cơ sở dữ liệu về Vũ trụ MirAi.</p>
+        </div>
+        <div class="databook-grid">
+            <a href="list.html?db=wiki" class="module-card">
+                <div class="module-icon"><i class="fas fa-users"></i></div>
+                <div class="module-title">Wiki Nhân Vật</div>
+                <div class="module-desc">Hồ sơ, thông số, sở thích.</div>
+            </a>
+            <a href="list.html?db=tech" class="module-card">
+                <div class="module-icon"><i class="fas fa-cogs"></i></div>
+                <div class="module-title">Cây Công Nghệ</div>
+                <div class="module-desc">Lịch sử, mã nguồn mở, cơ chế vật lý.</div>
+            </a>
+            <a href="list.html?db=prequel" class="module-card">
+                <div class="module-icon"><i class="fas fa-history"></i></div>
+                <div class="module-title">Tiền Truyện</div>
+                <div class="module-desc">Sự kiện quá khứ, lý giải thắc mắc.</div>
+            </a>
+            <a href="list.html?db=arcs" class="module-card">
+                <div class="module-icon"><i class="fas fa-sitemap"></i></div>
+                <div class="module-title">Tổng Quan Cốt Truyện</div>
+                <div class="module-desc">Tóm tắt các Arc và mối quan hệ.</div>
+            </a>
+        </div>
+    </div>
+    <script>
+        if(localStorage.getItem('user_theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
+    </script>
+</body>
+</html>
