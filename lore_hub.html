@@ -8,83 +8,68 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* CSS RIÊNG CHO TRANG LORE - PHONG CÁCH NEUMORPHISM */
+        /* CSS RIÊNG CHO TRANG LORE - PHONG CÁCH GLASSMORPHISM */
         
         body {
-            /* Dùng lại màu nền từ style.css để đồng bộ */
-            background-color: var(--bg-body);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            /* Dùng lại ảnh nền từ config.js */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
 
         .hub-container {
-            width: 100%;
             max-width: 1100px;
-            padding: 40px;
+            margin: 40px auto;
+            padding: 0 20px;
         }
+
+        /* [FIX] HEADER & CARD DÙNG CHUNG CLASS "glass-box" */
+        /* Class này đã được định nghĩa trong style.css, ta chỉ cần dùng lại */
 
         .hub-header {
             text-align: center;
-            margin-bottom: 50px;
         }
         .hub-header h1 {
-            font-size: 2rem;
-            color: var(--text-main);
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 5px;
         }
-        .hub-header h1 i { color: var(--primary); }
 
-        /* [FIX] SẮP XẾP LẠI GRID */
         .databook-grid {
             display: grid;
-            /* Trên màn hình lớn, chia 4 cột đều nhau */
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
         }
 
-        /* [FIX] HIỆU ỨNG NEUMORPHISM CHO CARD */
+        /* [FIX] CARD MODULE THEO PHONG CÁCH KÍNH MỜ */
         .module-card {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 30px;
-            background: var(--bg-body); /* Nền trùng với body */
-            border-radius: 20px;
+            padding: 30px 20px;
+            
+            /* Hiệu ứng kính mờ */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            
+            border-radius: 16px;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             text-decoration: none;
             color: inherit;
-            /* Bóng đổ tạo hiệu ứng nổi khối */
-            box-shadow: 
-                8px 8px 16px rgba(0, 0, 0, 0.1),
-                -8px -8px 16px rgba(255, 255, 255, 0.7);
         }
-        /* Hiệu ứng cho Dark Mode */
         [data-theme="dark"] .module-card {
-             box-shadow: 
-                8px 8px 16px #0c101a,
-                -8px -8px 16px #161c2e;
-        }
-        
-        /* Hiệu ứng khi hover: "Ấn xuống" */
-        .module-card:hover {
-            box-shadow: 
-                inset 5px 5px 10px rgba(0, 0, 0, 0.1),
-                inset -5px -5px 10px rgba(255, 255, 255, 0.7);
-        }
-        [data-theme="dark"] .module-card:hover {
-            box-shadow: 
-                inset 5px 5px 10px #0c101a,
-                inset -5px -5px 10px #161c2e;
+             background: rgba(30, 30, 45, 0.6);
+             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        .module-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.3);
+        }
 
         .module-icon {
             font-size: 2.5rem;
@@ -92,26 +77,14 @@
             color: var(--primary);
         }
         .module-title {
-            font-weight: 600;
-            font-size: 1.1rem;
+            font-weight: 700;
+            font-size: 1.2rem;
             color: var(--text-main);
         }
         .module-desc {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-muted);
             margin-top: 8px;
-        }
-
-        /* Responsive cho mobile */
-        @media (max-width: 900px) {
-            .databook-grid {
-                grid-template-columns: repeat(2, 1fr); /* 2 cột trên tablet */
-            }
-        }
-        @media (max-width: 500px) {
-            .databook-grid {
-                grid-template-columns: 1fr; /* 1 cột trên mobile */
-            }
         }
     </style>
 </head>
@@ -119,11 +92,12 @@
 
     <div class="hub-container">
         <!-- HEADER -->
-        <header class="hub-header">
-            <h1><i class="fas fa-book-open"></i> Thư Viện</h1>
+        <header class="hub-header glass-box">
+            <h1><i class="fas fa-book-open"></i> MIRAI DATABOOK</h1>
+            <p class="tagline">Cơ sở dữ liệu về Vũ trụ MirAi.</p>
             <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-                <a href="index.html" class="btn btn-outline">⬅ Quay về</a>
-                <button class="btn" onclick="toggleTheme()">🌙</button>
+                <a href="index.html" class="btn btn-outline">⬅ Quay về truyện chính</a>
+                <button class="btn" onclick="toggleTheme()">🌙 Đổi Giao Diện</button>
             </div>
         </header>
 
@@ -152,11 +126,19 @@
         </main>
     </div>
 
-    <!-- SCRIPT ĐỂ KÍCH HOẠT DARK MODE & NÚT -->
+    <!-- SCRIPT ĐỂ KÍCH HOẠT DARK MODE, NÚT, VÀ ẢNH NỀN -->
     <script src="config.js"></script>
     <script src="js/script.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', applyUserSettings);
+        // Tự động áp dụng theme đã lưu
+        document.addEventListener('DOMContentLoaded', () => {
+            applyUserSettings();
+            
+            // Tự động load ảnh nền từ config.js
+            if (typeof CONFIG !== 'undefined' && CONFIG.bgImage) {
+                document.body.style.backgroundImage = `url('${CONFIG.bgImage}')`;
+            }
+        });
     </script>
 </body>
 </html>
