@@ -4,88 +4,152 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MirAi Databook</title>
-    <!-- DÙNG CHUNG STYLE VỚI TRANG CHỦ -->
     <link rel="stylesheet" href="css/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* CSS THÊM VÀO ĐỂ CÓ GRID ICON */
+        /* CSS RIÊNG CHO TRANG LORE - PHONG CÁCH NEUMORPHISM */
+        
+        body {
+            /* Dùng lại màu nền từ style.css để đồng bộ */
+            background-color: var(--bg-body);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .hub-container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 40px;
+        }
+
+        .hub-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .hub-header h1 {
+            font-size: 2rem;
+            color: var(--text-main);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .hub-header h1 i { color: var(--primary); }
+
+        /* [FIX] SẮP XẾP LẠI GRID */
         .databook-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+            /* Trên màn hình lớn, chia 4 cột đều nhau */
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
         }
+
+        /* [FIX] HIỆU ỨNG NEUMORPHISM CHO CARD */
         .module-card {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 25px;
-            background: var(--bg-body); /* Nền giống ô search */
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            justify-content: center;
+            padding: 30px;
+            background: var(--bg-body); /* Nền trùng với body */
+            border-radius: 20px;
             text-align: center;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            /* Bóng đổ tạo hiệu ứng nổi khối */
+            box-shadow: 
+                8px 8px 16px rgba(0, 0, 0, 0.1),
+                -8px -8px 16px rgba(255, 255, 255, 0.7);
         }
+        /* Hiệu ứng cho Dark Mode */
+        [data-theme="dark"] .module-card {
+             box-shadow: 
+                8px 8px 16px #0c101a,
+                -8px -8px 16px #161c2e;
+        }
+        
+        /* Hiệu ứng khi hover: "Ấn xuống" */
         .module-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            color: var(--primary);
+            box-shadow: 
+                inset 5px 5px 10px rgba(0, 0, 0, 0.1),
+                inset -5px -5px 10px rgba(255, 255, 255, 0.7);
         }
+        [data-theme="dark"] .module-card:hover {
+            box-shadow: 
+                inset 5px 5px 10px #0c101a,
+                inset -5px -5px 10px #161c2e;
+        }
+
+
         .module-icon {
             font-size: 2.5rem;
             margin-bottom: 15px;
             color: var(--primary);
         }
         .module-title {
-            font-weight: 700;
-            font-size: 1.2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-main);
         }
         .module-desc {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             margin-top: 8px;
+        }
+
+        /* Responsive cho mobile */
+        @media (max-width: 900px) {
+            .databook-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 cột trên tablet */
+            }
+        }
+        @media (max-width: 500px) {
+            .databook-grid {
+                grid-template-columns: 1fr; /* 1 cột trên mobile */
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- HEADER (Y HỆT TRANG CHỦ) -->
-        <div class="glass-box" style="text-align: center;">
-            <h1 id="web-name">MIRAI DATABOOK</h1>
-            <p class="tagline" id="sub-title">Cơ sở dữ liệu về Vũ trụ MirAi.</p>
-            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                <button class="btn" onclick="toggleTheme()">🌙 Giao diện</button>
-                <a href="index.html" class="btn btn-outline">⬅ Quay về truyện chính</a>
+    <div class="hub-container">
+        <!-- HEADER -->
+        <header class="hub-header">
+            <h1><i class="fas fa-book-open"></i> Thư Viện</h1>
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+                <a href="index.html" class="btn btn-outline">⬅ Quay về</a>
+                <button class="btn" onclick="toggleTheme()">🌙</button>
             </div>
-        </div>
+        </header>
 
         <!-- GRID MODULES -->
-        <div class="glass-box">
-            <h3>📚 Thư Viện</h3>
-            <div class="databook-grid" style="margin-top: 20px;">
-                <a href="list.html?db=wiki" class="module-card">
-                    <div class="module-icon"><i class="fas fa-users"></i></div>
-                    <div class="module-title">Wiki Nhân Vật</div>
-                    <div class="module-desc">Hồ sơ, thông số, sở thích.</div>
-                </a>
-                <a href="list.html?db=tech" class="module-card">
-                    <div class="module-icon"><i class="fas fa-cogs"></i></div>
-                    <div class="module-title">Cây Công Nghệ</div>
-                    <div class="module-desc">Lịch sử, mã nguồn mở, cơ chế vật lý.</div>
-                </a>
-                <a href="list.html?db=prequel" class="module-card">
-                    <div class="module-icon"><i class="fas fa-history"></i></div>
-                    <div class="module-title">Tiền Truyện</div>
-                    <div class="module-desc">Sự kiện quá khứ, lý giải thắc mắc.</div>
-                </a>
-                <a href="list.html?db=arcs" class="module-card">
-                    <div class="module-icon"><i class="fas fa-sitemap"></i></div>
-                    <div class="module-title">Tổng Quan Cốt Truyện</div>
-                    <div class="module-desc">Tóm tắt các Arc và mối quan hệ.</div>
-                </a>
-            </div>
-        </div>
+        <main class="databook-grid">
+            <a href="list.html?db=wiki" class="module-card">
+                <div class="module-icon"><i class="fas fa-users"></i></div>
+                <div class="module-title">Wiki Nhân Vật</div>
+                <div class="module-desc">Hồ sơ, thông số, sở thích.</div>
+            </a>
+            <a href="list.html?db=tech" class="module-card">
+                <div class="module-icon"><i class="fas fa-cogs"></i></div>
+                <div class="module-title">Cây Công Nghệ</div>
+                <div class="module-desc">Lịch sử, mã nguồn mở, cơ chế vật lý.</div>
+            </a>
+            <a href="list.html?db=prequel" class="module-card">
+                <div class="module-icon"><i class="fas fa-history"></i></div>
+                <div class="module-title">Tiền Truyện</div>
+                <div class="module-desc">Sự kiện quá khứ, lý giải thắc mắc.</div>
+            </a>
+            <a href="list.html?db=arcs" class="module-card">
+                <div class="module-icon"><i class="fas fa-sitemap"></i></div>
+                <div class="module-title">Tổng Quan Cốt Truyện</div>
+                <div class="module-desc">Tóm tắt các Arc và mối quan hệ.</div>
+            </a>
+        </main>
     </div>
 
     <!-- SCRIPT ĐỂ KÍCH HOẠT DARK MODE & NÚT -->
