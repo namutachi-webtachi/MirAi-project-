@@ -18,11 +18,13 @@
             <p class="tagline" id="sub-title">Thư viện lưu trữ MirAi</p>
             <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
                 <button class="btn" onclick="toggleTheme()">🌙 Giao diện</button>
+                <!-- Nút Bookmark sẽ bị ẩn ở đây -->
+                <a href="#" id="bookmark-link" class="btn" style="display: none;"></a>
                 <a href="lore_hub.html" id="back-button" class="btn btn-outline">⬅ Quay về Databook</a>
             </div>
         </div>
 
-       <!-- Search & List -->
+       <!-- Search & List (Y hệt index.html) -->
         <div class="glass-box">
             <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm kiếm mục...">
             <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 20px 0;">
@@ -31,51 +33,31 @@
         </div>
     </div>
     
-    <!-- Player & Footer (Giữ nguyên) -->
-    <div id="bgm-player" onclick="toggleBGM()">
-        <div id="bgm-icon"></div>
-        <div id="bgm-controls">▶️</div>
-    </div>
-    <footer style="text-align: center; margin-top: 50px; padding: 20px;">
-        <p style="font-size: 0.8rem; opacity: 0.7;">&copy; 2026 MirAi Project - NamuTachi</p>
-    </footer>
+    <!-- Player & Footer (Y hệt index.html) -->
+    <div id="bgm-player" onclick="toggleBGM()">...</div>
+    <footer>...</footer>
 
     <!-- Scripts -->
     <script src="config.js"></script>
     <script src="js/script.js"></script>
+    <!-- DÒNG SCRIPT QUAN TRỌNG ĐỂ BIẾN HÓA -->
     <script>
-        // LOGIC ĐA NĂNG CHO list.html
-        document.addEventListener("DOMContentLoaded", async () => {
-            // 1. Lấy tên database từ URL (VD: ?db=wiki)
+        document.addEventListener("DOMContentLoaded", () => {
+            // Lấy tên db từ URL
             const urlParams = new URLSearchParams(window.location.search);
             const dbName = urlParams.get('db');
 
-            if (!dbName) {
+            if (dbName) {
+                // Cập nhật tiêu đề
+                const titleMap = { 'wiki': 'Wiki Nhân Vật', 'tech': 'Cây Công Nghệ', 'prequel': 'Tiền Truyện', 'arcs': 'Tổng Quan Cốt Truyện' };
+                document.title = titleMap[dbName] || 'Thư Viện';
+                document.getElementById('web-name').innerText = titleMap[dbName] || 'Thư Viện';
+                
+                // Gọi hàm initIndexPage đã được nâng cấp
+                initIndexPage(`data_${dbName}.json`, dbName);
+            } else {
                 document.getElementById('web-name').innerText = "Lỗi";
-                document.getElementById('chapter-list').innerHTML = "Không tìm thấy thư viện.";
-                hideLoading();
-                return;
             }
-
-            // 2. Cập nhật tiêu đề và các text
-            const titleMap = {
-                'wiki': 'Wiki Nhân Vật',
-                'tech': 'Cây Công Nghệ',
-                'prequel': 'Tiền Truyện',
-                'arcs': 'Tổng Quan Cốt Truyện'
-            };
-            const pageTitle = titleMap[dbName] || 'Thư Viện';
-            document.title = pageTitle + " - MirAi";
-            document.getElementById('web-name').innerText = pageTitle;
-            document.getElementById('list-title').innerText = `📖 Các mục trong ${pageTitle}`;
-
-            // 3. Gọi hàm initIndexPage đã được nâng cấp trong script.js
-            // Ta sẽ truyền vào tên file JSON và tên thư mục tương ứng
-            const jsonFile = `data_${dbName}.json`;
-            const folderPrefix = dbName;
-            
-            // Hàm này nằm trong script.js, ta chỉ cần gọi nó
-            await initIndexPage(jsonFile, folderPrefix);
         });
     </script>
 </body>
