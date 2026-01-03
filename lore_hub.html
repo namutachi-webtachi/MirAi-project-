@@ -4,40 +4,134 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MirAi Databook</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- DÙNG LẠI CSS GỐC ĐỂ ĐỒNG BỘ GIAO DIỆN -->
+    <link rel="stylesheet" href="css/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        .databook-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .module-card { display: block; padding: 30px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; text-align: center; transition: 0.3s; box-shadow: var(--shadow); }
-        .module-card:hover { transform: translateY(-5px); border-color: var(--primary); color: var(--primary); }
-        .module-icon { font-size: 3rem; margin-bottom: 15px; color: var(--primary); }
-        .module-title { font-weight: bold; font-size: 1.2rem; }
-        .module-desc { font-size: 0.9rem; color: var(--text-muted); margin-top: 5px; }
+        /* CSS TÙY CHỈNH CHO TRANG HUB */
+        
+        /* Căn giữa layout */
+        .hub-container {
+            max-width: 900px; /* Tăng độ rộng để chứa 4 cột */
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .hub-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+        .hub-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .hub-header i {
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+
+        /* Grid chứa các module */
+        .databook-grid {
+            display: grid;
+            /* Tự động co giãn: 2 cột trên mobile, 4 cột trên desktop */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+        }
+
+        /* Card Module */
+        .module-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            color: inherit;
+        }
+        .module-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.2);
+        }
+        [data-theme="dark"] .module-card:hover {
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6);
+        }
+
+        .module-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 107, 129, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .module-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .module-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="glass-box" style="text-align: center;">
-            <a href="index.html" class="btn btn-outline" style="margin-bottom: 10px;">⬅ Quay về truyện chính</a>
-            <h1>📚 MIRAI DATABOOK</h1>
+
+    <div class="hub-container">
+        <!-- HEADER -->
+        <div class="hub-header">
+            <h1><i class="fas fa-book-open"></i> MIRAI DATABOOK</h1>
             <p class="tagline">Cơ sở dữ liệu về Vũ trụ MirAi.</p>
+            <a href="index.html" class="btn btn-outline">⬅ Quay về truyện chính</a>
         </div>
+
+        <!-- GRID MODULES -->
         <div class="databook-grid">
+            <!-- MODULE 1: WIKI -->
             <a href="list.html?db=wiki" class="module-card">
                 <div class="module-icon"><i class="fas fa-users"></i></div>
                 <div class="module-title">Wiki Nhân Vật</div>
                 <div class="module-desc">Hồ sơ, thông số, sở thích.</div>
             </a>
+
+            <!-- MODULE 2: CÂY CÔNG NGHỆ -->
             <a href="list.html?db=tech" class="module-card">
                 <div class="module-icon"><i class="fas fa-cogs"></i></div>
                 <div class="module-title">Cây Công Nghệ</div>
                 <div class="module-desc">Lịch sử, mã nguồn mở, cơ chế vật lý.</div>
             </a>
+
+            <!-- MODULE 3: TIỀN TRUYỆN -->
             <a href="list.html?db=prequel" class="module-card">
                 <div class="module-icon"><i class="fas fa-history"></i></div>
                 <div class="module-title">Tiền Truyện</div>
                 <div class="module-desc">Sự kiện quá khứ, lý giải thắc mắc.</div>
             </a>
+            
+            <!-- MODULE 4: CÁC ARC TRUYỆN -->
             <a href="list.html?db=arcs" class="module-card">
                 <div class="module-icon"><i class="fas fa-sitemap"></i></div>
                 <div class="module-title">Tổng Quan Cốt Truyện</div>
@@ -45,8 +139,12 @@
             </a>
         </div>
     </div>
+
+    <!-- SCRIPT ĐỂ TỰ ĐỘNG NHẬN DIỆN DARK MODE -->
     <script>
-        if(localStorage.getItem('user_theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
+        if (localStorage.getItem('user_theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+        }
     </script>
 </body>
 </html>
