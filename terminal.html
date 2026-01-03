@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MirAi System Terminal</title>
+    <!-- 1. NẠP LUA VM (FENGARI) TỪ CDN -->
+    <script src="https://fengari.io/static/js/fengari-web.js" type="text/javascript"></script>
+    
+    <style>
+        /* GIAO DIỆN HACKER CRT */
+        body {
+            background-color: #0d0d0d;
+            color: #33ff00;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            text-shadow: 0 0 5px rgba(51, 255, 0, 0.7);
+        }
+        
+        /* Hiệu ứng màn hình cong & nhiễu sóng */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #container {
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        #output {
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            scrollbar-width: none; /* Ẩn thanh cuộn */
+        }
+
+        #input-line {
+            display: flex;
+            border-top: 1px solid #33ff00;
+            padding-top: 10px;
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            color: #33ff00;
+            font-family: inherit;
+            font-size: 1.1rem;
+            flex: 1;
+            outline: none;
+            margin-left: 10px;
+            text-shadow: 0 0 5px rgba(51, 255, 0, 0.7);
+        }
+
+        .prefix { font-weight: bold; }
+        
+        /* Animation nhấp nháy */
+        @keyframes blink { 50% { opacity: 0; } }
+        .cursor { animation: blink 1s step-end infinite; }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <div id="output">
+Initializing MirAi Kernel...
+[OK] Loading Lua 5.3 VM...
+[OK] Mounting LocalStorage...
+[OK] Connection Established.
+
+WELCOME TO MIRAI TERMINAL v1.0
+------------------------------
+Type 'help()' to see available commands.
+Type Lua code to execute directly.
+    </div>
+    <div id="input-line">
+        <span class="prefix">root@mirai:~$</span>
+        <input type="text" id="cmd" autocomplete="off" autofocus>
+    </div>
+</div>
+
+<script>
+    const output = document.getElementById('output');
+    const input = document.getElementById('cmd');
+
+    // 1. HÀM IN RA MÀN HÌNH
+    function print(text) {
+        output.innerHTML += `\n${text}`;
+        output.scrollTop = output.scrollHeight;
+    }
+
+    // 2. KHỞI TẠO MÔI TRƯỜNG LUA
+    function initLua() {
+        // Tạo các hàm API để Lua gọi ngược lại JS
+        window.mirai_api = {
+            clear: () => output.innerHTML = "Screen Cleared.",
+            
+            // Hack: Mở khóa chế độ Thần Thánh
+            unlock_god_mode: () => {
+                localStorage.setItem('mirai_god_mode', 'true');
+                return "ACCESS GRANTED. GOD MODE ENABLED.";
+            },
+            
+            // Hack: Reset toàn bộ
+            reset_system: () => {
+                localStorage.clear();
+                return "SYSTEM PURGED. REBOOTING...";
+            },
+            
+            // Hack: Đọc trộm token (Demo thôi nhé)
+            get_token: () => {
+                let t = localStorage.getItem('gh_token');
+                return t ? "Token Found: " + t.substring(0,5) + "***" : "No Token Found.";
+            },
+
+            help: () => {
+                return `
+AVAILABLE COMMANDS:
+-------------------
+1. print("text")       : In ra màn hình
+2. sys.clear()         : Xóa màn hình
+3. sys.get_token()     : Kiểm tra Token GitHub
+4. sys.unlock_god()    : Mở khóa tính năng ẩn
+5. sys.reset()         : Xóa dữ liệu web
+-------------------
+* This terminal runs standard Lua 5.3 *
+                `;
+            }
+        };
+    }
+
+    // 3. XỬ LÝ LỆNH NHẬP VÀO
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const cmd = input.value;
+            print(`<span style="color:#fff">root@mirai:~$ ${cmd}</span>`);
+            
+            try {
+                // GỌI FENGARI ĐỂ CHẠY LUA
+                fengari.load(`
+                    local js = require "js"
+                    local window = js.global
+                    
+                    -- Wrapper cho API JS
+                    sys = {
+                        clear = function() window.mirai_api:clear() end,
+                        unlock_god = function() print(window.mirai_api:unlock_god_mode()) end,
+                        reset = function() print(window.mirai_api:reset_system()) end,
+                        get_token = function() print(window.mirai_api:get_token()) end
+                    }
+                    
+                    function help() print(window.mirai_api:help()) end
+
+                    -- Chạy lệnh người dùng
+                    ${cmd}
+                `)();
+            } catch (err) {
+                print(`<span style="color:red">Error: ${err}</span>`);
+            }
+            
+            input.value = '';
+        }
+    });
+
+    // Run init
+    initLua();
+    
+    // Giữ focus
+    document.addEventListener('click', () => input.focus());
+</script>
+
+</body>
+</html>
