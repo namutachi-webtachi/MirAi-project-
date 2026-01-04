@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* FIX STICKY FOOTER */
+        /* CẤU TRÚC TRANG ĐỂ FOOTER TỰ ĐẨY XUỐNG MỀM MẠI */
         body {
             display: flex;
             flex-direction: column;
@@ -16,64 +16,84 @@
         }
 
         .container {
-            flex: 1; /* Đẩy footer xuống */
+            flex: 1;
             width: 100%;
-            max-width: 1100px;
+            max-width: 1200px; /* Mở rộng chiều ngang container */
             margin: 40px auto;
             padding: 0 20px;
+            display: flex; /* Flex để căn giữa nội dung theo chiều dọc nếu muốn */
+            flex-direction: column;
+            justify-content: center; /* Căn giữa theo chiều dọc */
         }
 
         .hub-header.glass-box {
             text-align: center;
             backdrop-filter: blur(5px);
+            padding: 40px 20px; /* Header dày dặn hơn */
+            margin-bottom: 40px;
         }
         .hub-header h1 {
-            font-size: 2.5rem;
+            font-size: 3rem; /* Tên to hơn */
             color: var(--primary);
+            margin-bottom: 10px;
         }
 
+        /* GRID "KHỔNG LỒ" */
         .databook-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Card rộng tối thiểu 280px */
+            gap: 40px; /* Khoảng cách giữa các card xa hơn */
+            margin-bottom: 40px;
         }
 
         .module-card {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px 20px;
+            justify-content: center; /* Căn giữa nội dung trong card */
+            padding: 50px 30px; /* Card phồng to ra */
+            min-height: 300px; /* Chiều cao tối thiểu của card lớn hơn */
+            
             background: var(--glass);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
+            border-radius: 24px; /* Bo góc mềm mại hơn */
+            
             text-align: center;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hiệu ứng nảy */
             text-decoration: none;
             color: inherit;
             box-shadow: var(--shadow);
         }
+        
+        /* Hiệu ứng hover bay lên cao hơn */
         .module-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-15px) scale(1.02);
             border-color: var(--primary);
-            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.4);
+            background: rgba(255, 255, 255, 0.15); /* Sáng hơn chút khi hover */
         }
 
         .module-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
+            font-size: 4.5rem; /* ICON SIÊU TO KHỔNG LỒ */
+            margin-bottom: 25px;
             color: var(--primary);
+            text-shadow: 0 0 15px var(--primary); /* Thêm hào quang cho icon */
         }
+        
         .module-title {
-            font-weight: 700;
-            font-size: 1.2rem;
+            font-weight: 800;
+            font-size: 1.5rem; /* Tiêu đề to hơn */
             color: var(--text-main);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+        
         .module-desc {
-            font-size: 0.9rem;
+            font-size: 1.1rem; /* Chữ mô tả dễ đọc hơn */
             color: var(--text-muted);
-            margin-top: 8px;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -83,10 +103,10 @@
         <!-- HEADER -->
         <header class="hub-header glass-box">
             <h1><i class="fas fa-book-open"></i> MIRAI DATABOOK</h1>
-            <p class="tagline">Cơ sở dữ liệu về Vũ trụ MirAi.</p>
-            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-                <a href="index.html" class="btn btn-outline">⬅ Quay về truyện chính</a>
-                <button class="btn" onclick="toggleTheme()">🌙 Đổi Giao Diện</button>
+            <p class="tagline" style="font-size: 1.2rem;">Cơ sở dữ liệu toàn thư về Vũ trụ MirAi.</p>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
+                <a href="index.html" class="btn btn-outline" style="padding: 12px 25px; font-size: 1rem;">⬅ Quay về truyện chính</a>
+                <button class="btn" onclick="toggleTheme()" style="padding: 12px 25px; font-size: 1rem;">🌙 Đổi Giao Diện</button>
             </div>
         </header>
 
@@ -95,22 +115,22 @@
             <a href="list.html?db=wiki" class="module-card">
                 <div class="module-icon"><i class="fas fa-users"></i></div>
                 <div class="module-title">Wiki Nhân Vật</div>
-                <div class="module-desc">Hồ sơ, thông số, sở thích.</div>
+                <div class="module-desc">Hồ sơ chi tiết, chỉ số sức mạnh và bí mật.</div>
             </a>
             <a href="list.html?db=tech" class="module-card">
                 <div class="module-icon"><i class="fas fa-cogs"></i></div>
                 <div class="module-title">Cây Công Nghệ</div>
-                <div class="module-desc">Lịch sử, mã nguồn mở, cơ chế vật lý.</div>
+                <div class="module-desc">Phân tích công nghệ thế giới MirAii.Phân t
             </a>
             <a href="list.html?db=prequel" class="module-card">
                 <div class="module-icon"><i class="fas fa-history"></i></div>
                 <div class="module-title">Tiền Truyện</div>
-                <div class="module-desc">Sự kiện quá khứ, lý giải thắc mắc.</div>
+                <div class="module-desc">Những sự kiện trong quá khứ bị lãng quên.</div>
             </a>
             <a href="list.html?db=arcs" class="module-card">
                 <div class="module-icon"><i class="fas fa-sitemap"></i></div>
-                <div class="module-title">Tổng Quan Cốt Truyện</div>
-                <div class="module-desc">Tóm tắt các Arc và mối quan hệ.</div>
+                <div class="module-title">Timeline & Arcs</div>
+                <div class="module-desc">Sơ đồ cốt truyện và mối quan hệ các Arc.</div>
             </a>
         </main>
     </div>
@@ -126,25 +146,22 @@
         });
     </script>
 
-    <!-- FOOTER ĐÃ FIX -->
-    <footer style="text-align: center; margin-top: auto; padding: 20px; background: var(--glass); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); width: 100%; color: var(--text-main);">
-        
+    <!-- FOOTER -->
+    <footer style="text-align: center; margin-top: auto; padding: 25px; background: var(--glass); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); width: 100%; color: var(--text-main);">
         <div style="margin-bottom: 15px;">
-            <a id="fb-link" href="#" target="_blank" style="text-decoration: none; margin: 0 10px; color: #1877F2; font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
+            <a id="fb-link" href="#" target="_blank" style="text-decoration: none; margin: 0 15px; color: #1877F2; font-weight: bold; font-size: 1.3rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
                 <i class="fab fa-facebook"></i> Facebook
             </a>
-            <a id="dc-link" href="#" target="_blank" style="text-decoration: none; margin: 0 10px; color: #5865F2; font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
+            <a id="dc-link" href="#" target="_blank" style="text-decoration: none; margin: 0 15px; color: #5865F2; font-weight: bold; font-size: 1.3rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
                 <i class="fab fa-discord"></i> Discord
             </a>
         </div>
-
-        <div style="font-size: 0.9rem; opacity: 0.9;">
+        <div style="font-size: 1rem; opacity: 0.9;">
             <span>👀 Lượt truy cập: <span id="busuanzi_value_site_pv" style="font-weight: bold; color: var(--primary);">...</span></span>
-            <span style="margin: 0 10px;">|</span>
+            <span style="margin: 0 15px;">|</span>
             <span>👤 Người đọc: <span id="busuanzi_value_site_uv" style="font-weight: bold; color: var(--primary);">...</span></span>
         </div>
-
-        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">&copy; 2025 MirAi Project - NamuTachi</p>
+        <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 15px;">&copy; 2025 MirAi Project - NamuTachi</p>
     </footer>
 
     <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
