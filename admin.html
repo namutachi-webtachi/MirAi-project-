@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MirAi Command Center V26</title>
+    <title>MirAi Command Center V27</title>
     
     <!-- LIB CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
@@ -29,8 +29,20 @@
     <nav id="sidebar">
         <div class="brand"><i class="fas fa-dragon"></i> MIRAI ADMIN</div>
         
+        <!-- [MỚI] MENU CHỌN DATABASE (QUAN TRỌNG) -->
+        <div style="padding: 0 15px; margin-bottom: 20px;">
+            <small style="color: var(--text-muted); font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.7rem;">ĐANG QUẢN LÝ:</small>
+            <select id="dbSelector" onchange="switchDatabase()" style="width: 100%; padding: 8px; border: 1px solid var(--primary); color: var(--primary); font-weight: bold; background: var(--bg); border-radius: 6px; cursor: pointer;">
+                <option value="main">📘 Truyện Chính</option>
+                <option value="wiki">👥 Wiki Nhân Vật</option>
+                <option value="tech">⚙️ Cây Công Nghệ</option>
+                <option value="prequel">📜 Tiền Truyện</option>
+                <option value="arcs">🗺️ Tổng Quan Arc</option>
+            </select>
+        </div>
+
         <div class="nav-item active" onclick="switchView('editor')"><i class="fas fa-pen-nib"></i> Soạn Thảo</div>
-        <div class="nav-item" onclick="switchView('list')"><i class="fas fa-list"></i> Quản Lý Truyện</div>
+        <div class="nav-item" onclick="switchView('list')"><i class="fas fa-list"></i> Danh Sách</div>
         <div class="nav-item" onclick="switchView('music')"><i class="fas fa-music"></i> Kho Nhạc</div>
         <div class="nav-item" onclick="switchView('achievements')"><i class="fas fa-trophy"></i> Thành Tựu</div>
         <div class="nav-item" onclick="switchView('ailab')"><i class="fas fa-brain"></i> AI Lab</div>
@@ -40,6 +52,7 @@
             <div class="nav-item" onclick="switchView('settings')"><i class="fas fa-cog"></i> Cấu hình</div>
             <div class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-sign-out-alt"></i> Thoát</div>
             
+            <!-- MINI PLAYER -->
             <div id="mini-player" style="display:none">
                 <div id="mp-title">Đang tải...</div>
                 <button class="btn btn-primary" onclick="toggleAdminMusic()" style="padding: 5px 10px; font-size: 0.8rem;">⏯️</button>
@@ -64,8 +77,8 @@
             <div class="card">
                 <input type="text" id="chapTitle" placeholder="Tiêu đề chương (VD: Chương 1: Khởi đầu)" style="font-size: 1.2rem; font-weight: bold;">
                 
-                <!-- TOOLBAR XỊN SÒ (Đã tích hợp Snippets & KPI) -->
-                <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
+                <!-- TOOLBAR XỊN SÒ -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
                     <button class="btn btn-outline" onclick="document.getElementById('imgInput').click()" title="Upload Ảnh"><i class="fas fa-image"></i></button>
                     <input type="file" id="imgInput" hidden accept="image/*" onchange="handleImgUpload()">
                     <button class="btn btn-outline" onclick="runAutoFormat()" title="Format lại"><i class="fas fa-magic"></i></button>
@@ -101,6 +114,7 @@
                 </div>
             </div>
 
+            <!-- Hidden Inputs -->
             <input type="hidden" id="edit-index" value="">
             <input type="hidden" id="edit-file-sha" value="">
         </div>
@@ -108,23 +122,27 @@
         <!-- VIEW: LIST -->
         <div id="view-list" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin:0">📋 Danh sách chương</h2>
+                <h2 style="margin:0">📋 Danh sách nội dung</h2>
                 <button class="btn btn-outline" onclick="loadChapterList()"><i class="fas fa-sync"></i> Refresh</button>
             </div>
             <div class="card" id="list-container">Đang tải dữ liệu...</div>
         </div>
 
-        <!-- VIEW: SETTINGS -->
+        <!-- VIEW: SETTINGS (CẤU HÌNH BẢO MẬT) -->
         <div id="view-settings" class="view-section">
              <div class="card">
                 <h3>🔑 Cấu hình kết nối & Bảo mật</h3>
-                <label>GitHub Token:</label>
+                <label for="token">GitHub Token:</label>
                 <input type="password" id="token" placeholder="ghp_..." onchange="saveConfig()">
-                <div style="margin-bottom: 15px;">
-                    <input type="checkbox" id="rememberToken" onchange="saveConfig()" style="width: auto; margin-right: 5px;">
-                    <label for="rememberToken" style="font-size: 0.9rem; color: var(--text-muted);">Lưu Token vào trình duyệt (⚠️ Cẩn thận)</label>
+                
+                <div style="margin-bottom: 15px; display: flex; align-items: center;">
+                    <input type="checkbox" id="rememberToken" onchange="saveConfig()" style="width: auto; margin: 0 10px 0 0;">
+                    <label for="rememberToken" style="font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+                        Lưu Token vào trình duyệt (⚠️ Cẩn thận nếu dùng máy lạ)
+                    </label>
                 </div>
-                <label>Discord Webhook:</label>
+
+                <label for="webhook">Discord Webhook:</label>
                 <input type="password" id="webhook" placeholder="https://discord.com/api/..." onchange="saveConfig()">
              </div>
         </div>
@@ -176,7 +194,7 @@
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>
-    <!-- CUSTOM JS (Module hóa) -->
+    <!-- CUSTOM JS -->
     <script src="js/admin.js"></script>
 </body>
 </html>
