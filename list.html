@@ -10,30 +10,44 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* LAYOUT CHUẨN */
+        /* FIX LỖI TRÀN LỀ (QUAN TRỌNG) */
+        * {
+            box-sizing: border-box; /* Tính padding vào trong kích thước, không làm phình to */
+        }
+
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            margin: 0; /* Xóa margin mặc định của trình duyệt */
+            overflow-x: hidden; /* Chặn tuyệt đối thanh cuộn ngang */
         }
+
         .container {
             flex: 1;
             width: 100%;
-            max-width: 1000px; /* Căn chiều rộng vừa mắt đọc */
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 40px 20px; /* Thêm padding trên dưới để tách header/footer ra */
+            padding: 40px 20px;
             display: flex;
             flex-direction: column;
-            gap: 30px; /* Khoảng cách giữa Header và List */
+            gap: 30px;
         }
         
-        /* Tinh chỉnh lại Glass Box cho đẹp */
         .glass-box {
-            padding: 30px; /* Tăng padding bên trong */
+            padding: 30px;
             border-radius: 20px;
+            width: 100%; /* Đảm bảo không vượt quá container */
         }
         
-        /* Khi list trống, có thể thêm class này bằng JS (tùy chọn), hoặc để mặc định */
+        /* Input tìm kiếm cũng cần fix để không tràn */
+        .search-box {
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Quan trọng cho input */
+        }
+
         #chapter-list:empty::before {
             content: "Đang cập nhật dữ liệu...";
             display: block;
@@ -60,8 +74,8 @@
         </div>
 
        <!-- Search & List -->
-        <div class="glass-box" style="min-height: 300px;"> <!-- Min-height để khung luôn to dù không có bài -->
-            <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm kiếm mục..." style="padding: 15px; font-size: 1rem;">
+        <div class="glass-box" style="min-height: 300px;">
+            <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm kiếm mục...">
             <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 30px 0;">
             <h3 id="list-title" style="margin-bottom: 20px; font-size: 1.5rem;">📖 Mục lục</h3>
             <div id="chapter-list" class="chapter-list"></div>
@@ -71,8 +85,8 @@
     <!-- Player -->
     <div id="bgm-player" onclick="toggleBGM()">...</div>
     
-    <!-- FOOTER -->
-    <footer style="text-align: center; margin-top: auto; padding: 25px; background: var(--glass); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border);  color: var(--text-main);">
+    <!-- FOOTER ĐÃ FIX: Xóa width 100%, thêm box-sizing -->
+    <footer style="text-align: center; margin-top: auto; padding: 25px; background: var(--glass); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); box-sizing: border-box; color: var(--text-main);">
         <div style="margin-bottom: 15px;">
             <a id="fb-link" href="#" target="_blank" style="text-decoration: none; margin: 0 15px; color: #1877F2; font-weight: bold; font-size: 1.3rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
                 <i class="fab fa-facebook"></i> Facebook
