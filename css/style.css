@@ -389,58 +389,36 @@ input:focus, textarea:focus {
     box-shadow: none !important;
 }
 /* =========================================
-   FIX MÀU LINK TRONG TRUYỆN (CHO DỄ ĐỌC)
-   ========================================= */
-
-/* Mặc định (Light Mode) */
-#content-area a {
-    color: #d63031; /* Màu đỏ đậm hoặc dùng var(--primary) */
-    font-weight: bold;
-    text-decoration: none;
-    border-bottom: 1px dashed currentColor;
-    transition: 0.3s;
-}
-
-/* Chế độ tối (Dark Mode) - QUAN TRỌNG */
-[data-theme="dark"] #content-area a {
-    color: #55efc4; /* Màu xanh ngọc Neon siêu nổi trên nền đen */
-    border-bottom-color: #55efc4;
-}
-
-/* Hiệu ứng khi di chuột vào */
-#content-area a:hover {
-    color: var(--accent); /* Đổi sang màu tím khi hover */
-    border-bottom-style: solid;
-}
-/* =========================================
-   FIX LỖI TRÀN CODE TRÊN MOBILE (QUAN TRỌNG)
+   FIX LORE DẠNG CODE (DATA LOG STYLE - NO BOX)
    ========================================= */
 
 #content-area pre {
-    white-space: pre-wrap;       /* Bắt buộc xuống dòng nếu hết chỗ */
-    word-wrap: break-word;       /* Ngắt cả những từ quá dài */
-    max-width: 100%;             /* Chiều rộng tối đa bằng màn hình */
-    overflow-x: hidden;          /* Ẩn thanh cuộn ngang xấu xí */
+    /* Ép xuống dòng */
+    white-space: pre-wrap;       
+    word-wrap: break-word;       
     
-    /* Trang trí thêm cho đẹp */
-    background: rgba(0, 0, 0, 0.05);
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    /* Xóa bỏ giao diện khung code */
+    background: transparent !important; /* Không nền */
+    border: none !important;            /* Không viền */
+    padding: 0 !important;              /* Không đệm */
+    margin: 15px 0;                     /* Cách dòng như văn bản thường */
+    box-shadow: none !important;        /* Không bóng đổ */
+    
+    /* Giữ font chữ ngầu */
+    font-family: 'Consolas', 'Monaco', monospace; 
+    font-size: 0.95em;                  /* Kích thước gần bằng chữ thường */
+    color: inherit;                     /* Màu chữ theo giao diện (Sáng/Tối) */
+    
+    /* Thêm chút style cho giống log hệ thống */
+    border-left: 3px solid var(--primary) !important; /* Chỉ giữ 1 vạch màu bên trái */
+    padding-left: 15px !important;      /* Cách vạch màu ra một chút */
+    opacity: 0.9;                       /* Hơi mờ tí cho ảo */
 }
 
-/* Dark mode cho khung code */
-[data-theme="dark"] #content-area pre {
-    background: rgba(0, 0, 0, 0.3);
-}
-
+/* Fix thẻ code nhỏ bên trong */
 #content-area code {
-    font-family: 'Courier New', monospace; /* Font code chuẩn */
-    font-size: 0.9em;
-}
-
-/* Fix ảnh bị tràn trên mobile (đề phòng) */
-#content-area img {
-    max-width: 100%;
-    height: auto;
+    font-family: inherit;
+    background: transparent;
+    color: inherit;
+    padding: 0;
 }
