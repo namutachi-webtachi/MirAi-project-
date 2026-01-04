@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         element: document.getElementById("content"),
         spellChecker: false,
         status: ["lines", "words"],
-        placeholder: "Paste nội dung từ Google Docs vào đây (Ctrl+V)...",
+        placeholder: "Nội dung...",
         autosave: { enabled: true, uniqueId: "MirAi_Draft", delay: 5000 },
     });
 
@@ -55,17 +55,21 @@ function login() {
     } else if (pass) alert("SAI MẬT MÃ!");
 }
 
-// --- [MỚI] DATABASE SWITCHER ---
+// --- [QUAN TRỌNG] DATABASE SWITCHER ---
+// Hàm này sẽ chạy khi bro chọn Menu "Đang quản lý"
 function switchDatabase() {
+    // 1. Cập nhật biến currentDB theo giá trị Menu
     currentDB = document.getElementById('dbSelector').value;
+    
+    // 2. Reset Editor để tránh nhầm lẫn
     resetEditor();
     
-    // Nếu đang ở tab List thì load lại list mới
+    // 3. Nếu đang ở tab Danh Sách, tải lại danh sách mới ngay lập tức
     if (document.getElementById('view-list').classList.contains('active')) {
         loadChapterList();
     }
     
-    // Đổi placeholder tiêu đề cho hợp ngữ cảnh
+    // 4. Đổi placeholder tiêu đề cho hợp ngữ cảnh
     const titleInput = document.getElementById('chapTitle');
     if (currentDB === 'main') titleInput.placeholder = "Tiêu đề chương (VD: Chương 1)...";
     else titleInput.placeholder = "Tên mục (VD: Hồ sơ Minh, Lịch sử AI)...";
@@ -73,12 +77,12 @@ function switchDatabase() {
     showToast(`📂 Đã chuyển sang: ${currentDB.toUpperCase()}`);
 }
 
-// Helper để lấy config
+// Helper để lấy tên file JSON và thư mục dựa trên currentDB
 function getDbConfig() {
     if (currentDB === 'main') {
         return { json: 'data.json', folder: 'chapters' };
     } else {
-        return { json: `data_${currentDB}.json`, folder: currentDB };
+        return { json: `data_${currentDB}.json`, folder: currentDB }; // VD: data_wiki.json, folder wiki/
     }
 }
 
@@ -177,21 +181,22 @@ async function handleImgUpload() {
     }});
 }
 
-// --- CHAPTER LOGIC (ĐÃ NÂNG CẤP) ---
+// --- CHAPTER LOGIC (ĐÃ NÂNG CẤP ĐA NHIỆM) ---
 async function loadChapterList() {
     const c = document.getElementById('list-container'), t = document.getElementById('token').value;
     if(!t) { c.innerHTML = "Nhập Token!"; return; }
     
-    // Lấy config dựa trên DB đang chọn
+    // [QUAN TRỌNG] Lấy đúng file JSON dựa trên lựa chọn hiện tại
     const { json } = getDbConfig();
     
-    c.innerHTML = `⏳ Đang tải dữ liệu [${currentDB}]...`;
+    c.innerHTML = `⏳ Đang tải dữ liệu [${currentDB.toUpperCase()}]...`;
+    
     try {
         const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${json}?t=${Date.now()}`, {headers:{Authorization:`token ${t}`}});
         if(!res.ok) {
             window.chaptersCache = [];
             window.jsonSha = null;
-            c.innerHTML = "Chưa có dữ liệu. Hãy tạo bài đầu tiên!";
+            c.innerHTML = `Chưa có dữ liệu cho mục <b>${currentDB}</b>.<br>Hãy tạo bài đầu tiên!`;
             return;
         }
         
@@ -212,10 +217,11 @@ async function publishChapter() {
     if(!title || !content || !token) return alert("Thiếu thông tin!");
     document.getElementById('publishBtn').innerText = "⏳ Đang xử lý...";
     
+    // [QUAN TRỌNG] Lấy đúng file JSON và thư mục để lưu
     const { json, folder } = getDbConfig();
 
     try {
-        // 1. Lấy danh sách hiện tại
+        // 1. Lấy danh sách hiện tại (để chắc chắn có SHA mới nhất)
         let chapters = [];
         let listSha = null;
         try {
@@ -232,6 +238,7 @@ async function publishChapter() {
         
         let path, sha = null;
         if(idx !== "") {
+            // Edit Mode
             path = chapters[idx].file;
             try {
                 const fInfo = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {headers:{Authorization:`token ${token}`}});
@@ -239,7 +246,8 @@ async function publishChapter() {
             } catch(e) {}
             chapters[idx].title = title; chapters[idx].timestamp = ts;
         } else {
-            path = `${folder}/${Date.now()}.md`; // Tên file theo folder
+            // New Mode: Lưu vào đúng thư mục (wiki/, tech/...)
+            path = `${folder}/${Date.now()}.md`;
             chapters.push({id: `${folder}_${Date.now()}`, title: title, file: path, timestamp: ts});
         }
 
@@ -249,7 +257,7 @@ async function publishChapter() {
         // 4. Upload List JSON
         await githubRequest(json, {message: `Upd List ${currentDB}`, content: btoa(unescape(encodeURIComponent(JSON.stringify(chapters, null, 2)))), sha: listSha});
         
-        // 5. Notify
+        // 5. Notify (Chỉ thông báo nếu là Truyện Chính)
         const wh = document.getElementById('webhook').value;
         if(wh && !idx && currentDB === 'main') {
             fetch(wh, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({content: `🎉 **CHƯƠNG MỚI:** ${title}\n👉 Link: https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}`})});
@@ -277,6 +285,7 @@ async function editChapter(i) {
 async function deleteChapter(i) {
     if(!confirm("Xóa vĩnh viễn?")) return;
     const item = window.chaptersCache[i], t = document.getElementById('token').value;
+    // [QUAN TRỌNG] Lấy đúng file JSON để xóa
     const { json } = getDbConfig();
 
     try {
