@@ -7,26 +7,25 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff6b81">
-    <!-- Thêm FontAwesome để hiện icon ở Footer -->
+    <!-- Thêm FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div id="loading">Đang tải thư viện...</div>
 
     <div class="container">
-        <!-- Header (Sẽ được JS tùy chỉnh) -->
+        <!-- Header -->
         <div class="glass-box" style="text-align: center;">
             <h1 id="web-name">Đang tải...</h1>
             <p class="tagline" id="sub-title">Thư viện lưu trữ MirAi</p>
             <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
                 <button class="btn" onclick="toggleTheme()">🌙 Giao diện</button>
-                <!-- Nút Bookmark sẽ bị ẩn ở đây -->
                 <a href="#" id="bookmark-link" class="btn" style="display: none;"></a>
                 <a href="lore_hub.html" id="back-button" class="btn btn-outline">⬅ Quay về Databook</a>
             </div>
         </div>
 
-       <!-- Search & List (Y hệt index.html) -->
+       <!-- Search & List -->
         <div class="glass-box">
             <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm kiếm mục...">
             <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 20px 0;">
@@ -38,40 +37,37 @@
     <!-- Player -->
     <div id="bgm-player" onclick="toggleBGM()">...</div>
     
-    <!-- FOOTER XỊN SÒ: ĐẾM VIEW + SOCIAL (Đã chèn) -->
-    <footer style="text-align: center; margin-top: 50px; padding: 20px; background: rgba(255,255,255,0.8); border-radius: 20px 20px 0 0;">
+    <!-- FOOTER ĐÃ FIX: Dùng var(--glass) để trong suốt -->
+    <footer style="text-align: center; margin-top: 50px; padding: 20px; background: var(--glass); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); border-radius: 20px 20px 0 0; color: var(--text-main); box-shadow: 0 -5px 15px rgba(0,0,0,0.1);">
         
-        <!-- Các nút mạng xã hội -->
+        <!-- Social Buttons -->
         <div style="margin-bottom: 15px;">
-            <a id="fb-link" href="#" target="_blank" style="text-decoration: none; margin: 0 10px; color: #1877F2; font-weight: bold; font-size: 1.2rem;">
+            <a id="fb-link" href="#" target="_blank" style="text-decoration: none; margin: 0 10px; color: #1877F2; font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
                 <i class="fab fa-facebook"></i> Facebook
             </a>
-            <a id="dc-link" href="#" target="_blank" style="text-decoration: none; margin: 0 10px; color: #5865F2; font-weight: bold; font-size: 1.2rem;">
+            <a id="dc-link" href="#" target="_blank" style="text-decoration: none; margin: 0 10px; color: #5865F2; font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
                 <i class="fab fa-discord"></i> Discord
             </a>
         </div>
 
-        <!-- Bộ đếm lượt xem (Tự động chạy) -->
-        <div style="font-size: 0.9rem; color: #666;">
+        <!-- View Counter -->
+        <div style="font-size: 0.9rem; opacity: 0.9;">
             <span>👀 Lượt truy cập: <span id="busuanzi_value_site_pv" style="font-weight: bold; color: var(--primary);">...</span></span>
             <span style="margin: 0 10px;">|</span>
             <span>👤 Người đọc: <span id="busuanzi_value_site_uv" style="font-weight: bold; color: var(--primary);">...</span></span>
         </div>
 
-        <p style="font-size: 0.8rem; opacity: 0.7;">&copy; 2025 MirAi Project - NamuTachi</p>
+        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">&copy; 2025 MirAi Project - NamuTachi</p>
     </footer>
 
     <!-- Scripts -->
     <script src="config.js"></script>
     <script src="js/script.js"></script>
-    
-    <!-- Script đếm view (Busuanzi) -->
     <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     
-    <!-- Script lấy link social từ config (Đặt sau config.js để không bị lỗi) -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Xử lý Social Links
+            // Social Links
             if(typeof CONFIG !== 'undefined') {
                 const fbLink = document.getElementById('fb-link');
                 const dcLink = document.getElementById('dc-link');
@@ -79,18 +75,15 @@
                 if(dcLink) dcLink.href = CONFIG.social.discord;
             }
 
-            // Xử lý Logic trang List
-            // Lấy tên db từ URL
+            // Page Logic
             const urlParams = new URLSearchParams(window.location.search);
             const dbName = urlParams.get('db');
 
             if (dbName) {
-                // Cập nhật tiêu đề
                 const titleMap = { 'wiki': 'Wiki Nhân Vật', 'tech': 'Cây Công Nghệ', 'prequel': 'Tiền Truyện', 'arcs': 'Tổng Quan Cốt Truyện' };
                 document.title = titleMap[dbName] || 'Thư Viện';
                 document.getElementById('web-name').innerText = titleMap[dbName] || 'Thư Viện';
                 
-                // Gọi hàm initIndexPage đã được nâng cấp
                 if (typeof initIndexPage === 'function') {
                     initIndexPage(`data_${dbName}.json`, dbName);
                 }
