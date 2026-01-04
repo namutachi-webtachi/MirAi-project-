@@ -1,144 +1,104 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MirAi Databook</title>
-    <link rel="stylesheet" href="css/style.css"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        /* CSS RIÊNG CHO TRANG LORE - PHONG CÁCH GLASSMORPHISM */
-        
-        body {
-            /* Dùng lại ảnh nền từ config.js */
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
+/* =================================================================
+   LORE STYLESHEET (Thừa kế từ style.css)
+   ================================================================= */
 
-        .hub-container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+/* --- 1. IMPORT FONTS & BIẾN MÀU (Lấy từ style.css) --- */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Merriweather:wght@300;400;700&display=swap');
+:root {
+    --primary: #ff6b81;
+    --accent: #a29bfe;
+    --glass: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --text: #2d3436;
+    --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+[data-theme="dark"] {
+    --primary: #ff4757;
+    --accent: #70a1ff;
+    --glass: rgba(30, 30, 30, 0.95);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text: #dfe4ea;
+}
 
-        /* [FIX] HEADER & CARD DÙNG CHUNG CLASS "glass-box" */
-        /* Class này đã được định nghĩa trong style.css, ta chỉ cần dùng lại */
+/* --- 2. CẤU TRÚC CƠ BẢN (Lấy từ style.css) --- */
+body {
+    font-family: 'Nunito', sans-serif;
+    color: var(--text);
+    background-color: #f1f2f6;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    margin: 0;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+}
+.container {
+    max-width: 1100px; /* Rộng hơn cho trang Lore */
+    margin: 40px auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
 
-        .hub-header {
-            text-align: center;
-        }
-        .hub-header h1 {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
+/* --- 3. HIỆU ỨNG KÍNH MỜ (Lấy từ style.css) --- */
+.glass-box {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: var(--shadow);
+    animation: fadeIn 0.8s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-        .databook-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
-        }
+/* --- 4. CÁC THÀNH PHẦN UI (Lấy từ style.css) --- */
+h1 {
+    background: linear-gradient(to right, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.5rem;
+    margin: 0;
+    text-align: center;
+}
+.tagline { text-align: center; font-style: italic; opacity: 0.8; margin-bottom: 20px; }
+.btn {
+    padding: 10px 20px; border: none; border-radius: 50px;
+    background: linear-gradient(45deg, var(--primary), var(--accent));
+    color: white; font-weight: bold; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 5px; text-decoration: none; font-size: 0.9rem;
+}
+.btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 107, 129, 0.4); }
+.btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
 
-        /* [FIX] CARD MODULE THEO PHONG CÁCH KÍNH MỜ */
-        .module-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px 20px;
-            
-            /* Hiệu ứng kính mờ */
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            
-            border-radius: 16px;
-            text-align: center;
-            transition: all 0.3s;
-            text-decoration: none;
-            color: inherit;
-        }
-        [data-theme="dark"] .module-card {
-             background: rgba(30, 30, 45, 0.6);
-             border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .module-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--primary);
-            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.3);
-        }
-
-        .module-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-        .module-title {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: #111827;
-        }
-        .module-desc {
-            font-size: 0.9rem;
-            color: #4b5563;
-            margin-top: 8px;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="hub-container">
-        <!-- HEADER -->
-        <header class="hub-header glass-box">
-            <h1><i class="fas fa-book-open"></i> MIRAI DATABOOK</h1>
-            <p class="tagline">Cơ sở dữ liệu về Vũ trụ MirAi.</p>
-            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-                <a href="index.html" class="btn btn-outline">⬅ Quay về truyện chính</a>
-                <button class="btn" onclick="toggleTheme()">🌙 Đổi Giao Diện</button>
-            </div>
-        </header>
-
-        <!-- GRID MODULES -->
-        <main class="databook-grid">
-            <a href="list.html?db=wiki" class="module-card">
-                <div class="module-icon"><i class="fas fa-users"></i></div>
-                <div class="module-title">Wiki Nhân Vật</div>
-                <div class="module-desc">Hồ sơ, thông số, sở thích.</div>
-            </a>
-            <a href="list.html?db=tech" class="module-card">
-                <div class="module-icon"><i class="fas fa-cogs"></i></div>
-                <div class="module-title">Cây Công Nghệ</div>
-                <div class="module-desc">Lịch sử, mã nguồn mở, cơ chế vật lý.</div>
-            </a>
-            <a href="list.html?db=prequel" class="module-card">
-                <div class="module-icon"><i class="fas fa-history"></i></div>
-                <div class="module-title">Tiền Truyện</div>
-                <div class="module-desc">Sự kiện quá khứ, lý giải thắc mắc.</div>
-            </a>
-            <a href="list.html?db=arcs" class="module-card">
-                <div class="module-icon"><i class="fas fa-sitemap"></i></div>
-                <div class="module-title">Tổng Quan Cốt Truyện</div>
-                <div class="module-desc">Tóm tắt các Arc và mối quan hệ.</div>
-            </a>
-        </main>
-    </div>
-
-    <!-- SCRIPT ĐỂ KÍCH HOẠT DARK MODE, NÚT, VÀ ẢNH NỀN -->
-    <script src="config.js"></script>
-    <script src="js/script.js"></script>
-    <script>
-        // Tự động áp dụng theme đã lưu
-        document.addEventListener('DOMContentLoaded', () => {
-            applyUserSettings();
-            
-            // Tự động load ảnh nền từ config.js
-            if (typeof CONFIG !== 'undefined' && CONFIG.bgImage) {
-                document.body.style.backgroundImage = `url('${CONFIG.bgImage}')`;
-            }
-        });
-    </script>
-</body>
-</html>
+/* --- 5. GRID MODULES (Tùy chỉnh riêng cho Lore) --- */
+.databook-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+}
+.module-card {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 30px 20px;
+    /* Dùng lại hiệu ứng kính mờ */
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    text-align: center;
+    transition: all 0.3s;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow);
+}
+.module-card:hover { transform: translateY(-8px); border-color: var(--primary); }
+.module-icon { font-size: 2.5rem; margin-bottom: 15px; color: var(--primary); }
+.module-title { font-weight: 700; font-size: 1.2rem; color: var(--text); }
+.module-desc { font-size: 0.9rem; opacity: 0.8; color: var(--text); margin-top: 8px; }
