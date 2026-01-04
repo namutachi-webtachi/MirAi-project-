@@ -412,3 +412,35 @@ input:focus, textarea:focus {
     color: var(--accent); /* Đổi sang màu tím khi hover */
     border-bottom-style: solid;
 }
+/* =========================================
+   FIX LỖI TRÀN CODE TRÊN MOBILE (QUAN TRỌNG)
+   ========================================= */
+
+#content-area pre {
+    white-space: pre-wrap;       /* Bắt buộc xuống dòng nếu hết chỗ */
+    word-wrap: break-word;       /* Ngắt cả những từ quá dài */
+    max-width: 100%;             /* Chiều rộng tối đa bằng màn hình */
+    overflow-x: hidden;          /* Ẩn thanh cuộn ngang xấu xí */
+    
+    /* Trang trí thêm cho đẹp */
+    background: rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+/* Dark mode cho khung code */
+[data-theme="dark"] #content-area pre {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+#content-area code {
+    font-family: 'Courier New', monospace; /* Font code chuẩn */
+    font-size: 0.9em;
+}
+
+/* Fix ảnh bị tràn trên mobile (đề phòng) */
+#content-area img {
+    max-width: 100%;
+    height: auto;
+}
