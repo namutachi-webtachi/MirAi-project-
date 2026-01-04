@@ -131,5 +131,39 @@
             }
         });
     </script>
+     <!-- FOOTER XỊN SÒ: ĐẾM VIEW + SOCIAL -->
+<footer style="text-align: center; margin-top: 50px; padding: 20px; background: rgba(255,255,255,0.8); border-radius: 20px 20px 0 0;">
+    
+    <!-- Các nút mạng xã hội -->
+    <div style="margin-bottom: 15px;">
+        <a id="fb-link" href="#" target="_blank" style="text-decoration: none; margin: 0 10px; color: #1877F2; font-weight: bold; font-size: 1.2rem;">
+            <i class="fab fa-facebook"></i> Facebook
+        </a>
+        <a id="dc-link" href="#" target="_blank" style="text-decoration: none; margin: 0 10px; color: #5865F2; font-weight: bold; font-size: 1.2rem;">
+            <i class="fab fa-discord"></i> Discord
+        </a>
+    </div>
+
+    <!-- Bộ đếm lượt xem (Tự động chạy) -->
+    <div style="font-size: 0.9rem; color: #666;">
+        <span>👀 Lượt truy cập: <span id="busuanzi_value_site_pv" style="font-weight: bold; color: var(--primary);">...</span></span>
+        <span style="margin: 0 10px;">|</span>
+        <span>👤 Người đọc: <span id="busuanzi_value_site_uv" style="font-weight: bold; color: var(--primary);">...</span></span>
+    </div>
+
+    <p style="font-size: 0.8rem; opacity: 0.7;">&copy; 2025 MirAi Project - NamuTachi</p>
+</footer>
+
+<!-- Script đếm view (Busuanzi) -->
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- Script lấy link social từ config -->
+<script>
+    if(typeof CONFIG !== 'undefined') {
+        document.getElementById('fb-link').href = CONFIG.social.facebook;
+        document.getElementById('dc-link').href = CONFIG.social.discord;
+    }
+</script>
+<!-- Thêm Icon FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </body>
 </html>
