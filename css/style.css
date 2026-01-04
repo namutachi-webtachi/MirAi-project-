@@ -389,36 +389,37 @@ input:focus, textarea:focus {
     box-shadow: none !important;
 }
 /* =========================================
-   FIX LORE DẠNG CODE (DATA LOG STYLE - NO BOX)
+   FIX LORE DẠNG CODE (INVISIBLE STYLE)
    ========================================= */
 
 #content-area pre {
-    /* Ép xuống dòng */
-    white-space: pre-wrap;       
-    word-wrap: break-word;       
+    /* 1. Xóa sạch sành sanh khung, nền, viền */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
     
-    /* Xóa bỏ giao diện khung code */
-    background: transparent !important; /* Không nền */
-    border: none !important;            /* Không viền */
-    padding: 0 !important;              /* Không đệm */
-    margin: 15px 0;                     /* Cách dòng như văn bản thường */
-    box-shadow: none !important;        /* Không bóng đổ */
+    /* 2. Canh lề y hệt đoạn văn thường (thẻ p) */
+    margin: 0 0 20px 0 !important; 
     
-    /* Giữ font chữ ngầu */
-    font-family: 'Consolas', 'Monaco', monospace; 
-    font-size: 0.95em;                  /* Kích thước gần bằng chữ thường */
-    color: inherit;                     /* Màu chữ theo giao diện (Sáng/Tối) */
+    /* 3. Xử lý xuống dòng (Vẫn phải giữ để không vỡ layout) */
+    white-space: pre-wrap;
+    word-wrap: break-word;
+
+    /* 4. Font chữ (Giữ Monospace để nhìn vẫn ra chất Code/Log) */
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.95em; 
+    color: inherit; /* Ăn theo màu chữ chính của truyện */
     
-    /* Thêm chút style cho giống log hệ thống */
-    border-left: 3px solid var(--primary) !important; /* Chỉ giữ 1 vạch màu bên trái */
-    padding-left: 15px !important;      /* Cách vạch màu ra một chút */
-    opacity: 0.9;                       /* Hơi mờ tí cho ảo */
+    /* Xóa luôn vạch màu hay độ mờ nếu có */
+    border-left: none !important;
+    opacity: 1 !important;
 }
 
-/* Fix thẻ code nhỏ bên trong */
+/* Fix thẻ code con bên trong */
 #content-area code {
+    background: transparent !important;
+    color: inherit !important;
+    padding: 0 !important;
     font-family: inherit;
-    background: transparent;
-    color: inherit;
-    padding: 0;
 }
