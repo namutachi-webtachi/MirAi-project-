@@ -5,9 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MirAi Databook</title>
     <!-- THAY ĐỔI DÒNG NÀY -->
-    <link rel="stylesheet" href="css/lore.css"> 
+    <link rel="stylesheet" href="css/style.css"> 
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* CSS RIÊNG CHO TRANG LORE - TÙY CHỈNH LAYOUT & HIỆU ỨNG */
+        
+        body {
+            /* Các thuộc tính nền sẽ được style.css + js/script.js lo */
+        }
+
+        .container {
+            max-width: 1100px; /* Rộng hơn trang đọc truyện */
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Card dùng chung class "glass-box" từ style.css */
+        /* Ta chỉ cần tùy chỉnh lại một chút */
+
+        .hub-header.glass-box {
+            text-align: center;
+            backdrop-filter: blur(5px); /* Giảm độ mờ một chút */
+        }
+        .hub-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .databook-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .module-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+            
+            /* Hiệu ứng kính mờ (Dùng lại từ style.css) */
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: var(--shadow); /* Dùng shadow từ style.css */
+        }
+        .module-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.3);
+        }
+
+        .module-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        .module-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-main); /* Dùng màu chữ chính từ style.css */
+        }
+        .module-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted); /* Dùng màu chữ phụ từ style.css */
+            margin-top: 8px;
+        }
+    </style>
 </head>
 <body>
 
