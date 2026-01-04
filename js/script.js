@@ -109,7 +109,7 @@ async function initReaderPage() {
     document.getElementById('chap-title').innerText = currentChapter.title;
 
     try {
-        const filePath = (dbPrefix === 'chapters') ? currentChapter.file : `${dbPrefix}/${currentChapter.file}`;
+        const filePath = currentChapter.file;
         const response = await fetch(`${filePath}?t=${Date.now()}`);
         contentElement.innerHTML = marked.parse(await response.text());
     } catch (error) { contentElement.innerText = "Lỗi tải nội dung."; }
