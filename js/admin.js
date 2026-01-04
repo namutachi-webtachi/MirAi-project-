@@ -1,374 +1,478 @@
-const SECRET_PASS = "2006";
-let editor;
-let currentDB = 'main'; // Mặc định là truyện chính
+// =================================================================
+// MIRAI PROJECT - CORE SCRIPT V7.7 (EXTENDED & FULLY FIXED)
+// Tác giả: NamuTachi
+// Phiên bản: Hỗ trợ Databook, Fix lỗi Path, Full Logic
+// =================================================================
 
-// --- 1. CORE & UI ---
-document.addEventListener("DOMContentLoaded", () => {
-    // Theme Init
-    if(localStorage.getItem('admin_theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
-    
-    // Editor Init
-    editor = new EasyMDE({
-        element: document.getElementById("content"),
-        spellChecker: false,
-        status: ["lines", "words"],
-        placeholder: "Nội dung...",
-        autosave: { enabled: true, uniqueId: "MirAi_Draft", delay: 5000 },
-    });
+// -----------------------------------------------------------------
+// 1. KHỞI TẠO CẤU HÌNH & MÔI TRƯỜNG
+// -----------------------------------------------------------------
 
-    // Smart Paste
-    editor.codemirror.on("paste", (cm, event) => {
-        event.preventDefault();
-        let text = event.clipboardData.getData("text/plain");
-        if (!text) return;
-        let processed = text.trim()
-            .replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n")
-            .replace(/…/g, "...")
-            .replace(/^\[(.*?)\]:\s*(.*)$/gm, '**[$1]:** $2')
-            .replace(/\((.*?)\)/g, '*($1)*')
-            .replace(/^\s*\*\*\*\s*$/gm, '---');
-        cm.replaceSelection(processed);
-        showToast("⚡ Đã Smart Paste & Format!");
-    });
+// Kiểm tra và load ảnh nền từ file config.js
+if (typeof CONFIG !== 'undefined' && CONFIG.bgImage) {
+    document.body.style.backgroundImage = `url('${CONFIG.bgImage}')`;
+}
 
-    // Stats Hook
-    setTimeout(() => { if(editor) { editor.codemirror.on("change", updateStats); updateStats(); } }, 1000);
-
-    // Load Config
-    const savedToken = localStorage.getItem('gh_token');
-    if (savedToken && localStorage.getItem('remember_token') === 'true') {
-        document.getElementById('token').value = savedToken;
-        document.getElementById('rememberToken').checked = true;
+// Hàm hiển thị màn hình chờ (Loading)
+const showLoading = () => {
+    const loadingElement = document.getElementById('loading');
+    if (loadingElement) {
+        loadingElement.style.display = 'flex';
     }
-    document.getElementById('webhook').value = localStorage.getItem('discord_webhook') || '';
-});
+};
 
-// --- AUTH ---
-document.getElementById('lock-screen').addEventListener('click', login);
-window.addEventListener('keydown', (e) => { if(e.key === 'F12') login(); });
-
-function login() {
-    let pass = prompt("🔑 Mật mã:");
-    if (pass === SECRET_PASS) {
-        document.getElementById('lock-screen').style.display = 'none';
-        initAdminMusic();
-    } else if (pass) alert("SAI MẬT MÃ!");
-}
-
-// --- [QUAN TRỌNG] DATABASE SWITCHER ---
-// Hàm này sẽ chạy khi bro chọn Menu "Đang quản lý"
-function switchDatabase() {
-    // 1. Cập nhật biến currentDB theo giá trị Menu
-    currentDB = document.getElementById('dbSelector').value;
-    
-    // 2. Reset Editor để tránh nhầm lẫn
-    resetEditor();
-    
-    // 3. Nếu đang ở tab Danh Sách, tải lại danh sách mới ngay lập tức
-    if (document.getElementById('view-list').classList.contains('active')) {
-        loadChapterList();
+// Hàm ẩn màn hình chờ
+const hideLoading = () => {
+    const loadingElement = document.getElementById('loading');
+    if (loadingElement) {
+        loadingElement.style.display = 'none';
     }
-    
-    // 4. Đổi placeholder tiêu đề cho hợp ngữ cảnh
-    const titleInput = document.getElementById('chapTitle');
-    if (currentDB === 'main') titleInput.placeholder = "Tiêu đề chương (VD: Chương 1)...";
-    else titleInput.placeholder = "Tên mục (VD: Hồ sơ Minh, Lịch sử AI)...";
+};
 
-    showToast(`📂 Đã chuyển sang: ${currentDB.toUpperCase()}`);
-}
+// -----------------------------------------------------------------
+// 2. TƯƠNG TÁC DỮ LIỆU (DATABASE)
+// -----------------------------------------------------------------
 
-// Helper để lấy tên file JSON và thư mục dựa trên currentDB
-function getDbConfig() {
-    if (currentDB === 'main') {
-        return { json: 'data.json', folder: 'chapters' };
-    } else {
-        return { json: `data_${currentDB}.json`, folder: currentDB }; // VD: data_wiki.json, folder wiki/
-    }
-}
-
-// --- UI UTILS ---
-function switchView(viewId) {
-    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-    document.getElementById('view-' + viewId).classList.add('active');
-    
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    if(event && event.currentTarget) event.currentTarget.classList.add('active');
-
-    if(viewId === 'list') loadChapterList();
-    if(viewId === 'music') loadMusicList();
-    if(viewId === 'achievements') loadAchievements();
-}
-
-function toggleTheme() {
-    const isDark = document.body.getAttribute('data-theme') === 'dark';
-    document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-    localStorage.setItem('admin_theme', isDark ? 'light' : 'dark');
-}
-
-function showToast(msg) {
-    const t = document.getElementById('toast'); 
-    t.innerText = msg; 
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-function saveConfig() {
-    const token = document.getElementById('token').value;
-    const remember = document.getElementById('rememberToken').checked;
-    if (remember) { 
-        localStorage.setItem('gh_token', token); 
-        localStorage.setItem('remember_token', 'true'); 
-    } else { 
-        localStorage.removeItem('gh_token'); 
-        localStorage.setItem('remember_token', 'false'); 
-    }
-    localStorage.setItem('discord_webhook', document.getElementById('webhook').value);
-    showToast("💾 Đã lưu cấu hình");
-}
-
-// --- EDITOR FEATURES ---
-function runAutoFormat() {
-    let txt = editor.value();
-    editor.value(txt.replace(/^\[(.*?)\]:\s*(.*)$/gm, '**[$1]:** $2').replace(/\((.*?)\)/g, '*($1)*'));
-    showToast("✨ Đã Format lại thủ công");
-}
-
-function toggleSnippets() { document.getElementById('snippet-menu').classList.toggle('show'); }
-window.addEventListener('click', (e) => { 
-    if (!e.target.matches('.btn-outline')) {
-        const menu = document.getElementById('snippet-menu');
-        if(menu) menu.classList.remove('show');
-    } 
-});
-
-function insertText(text) { editor.codemirror.replaceSelection(text); editor.codemirror.focus(); }
-
-function updateStats() {
-    const wordCount = editor.value().trim().split(/\s+/).length;
-    const TARGET = 2000;
-    let percent = Math.min((wordCount / TARGET) * 100, 100);
-    document.getElementById('word-count').innerText = `${wordCount} / ${TARGET} từ`;
-    document.getElementById('read-time').innerText = `~${Math.ceil(wordCount / 200)}p đọc`;
-    const bar = document.getElementById('word-progress');
-    bar.style.width = `${percent}%`;
-    bar.style.background = (wordCount >= TARGET) ? "#2ecc71" : "linear-gradient(90deg, #ff6b81, #ff9f43)";
-    if(wordCount >= TARGET) bar.style.boxShadow = "0 0 10px #2ecc71";
-}
-
-// --- API HELPER ---
-async function githubRequest(path, body, method='PUT') {
-    const token = document.getElementById('token').value;
-    if(!token) throw new Error("Nhập GitHub Token!");
-    return fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {
-        method: method, headers: {Authorization: `token ${token}`}, body: JSON.stringify(body)
-    });
-}
-
-async function handleImgUpload() {
-    const f = document.getElementById('imgInput').files[0]; if(!f) return;
-    showToast("⏳ Đang nén & Up ảnh...");
-    new Compressor(f, { quality: 0.6, maxWidth: 1200, success(result) {
-        const r = new FileReader(); r.readAsDataURL(result);
-        r.onload = async function() {
-            try {
-                const b64 = r.result.split(',')[1];
-                const path = `images/${Date.now()}_img.jpg`;
-                await githubRequest(path, {message: "up img", content: b64});
-                editor.codemirror.replaceSelection(`\n![Ảnh](https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}/${path})\n`);
-                showToast("🖼️ Ảnh đã lên!");
-            } catch(e) { alert(e); }
-        };
-    }});
-}
-
-// --- CHAPTER LOGIC (ĐÃ NÂNG CẤP ĐA NHIỆM) ---
-async function loadChapterList() {
-    const c = document.getElementById('list-container'), t = document.getElementById('token').value;
-    if(!t) { c.innerHTML = "Nhập Token!"; return; }
-    
-    // [QUAN TRỌNG] Lấy đúng file JSON dựa trên lựa chọn hiện tại
-    const { json } = getDbConfig();
-    
-    c.innerHTML = `⏳ Đang tải dữ liệu [${currentDB.toUpperCase()}]...`;
-    
+// Hàm lấy dữ liệu từ file JSON bất kỳ
+async function fetchDatabase(jsonFile = 'data.json') {
     try {
-        const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${json}?t=${Date.now()}`, {headers:{Authorization:`token ${t}`}});
-        if(!res.ok) {
-            window.chaptersCache = [];
-            window.jsonSha = null;
-            c.innerHTML = `Chưa có dữ liệu cho mục <b>${currentDB}</b>.<br>Hãy tạo bài đầu tiên!`;
+        // Thêm timestamp để tránh cache
+        const response = await fetch(`${jsonFile}?t=${Date.now()}`);
+        if (response.ok) {
+            return await response.json();
+        } else {
+            return []; // Trả về mảng rỗng nếu lỗi
+        }
+    } catch (error) {
+        console.error("Lỗi khi tải Database:", error);
+        return [];
+    }
+}
+
+// -----------------------------------------------------------------
+// 3. LOGIC TRANG CHỦ & LIST (INDEX PAGE)
+// -----------------------------------------------------------------
+
+async function initIndexPage(jsonFile = 'data.json', folderPrefix = 'chapters') {
+    const chapterListElement = document.getElementById('chapter-list');
+    
+    // Nếu không tìm thấy element này -> Không phải trang list -> Thoát
+    if (!chapterListElement) return;
+
+    showLoading();
+    const allItems = await fetchDatabase(jsonFile);
+    const searchInput = document.getElementById('search-input');
+    
+    // Hiển thị nút "Đọc tiếp" (Bookmark) CHỈ NẾU là truyện chính
+    if (folderPrefix === 'chapters') {
+        const bookmarkLink = document.getElementById('bookmark-link');
+        if (bookmarkLink) {
+            loadBookmark(allItems);
+        }
+    }
+
+    // Hàm vẽ danh sách chương ra màn hình
+    const renderItems = (items) => {
+        chapterListElement.innerHTML = '';
+        
+        if (items.length === 0) {
+            chapterListElement.innerHTML = '<p style="text-align:center; width: 100%;">Chưa có nội dung nào được đăng.</p>';
             return;
         }
-        
-        const data = await res.json();
-        window.chaptersCache = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-        window.jsonSha = data.sha;
 
-        c.innerHTML = "";
-        window.chaptersCache.forEach((item, i) => {
-            let st = (item.timestamp > Date.now()) ? '<span style="color:#f39c12">⏳</span>' : '<span style="color:#2ecc71">✅</span>';
-            c.innerHTML += `<div class="list-item"><div><b>#${i+1}: ${item.title}</b> ${st}</div><div><button class="btn btn-outline" onclick="editChapter(${i})"><i class="fas fa-pen"></i></button><button class="btn btn-outline" style="color:#e74c3c" onclick="deleteChapter(${i})"><i class="fas fa-trash"></i></button></div></div>`;
+        // Lọc các chương đã đến giờ đăng (Logic Hẹn giờ)
+        const currentTime = Date.now();
+        const visibleItems = items.filter(item => {
+            if (!item.timestamp) return true; // Không hẹn giờ -> Hiện luôn
+            return item.timestamp <= currentTime; // Đã qua giờ hẹn -> Hiện
         });
-    } catch(e) { c.innerHTML = "Lỗi tải list: " + e.message; }
-}
 
-async function publishChapter() {
-    const title = document.getElementById('chapTitle').value, content = editor.value(), token = document.getElementById('token').value;
-    if(!title || !content || !token) return alert("Thiếu thông tin!");
-    document.getElementById('publishBtn').innerText = "⏳ Đang xử lý...";
-    
-    // [QUAN TRỌNG] Lấy đúng file JSON và thư mục để lưu
-    const { json, folder } = getDbConfig();
+        if (visibleItems.length === 0) {
+            chapterListElement.innerHTML = '<p style="text-align:center;">Chưa có mục nào đến giờ phát hành.</p>';
+            return;
+        }
 
-    try {
-        // 1. Lấy danh sách hiện tại (để chắc chắn có SHA mới nhất)
-        let chapters = [];
-        let listSha = null;
-        try {
-            const listRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${json}?t=${Date.now()}`, {headers:{Authorization:`token ${token}`}});
-            if(listRes.ok) {
-                const listData = await listRes.json();
-                chapters = JSON.parse(decodeURIComponent(escape(atob(listData.content))));
-                listSha = listData.sha;
+        visibleItems.forEach((item) => {
+            // Tìm index gốc trong mảng allItems để tạo link đúng
+            const originalIndex = allItems.findIndex(c => c.id === item.id);
+            
+            if (originalIndex !== -1) {
+                // Thêm tham số &db=... để trang đọc biết file này thuộc mục nào
+                chapterListElement.innerHTML += `
+                    <a href="reader.html?id=${originalIndex}&db=${folderPrefix}" class="chap-card">
+                        <div>${item.title}</div>
+                    </a>
+                `;
             }
-        } catch(e) {}
-
-        // 2. Chuẩn bị File
-        const idx = document.getElementById('edit-index').value, ts = document.getElementById('scheduleTime').value ? new Date(document.getElementById('scheduleTime').value).getTime() : Date.now();
-        
-        let path, sha = null;
-        if(idx !== "") {
-            // Edit Mode
-            path = chapters[idx].file;
-            try {
-                const fInfo = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {headers:{Authorization:`token ${token}`}});
-                if(fInfo.ok) sha = (await fInfo.json()).sha;
-            } catch(e) {}
-            chapters[idx].title = title; chapters[idx].timestamp = ts;
-        } else {
-            // New Mode: Lưu vào đúng thư mục (wiki/, tech/...)
-            path = `${folder}/${Date.now()}.md`;
-            chapters.push({id: `${folder}_${Date.now()}`, title: title, file: path, timestamp: ts});
-        }
-
-        // 3. Upload File MD
-        await githubRequest(path, {message: `Upd ${title} in ${currentDB}`, content: btoa(unescape(encodeURIComponent(content))), sha: sha});
-        
-        // 4. Upload List JSON
-        await githubRequest(json, {message: `Upd List ${currentDB}`, content: btoa(unescape(encodeURIComponent(JSON.stringify(chapters, null, 2)))), sha: listSha});
-        
-        // 5. Notify (Chỉ thông báo nếu là Truyện Chính)
-        const wh = document.getElementById('webhook').value;
-        if(wh && !idx && currentDB === 'main') {
-            fetch(wh, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({content: `🎉 **CHƯƠNG MỚI:** ${title}\n👉 Link: https://${CONFIG.adminUser}.github.io/${CONFIG.repoName}`})});
-        }
-        
-        showToast("🚀 THÀNH CÔNG!");
-        resetEditor();
-    } catch(e) { alert("Lỗi: " + e); }
-    document.getElementById('publishBtn').innerText = "🚀 ĐĂNG BÀI";
-}
-
-async function editChapter(i) {
-    const item = window.chaptersCache[i]; switchView('editor'); showToast("Loading...");
-    const t = document.getElementById('token').value;
-    try {
-        const res = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${item.file}?t=${Date.now()}`, {headers:{Authorization:`token ${t}`}});
-        const d = await res.json();
-        document.getElementById('chapTitle').value = item.title;
-        editor.value(decodeURIComponent(escape(atob(d.content))));
-        document.getElementById('edit-index').value = i;
-        document.getElementById('publishBtn').innerText = "💾 CẬP NHẬT";
-    } catch(e) { alert("Lỗi tải chương: " + e); }
-}
-
-async function deleteChapter(i) {
-    if(!confirm("Xóa vĩnh viễn?")) return;
-    const item = window.chaptersCache[i], t = document.getElementById('token').value;
-    // [QUAN TRỌNG] Lấy đúng file JSON để xóa
-    const { json } = getDbConfig();
-
-    try {
-        // 1. Xóa file MD
-        const fRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${item.file}`, {headers:{Authorization:`token ${t}`}});
-        if(fRes.ok) {
-            const fData = await fRes.json();
-            await githubRequest(item.file, {message:`Del ${item.title}`, sha: fData.sha}, 'DELETE');
-        }
-        
-        // 2. Cập nhật list
-        const lRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${json}?t=${Date.now()}`, {headers:{Authorization:`token ${t}`}});
-        const lData = await lRes.json();
-        
-        let list = JSON.parse(decodeURIComponent(escape(atob(lData.content)))).filter(c => c.id !== item.id);
-        
-        await githubRequest(json, {
-            message:`Rm ${item.title}`, 
-            content: btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2)))), 
-            sha: lData.sha
         });
+    };
+
+    // Vẽ danh sách lần đầu
+    renderItems(allItems);
+    hideLoading();
+
+    // Kích hoạt tính năng tìm kiếm
+    if (searchInput) {
+        searchInput.addEventListener('input', (event) => {
+            const keyword = event.target.value.toLowerCase();
+            const filteredItems = allItems.filter(c => c.title.toLowerCase().includes(keyword));
+            renderItems(filteredItems);
+        });
+    }
+}
+
+// -----------------------------------------------------------------
+// 4. LOGIC TRANG ĐỌC (READER PAGE - ĐÃ FIX LỖI PATH)
+// -----------------------------------------------------------------
+
+async function initReaderPage() {
+    const contentElement = document.getElementById('content-area');
+    
+    // Nếu không tìm thấy element này -> Không phải trang đọc -> Thoát
+    if (!contentElement) return;
+
+    showLoading();
+    
+    // Lấy các tham số từ URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const customFile = urlParams.get('file'); // Dùng cho file lẻ (VD: lore.md)
+    const chapterId = parseInt(urlParams.get('id')); // Dùng cho file trong list
+    const dbPrefix = urlParams.get('db') || 'chapters'; // Mặc định là truyện chính
+    
+    // Xác định file JSON và link quay về
+    const jsonFile = (dbPrefix === 'chapters') ? 'data.json' : `data_${dbPrefix}.json`;
+    const backLink = (dbPrefix === 'chapters') ? 'index.html' : `list.html?db=${dbPrefix}`;
+    
+    // Cập nhật nút "Quay về" trên giao diện
+    const homeBtn = document.querySelector('.reader-controls a');
+    if (homeBtn) {
+        homeBtn.href = backLink;
+    }
+
+    // --- TRƯỜNG HỢP 1: ĐỌC FILE LẺ (CUSTOM FILE) ---
+    if (customFile) {
+        document.title = "Tài liệu MirAi";
+        document.getElementById('chap-title').innerText = "Tài liệu Lưu trữ";
+        // Ẩn nút điều hướng vì file lẻ không có trước/sau
+        document.getElementById('prev-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
         
-        showToast("🗑️ Đã xóa!"); loadChapterList();
-    } catch(e) { alert("Lỗi xóa: " + e); }
+        try {
+            const response = await fetch(`${customFile}?t=${Date.now()}`);
+            if (!response.ok) throw new Error("File not found");
+            const markdownText = await response.text();
+            contentElement.innerHTML = marked.parse(markdownText);
+        } catch (e) {
+            contentElement.innerText = "Lỗi tải tài liệu: " + e.message;
+        }
+        
+        hideLoading();
+        applyUserSettings();
+        loadGiscus();
+        return; // Kết thúc hàm
+    }
+
+    // --- TRƯỜNG HỢP 2: ĐỌC TỪ DANH SÁCH (DATABASE) ---
+    const chapters = await fetchDatabase(jsonFile);
+
+    // Kiểm tra ID có hợp lệ không
+    if (isNaN(chapterId) || !chapters[chapterId]) {
+        contentElement.innerHTML = '<h3>Lỗi: Không tìm thấy mục này!</h3>';
+        hideLoading();
+        return;
+    }
+
+    // Bảo mật Hẹn giờ
+    const currentChapter = chapters[chapterId];
+    if (currentChapter.timestamp && currentChapter.timestamp > Date.now()) {
+        alert("⛔ Mục này chưa đến giờ phát hành!");
+        window.location.href = backLink;
+        return;
+    }
+
+    // Lưu Bookmark (Chỉ lưu cho truyện chính để tránh loạn)
+    if (dbPrefix === 'chapters') {
+        localStorage.setItem('mirai_bookmark', chapterId);
+    }
+
+    // Cập nhật tiêu đề
+    document.title = `${currentChapter.title} - ${CONFIG.webName}`;
+    document.getElementById('chap-title').innerText = currentChapter.title;
+
+    // Tải nội dung Markdown và render
+    try {
+        // [FIX QUAN TRỌNG NHẤT]: Luôn dùng đường dẫn gốc trong JSON
+        // Admin Tool đã lưu full path (VD: wiki/minh.md), nên không cần cộng chuỗi nữa.
+        const filePath = currentChapter.file;
+        
+        const response = await fetch(`${filePath}?t=${Date.now()}`);
+        if (!response.ok) throw new Error("File not found: " + filePath);
+        
+        const markdownText = await response.text();
+        contentElement.innerHTML = marked.parse(markdownText);
+    } catch (error) {
+        contentElement.innerText = "Lỗi tải nội dung: " + error.message;
+        console.error(error);
+    }
+
+    // Xử lý nút điều hướng (Trước/Sau)
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    
+    // Cập nhật link cho nút điều hướng (phải kèm theo &db=...)
+    prevBtn.onclick = () => window.location.href = `reader.html?id=${chapterId - 1}&db=${dbPrefix}`;
+    nextBtn.onclick = () => window.location.href = `reader.html?id=${chapterId + 1}&db=${dbPrefix}`;
+    
+    // Ẩn nút nếu ở đầu/cuối danh sách
+    if (chapterId === 0) {
+        prevBtn.style.display = 'none';
+    }
+    if (chapterId >= chapters.length - 1) {
+        nextBtn.style.display = 'none';
+    }
+
+    // Kích hoạt các tính năng phụ
+    initReadingProgress();
+    loadGiscus();
+    hideLoading();
+    applyUserSettings();
 }
 
-function resetEditor() {
-    document.getElementById('chapTitle').value = "";
-    editor.value("");
-    document.getElementById('edit-index').value = "";
-    document.getElementById('publishBtn').innerText = "🚀 ĐĂNG BÀI";
+// -----------------------------------------------------------------
+// 5. HỆ THỐNG ÂM NHẠC (PLAYLIST & PLAYER)
+// -----------------------------------------------------------------
+
+let musicPlaylist = [];
+let currentTrackIndex = parseInt(localStorage.getItem('bgm_track_idx')) || 0;
+const audioPlayer = new Audio();
+audioPlayer.loop = false; // Tắt loop để tự chuyển bài
+let isMusicPlaying = false;
+
+// Khởi tạo hệ thống nhạc
+async function initMusicSystem() {
+    try {
+        const response = await fetch(`music.json?t=${Date.now()}`);
+        if (response.ok) {
+            musicPlaylist = await response.json();
+        }
+    } catch (error) {
+        console.error("Lỗi tải nhạc:", error);
+    }
+
+    // Nếu không có nhạc nào, dùng bài mặc định
+    if (musicPlaylist.length === 0) {
+        if (typeof CONFIG !== 'undefined' && CONFIG.defaultMusic) {
+            musicPlaylist = [{ title: "Default Lofi", url: CONFIG.defaultMusic }];
+        } else {
+            musicPlaylist = [{ title: "Default Lofi", url: "images/music.mp3" }];
+        }
+    }
+    
+    if (currentTrackIndex >= musicPlaylist.length) currentTrackIndex = 0;
 }
 
-// --- MUSIC & UTILS ---
-function translateLogic() {
-    let t = document.getElementById('humanLogic').value.toLowerCase();
-    const map = {'giờ':'env.hour','đọc':'env.readCount','lớn hơn':'>','nhỏ hơn':'<','bằng':'==','và':'&&'};
-    for(let k in map) t = t.replace(new RegExp(k,'g'), map[k]);
-    document.getElementById('logicResult').value = t;
+// Hàm tải bài hát vào Player
+function loadTrack(index) {
+    if (index >= musicPlaylist.length) index = 0;
+    currentTrackIndex = index;
+    
+    audioPlayer.src = musicPlaylist[index].url;
+    localStorage.setItem('bgm_track_idx', index);
 }
 
-const bgm = new Audio(); let pl = [], idx = 0;
-async function initAdminMusic() {
-    try { pl = await (await fetch(`music.json?t=${Date.now()}`)).json(); if(pl.length){ document.getElementById('mini-player').style.display='block'; bgm.src=pl[0].url; document.getElementById('mp-title').innerText=pl[0].title; } } catch{}
-}
-function toggleAdminMusic() { bgm.paused ? bgm.play() : bgm.pause(); }
-function nextAdminMusic() { idx=(idx+1)%pl.length; bgm.src=pl[idx].url; document.getElementById('mp-title').innerText=pl[idx].title; bgm.play(); }
+// Sự kiện: Khi hết bài thì tự chuyển bài tiếp theo
+audioPlayer.addEventListener('ended', playNextSong);
 
-// --- ACHIEVEMENTS ---
-async function loadAchievements() { 
-    const c=document.getElementById('ach-list-container'); c.innerHTML="Loading..."; 
-    const t=document.getElementById('token').value; 
-    if(!t) { c.innerHTML = "Nhập Token!"; return; }
-    try { 
-        const res=await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/achievements.json?t=${Date.now()}`, {headers:{Authorization:`token ${t}`}}); 
-        if (!res.ok) { window.achData=[]; c.innerHTML="Trống"; return; } 
-        const d=await res.json(); 
-        window.achData=JSON.parse(decodeURIComponent(escape(atob(d.content)))); 
-        window.achSha=d.sha; 
-        c.innerHTML=''; 
-        window.achData.forEach((a,i)=>{ c.innerHTML+=`<div class="list-item"><div>${a.icon} <b>${a.title}</b><br><small>${a.condition}</small></div><button class="btn btn-outline" style="color:#e74c3c; border-color:#e74c3c" onclick="delAchievement(${i})"><i class="fas fa-trash"></i></button></div>`; }); 
-    } catch(e) { c.innerHTML="Lỗi: "+e.message; } 
+// Cập nhật giao diện Player
+function updatePlayerUI() {
+    const icon = document.getElementById('bgm-icon');
+    const btn = document.getElementById('bgm-controls');
+    
+    if (!icon || !btn) return;
+    
+    if (isMusicPlaying) {
+        icon.classList.add('playing');
+        btn.innerHTML = '⏸️';
+    } else {
+        icon.classList.remove('playing');
+        btn.innerHTML = '▶️';
+    }
 }
 
-async function addAchievement() { 
-    const id=document.getElementById('achId').value, title=document.getElementById('achTitle').value, t=document.getElementById('token').value; 
-    if (!id||!title||!t) return alert("Thiếu thông tin!"); 
-    if (!window.achData) window.achData=[]; 
-    window.achData.push({
-        id: id, icon: document.getElementById('achIcon').value, 
-        title: title, desc: document.getElementById('achDesc').value, 
-        condition: document.getElementById('achCondition').value
-    }); 
-    const jB={message:"Upd Ach", content:btoa(unescape(encodeURIComponent(JSON.stringify(window.achData,null,2))))}; 
-    if (window.achSha) jB.sha=window.achSha; 
-    await githubRequest('achievements.json', jB); 
-    showToast("Added!"); loadAchievements(); 
+// Hàm Bật/Tắt nhạc
+function toggleBGM() {
+    if (!audioPlayer.src) loadTrack(currentTrackIndex);
+    
+    if (audioPlayer.paused) {
+        audioPlayer.play().then(() => {
+            isMusicPlaying = true;
+            updatePlayerUI();
+            localStorage.setItem('bgm_status', 'on');
+        }).catch(error => {
+            console.error("Lỗi phát nhạc:", error);
+        });
+    } else {
+        audioPlayer.pause();
+        isMusicPlaying = false;
+        updatePlayerUI();
+        localStorage.setItem('bgm_status', 'off');
+    }
 }
 
-async function delAchievement(i) { 
-    if (!confirm("Xóa?")) return; 
-    window.achData.splice(i, 1); 
-    const jB={message:"Del Ach", content:btoa(unescape(encodeURIComponent(JSON.stringify(window.achData,null,2)))), sha:window.achSha}; 
-    await githubRequest('achievements.json', jB); 
-    showToast("Deleted!"); loadAchievements(); 
+// Hàm chuyển bài tiếp theo
+function playNextSong() {
+    currentTrackIndex++;
+    if (currentTrackIndex >= musicPlaylist.length) currentTrackIndex = 0;
+    
+    loadTrack(currentTrackIndex);
+    
+    if (localStorage.getItem('bgm_status') === 'on') {
+        audioPlayer.play();
+        isMusicPlaying = true;
+        updatePlayerUI();
+    }
 }
+
+// Tự phát nhạc sau cú click đầu tiên (Lách luật trình duyệt)
+if (localStorage.getItem('bgm_status') === 'on') {
+    document.body.addEventListener('click', () => {
+        if (audioPlayer.paused && localStorage.getItem('bgm_status') === 'on') {
+            if (!audioPlayer.src) loadTrack(currentTrackIndex);
+            
+            audioPlayer.play().then(() => {
+                isMusicPlaying = true;
+                updatePlayerUI();
+            });
+        }
+    }, { once: true });
+}
+
+// -----------------------------------------------------------------
+// 6. CÁC TÍNH NĂNG KHÁC (UI UTILS)
+// -----------------------------------------------------------------
+
+// Thanh tiến độ đọc
+function initReadingProgress() {
+    const bar = document.getElementById('progress-bar');
+    if (!bar) return;
+    
+    window.addEventListener('scroll', () => {
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progressPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        
+        bar.style.width = `${progressPercent}%`;
+    });
+}
+
+// Settings: Hiện/Ẩn Panel
+function toggleSettings() {
+    document.getElementById('settings-panel').classList.toggle('active');
+}
+
+// Settings: Đổi cỡ chữ
+function changeFontSize(action) {
+    const content = document.getElementById('content-area');
+    if (!content) return;
+    
+    let size = parseFloat(window.getComputedStyle(content).fontSize);
+    size += (action === 'up' ? 2 : -2);
+    content.style.fontSize = `${size}px`;
+    localStorage.setItem('user_fontSize', size);
+}
+
+// Settings: Đổi Theme
+function toggleTheme() {
+    const currentTheme = document.body.getAttribute('data-theme');
+    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.body.setAttribute('data-theme', nextTheme);
+    localStorage.setItem('user_theme', nextTheme);
+}
+
+// Settings: Đổi Font (Đã fix lỗi logic)
+function changeFont(fontName) {
+    if (fontName === 'serif') {
+        document.body.setAttribute('data-font', 'serif');
+    } else {
+        document.body.removeAttribute('data-font');
+    }
+    localStorage.setItem('user_font', fontName);
+}
+
+// Áp dụng cài đặt khi load trang
+function applyUserSettings() {
+    // Theme
+    if (localStorage.getItem('user_theme') === 'dark') {
+        document.body.setAttribute('data-theme', 'dark');
+    }
+    
+    // Font Size
+    const content = document.getElementById('content-area');
+    if (content) {
+        const size = localStorage.getItem('user_fontSize');
+        if (size) content.style.fontSize = `${size}px`;
+    }
+    
+    // Font Family
+    if (localStorage.getItem('user_font') === 'serif') {
+        document.body.setAttribute('data-font', 'serif');
+    }
+}
+
+// Bookmark
+function loadBookmark(chapters) {
+    const id = localStorage.getItem('mirai_bookmark');
+    const linkEl = document.getElementById('bookmark-link');
+    if (id !== null && chapters[id] && linkEl) {
+        linkEl.style.display = 'inline-flex';
+        linkEl.href = `reader.html?id=${id}&db=chapters`;
+        linkEl.innerHTML = `📖 Đọc tiếp: ${chapters[id].title.substring(0, 15)}...`;
+    }
+}
+
+// Bình luận Giscus
+function loadGiscus() {
+    const container = document.getElementById('comments');
+    if (!container || container.hasChildNodes()) return;
+    
+    const script = document.createElement('script');
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.setAttribute("data-repo", CONFIG.giscus.repo);
+    script.setAttribute("data-repo-id", CONFIG.giscus.repoId);
+    script.setAttribute("data-category", CONFIG.giscus.category);
+    script.setAttribute("data-category-id", CONFIG.giscus.categoryId);
+    script.setAttribute("data-mapping", "title");
+    script.setAttribute("data-reactions-enabled", "1");
+    script.setAttribute("data-theme", "preferred_color_scheme");
+    container.appendChild(script);
+}
+
+// -----------------------------------------------------------------
+// 7. KHỞI CHẠY (MAIN ENTRY POINT)
+// -----------------------------------------------------------------
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Chờ tải nhạc xong mới chạy logic khác
+    await initMusicSystem();
+    
+    // Áp dụng cài đặt giao diện
+    applyUserSettings();
+
+    // Điều hướng logic theo trang hiện tại
+    const path = window.location.pathname;
+    
+    if (document.getElementById('chapter-list')) {
+        // Nếu là trang index.html hoặc root
+        if (path.endsWith('/') || path.endsWith('index.html')) {
+            initIndexPage();
+        }
+        // Nếu là trang list.html thì nó tự gọi initIndexPage trong file HTML của nó
+    } 
+    else if (document.getElementById('content-area')) {
+        // Nếu là trang đọc truyện
+        initReaderPage();
+    }
+});
