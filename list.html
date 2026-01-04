@@ -10,18 +10,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* FIX LỖI FOOTER LƠ LỬNG - KỸ THUẬT STICKY FOOTER */
+        /* LAYOUT CHUẨN */
         body {
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Chiều cao tối thiểu bằng màn hình */
+            min-height: 100vh;
         }
         .container {
-            flex: 1; /* Tự động giãn ra để đẩy footer xuống đáy */
+            flex: 1;
             width: 100%;
-            max-width: 1100px; /* Đảm bảo không bị bè ra quá */
-            margin: 0 auto; /* Căn giữa */
-            padding-top: 20px;
+            max-width: 1000px; /* Căn chiều rộng vừa mắt đọc */
+            margin: 0 auto;
+            padding: 40px 20px; /* Thêm padding trên dưới để tách header/footer ra */
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* Khoảng cách giữa Header và List */
+        }
+        
+        /* Tinh chỉnh lại Glass Box cho đẹp */
+        .glass-box {
+            padding: 30px; /* Tăng padding bên trong */
+            border-radius: 20px;
+        }
+        
+        /* Khi list trống, có thể thêm class này bằng JS (tùy chọn), hoặc để mặc định */
+        #chapter-list:empty::before {
+            content: "Đang cập nhật dữ liệu...";
+            display: block;
+            text-align: center;
+            padding: 50px 0;
+            color: var(--text-muted);
+            font-style: italic;
         }
     </style>
 </head>
@@ -31,9 +50,9 @@
     <div class="container">
         <!-- Header -->
         <div class="glass-box" style="text-align: center;">
-            <h1 id="web-name">Đang tải...</h1>
-            <p class="tagline" id="sub-title">Thư viện lưu trữ MirAi</p>
-            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <h1 id="web-name" style="font-size: 2.5rem; margin-bottom: 10px;">Đang tải...</h1>
+            <p class="tagline" id="sub-title" style="font-size: 1.1rem;">Thư viện lưu trữ MirAi</p>
+            <div style="margin-top: 25px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
                 <button class="btn" onclick="toggleTheme()">🌙 Giao diện</button>
                 <a href="#" id="bookmark-link" class="btn" style="display: none;"></a>
                 <a href="lore_hub.html" id="back-button" class="btn btn-outline">⬅ Quay về Databook</a>
@@ -41,10 +60,10 @@
         </div>
 
        <!-- Search & List -->
-        <div class="glass-box">
-            <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm kiếm mục...">
-            <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 20px 0;">
-            <h3 id="list-title">📖 Mục lục</h3>
+        <div class="glass-box" style="min-height: 300px;"> <!-- Min-height để khung luôn to dù không có bài -->
+            <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm kiếm mục..." style="padding: 15px; font-size: 1rem;">
+            <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 30px 0;">
+            <h3 id="list-title" style="margin-bottom: 20px; font-size: 1.5rem;">📖 Mục lục</h3>
             <div id="chapter-list" class="chapter-list"></div>
         </div>
     </div>
@@ -52,27 +71,22 @@
     <!-- Player -->
     <div id="bgm-player" onclick="toggleBGM()">...</div>
     
-    <!-- FOOTER ĐÃ FIX: Luôn nằm dưới cùng -->
-    <footer style="text-align: center; margin-top: auto; padding: 20px; background: var(--glass); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); width: 100%; color: var(--text-main);">
-        
-        <!-- Social Buttons -->
+    <!-- FOOTER -->
+    <footer style="text-align: center; margin-top: auto; padding: 25px; background: var(--glass); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); width: 100%; color: var(--text-main);">
         <div style="margin-bottom: 15px;">
-            <a id="fb-link" href="#" target="_blank" style="text-decoration: none; margin: 0 10px; color: #1877F2; font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
+            <a id="fb-link" href="#" target="_blank" style="text-decoration: none; margin: 0 15px; color: #1877F2; font-weight: bold; font-size: 1.3rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
                 <i class="fab fa-facebook"></i> Facebook
             </a>
-            <a id="dc-link" href="#" target="_blank" style="text-decoration: none; margin: 0 10px; color: #5865F2; font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
+            <a id="dc-link" href="#" target="_blank" style="text-decoration: none; margin: 0 15px; color: #5865F2; font-weight: bold; font-size: 1.3rem; text-shadow: 0 0 5px rgba(255,255,255,0.5);">
                 <i class="fab fa-discord"></i> Discord
             </a>
         </div>
-
-        <!-- View Counter -->
-        <div style="font-size: 0.9rem; opacity: 0.9;">
+        <div style="font-size: 1rem; opacity: 0.9;">
             <span>👀 Lượt truy cập: <span id="busuanzi_value_site_pv" style="font-weight: bold; color: var(--primary);">...</span></span>
-            <span style="margin: 0 10px;">|</span>
+            <span style="margin: 0 15px;">|</span>
             <span>👤 Người đọc: <span id="busuanzi_value_site_uv" style="font-weight: bold; color: var(--primary);">...</span></span>
         </div>
-
-        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">&copy; 2025 MirAi Project - NamuTachi</p>
+        <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 15px;">&copy; 2025 MirAi Project - NamuTachi</p>
     </footer>
 
     <!-- Scripts -->
