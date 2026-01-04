@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* CẤU TRÚC ĐỂ FOOTER DÍNH ĐÁY */
+        /* --- CẤU TRÚC CHUNG (DESKTOP) --- */
         body {
             display: flex;
             flex-direction: column;
@@ -19,7 +19,7 @@
             flex: 1;
             width: 100%;
             max-width: 1100px;
-            margin: 0 auto; /* Căn giữa container */
+            margin: 0 auto;
             padding: 40px 20px;
         }
 
@@ -36,25 +36,25 @@
             margin-bottom: 10px;
         }
 
-        /* GRID ĐƠN GIẢN */
+        /* GRID */
         .databook-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 30px;
         }
 
-        /* CARD STYLE - KHÔNG CĂN CHỈNH PHỨC TẠP */
+        /* CARD STYLE (MẶC ĐỊNH) */
         .module-card {
-            display: block; /* Để tự nhiên, không ép Flexbox căn giữa dọc */
+            display: block;
             padding: 30px 20px;
-            height: 100%; /* Đảm bảo các thẻ cao bằng nhau */
+            height: 100%; /* Desktop thì để 100% cho đều hàng */
             
             background: var(--glass);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             
-            text-align: center; /* Chỉ căn giữa chữ cho đẹp mắt */
+            text-align: center;
             text-decoration: none;
             color: inherit;
             box-shadow: var(--shadow);
@@ -84,6 +84,46 @@
             color: var(--text-muted);
             line-height: 1.4;
         }
+
+        /* --- 📱 MOBILE RESPONSIVE (FIX LỖI CỦA ÔNG Ở ĐÂY) --- */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px; /* Giảm lề cho đỡ chật */
+                display: block; /* Bỏ flex center dọc, để nó trôi tự nhiên */
+            }
+
+            .hub-header.glass-box {
+                padding: 20px;
+                margin-bottom: 25px; /* Giảm khoảng cách dưới header */
+            }
+            
+            .hub-header h1 {
+                font-size: 1.8rem; /* Tên bé lại cho vừa màn hình */
+            }
+
+            .databook-grid {
+                grid-template-columns: 1fr; /* Ép về 1 cột duy nhất */
+                gap: 20px; /* Khoảng cách giữa các thẻ nhỏ hơn */
+            }
+
+            .module-card {
+                height: auto; /* QUAN TRỌNG: Để thẻ tự co lại theo nội dung, không bị kéo dãn */
+                min-height: auto;
+                padding: 20px 15px; /* Card nhỏ gọn hơn */
+                display: flex; /* Dùng flex để căn chỉnh icon và chữ ngang hàng (tùy chọn) hoặc dọc */
+                flex-direction: column; /* Vẫn xếp dọc nhưng gọn */
+                align-items: center;
+            }
+
+            .module-icon {
+                font-size: 2.5rem; /* Icon nhỏ lại chút */
+                margin-bottom: 10px;
+            }
+
+            .module-title {
+                font-size: 1.1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -99,7 +139,7 @@
             </div>
         </header>
 
-        <!-- GRID MODULES - NỘI DUNG ĐÃ SỬA THEO YÊU CẦU -->
+        <!-- GRID MODULES -->
         <main class="databook-grid">
             
             <!-- 1. Wiki -->
