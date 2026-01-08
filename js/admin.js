@@ -1,5 +1,5 @@
 // =================================================================
-// MIRAI ADMIN SCRIPT V28 (STABLE LOGIN & DATABOOK)
+// MIRAI ADMIN SCRIPT V31 (FULL UNLEASHED)
 // =================================================================
 
 const SECRET_PASS = "2006";
@@ -8,85 +8,132 @@ let currentDB = 'main'; // Mặc định quản lý Truyện Chính
 
 // --- 1. KHỞI TẠO (ENTRY POINT) ---
 document.addEventListener("DOMContentLoaded", () => {
-    // 1.1. Khởi tạo Editor (EasyMDE)
-    editor = new EasyMDE({
-        element: document.getElementById("content"),
-        spellChecker: false,
-        status: ["lines", "words"],
-        placeholder: "Nội dung bài viết...",
-        autosave: { enabled: true, uniqueId: "MirAi_Draft", delay: 5000 },
-    });
-
-    // 1.2. Smart Paste (Tự động format khi Ctrl+V từ Google Docs)
-    editor.codemirror.on("paste", (cm, event) => {
-        event.preventDefault();
-        let text = event.clipboardData.getData("text/plain");
-        if (!text) return;
-        let processed = text.trim()
-            .replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n")
-            .replace(/…/g, "...")
-            .replace(/^\[(.*?)\]:\s*(.*)$/gm, '**[$1]:** $2')
-            .replace(/\((.*?)\)/g, '*($1)*')
-            .replace(/^\s*\*\*\*\s*$/gm, '---');
-        cm.replaceSelection(processed);
-        showToast("⚡ Đã Smart Paste & Format!");
-    });
-
-    // 1.3. Gán sự kiện cho Màn hình khóa
-    const lockScreen = document.getElementById('lock-screen');
-    if (lockScreen) {
-        lockScreen.addEventListener('click', login);
-    }
-    
-    // Phím tắt F12 để login nhanh
-    window.addEventListener('keydown', (e) => { 
-        if(e.key === 'F12') login(); 
-    });
-
-    // 1.4. Load Cấu hình đã lưu (Token, Theme)
+    // 1.1. Khởi tạo Theme
     if(localStorage.getItem('admin_theme') === 'dark') {
         document.body.setAttribute('data-theme', 'dark');
     }
+    
+    // 1.2. Khởi tạo Editor (EasyMDE)
+    editor = new EasyMDE({
+        element: document.getElementById("content"),
+        spellChecker: false,
+        status: ["lines", "words", "cursor"],
+        placeholder: "Paste nội dung từ Google Docs vào đây (Ctrl+V)...",
+        autosave: { 
+            enabled: true, 
+            uniqueId: "MirAi_Draft_V31", 
+            delay: 5000 
+        },
+        toolbar: [
+            "bold", "italic", "heading", "|", 
+            "quote", "unordered-list", "ordered-list", "|", 
+            "link", "image", "|", 
+            "preview", "side-by-side", "fullscreen", "|", 
+            "guide"
+        ],
+        minHeight: "500px",
+        maxHeight: "85vh",
+    });
 
+    // 1.3. Fix lỗi Auto-Scroll (Tự cuộn khi gõ xuống cuối)
+    editor.codemirror.on("cursorActivity", () => {
+        const cursor = editor.codemirror.getCursor();
+        const scrollInfo = editor.codemirror.getScrollInfo();
+        const lineCoords = editor.codemirror.charCoords(cursor, "local");
+        // Nếu con trỏ cách đáy < 50px thì cuộn xuống
+        if (lineCoords.bottom > scrollInfo.clientHeight - 50) {
+            editor.codemirror.scrollTo(null, lineCoords.bottom - scrollInfo.clientHeight + 100);
+        }
+    });
+
+    // 1.4. Hook thống kê từ vựng (KPI)
+    setTimeout(() => { 
+        if(editor) { 
+            editor.codemirror.on("change", updateStats); 
+            updateStats(); 
+        } 
+    }, 1000);
+
+    // 1.5. Load Cấu hình đã lưu
     const savedToken = localStorage.getItem('gh_token');
-    if (savedToken && localStorage.getItem('remember_token') === 'true') {
+    const rememberMe = localStorage.getItem('remember_token') === 'true';
+    if (savedToken && rememberMe) {
         document.getElementById('token').value = savedToken;
         document.getElementById('rememberToken').checked = true;
     }
     document.getElementById('webhook').value = localStorage.getItem('discord_webhook') || '';
+
+    // 1.6. Sự kiện Màn hình khóa
+    const lockScreen = document.getElementById('lock-screen');
+    if (lockScreen) {
+        lockScreen.addEventListener('click', login);
+    }
+    window.addEventListener('keydown', (e) => { 
+        if(e.key === 'F12') login(); 
+    });
 });
 
-// --- 2. HỆ THỐNG ĐĂNG NHẬP (AUTH) ---
+// --- 2. BỘ XỬ LÝ VĂN BẢN (TEXT ENGINE) ---
+function processText(text) {
+    let processed = text
+        // 1. Fix lỗi xuống dòng của Google Docs (Quan trọng)
+        // Nếu dòng không bắt đầu bằng khoảng trắng và dòng trước đó có chữ -> Thêm xuống dòng
+        .replace(/([^\n])\n([^\n])/g, '$1\n\n$2') 
+        
+        // 2. Xóa khoảng trắng thừa đầu đuôi mỗi dòng
+        .split('\n').map(line => line.trim()).join('\n')
+        
+        // 3. Chuẩn hóa dòng trống (tối đa 2 dòng trống liên tiếp)
+        .replace(/\n{3,}/g, "\n\n")
+        
+        // 4. Fix ký tự lạ
+        .replace(/…/g, "...")
+        .replace(/[“”]/g, '"')
+        
+        // 5. In đậm tên nhân vật: [Minh]: -> **[Minh]:**
+        .replace(/^\s*\[(.*?)\]:\s*(.*)$/gm, '**[$1]:** $2')
+        
+        // 6. In nghiêng suy nghĩ (ngắn)
+        .replace(/(\s)\((.*?)\)(\s|$)/g, '$1*($2)*$3') 
+        
+        // 7. Căn giữa phân cách (Hoa văn hoặc ***)
+        .replace(/^\s*(❖.*❖|\*\*\*)\s*$/gm, '\n<div style="text-align:center; color:var(--primary); margin: 20px 0; font-weight:bold;">❖ ── ✦ ── ❖</div>\n');
+
+    return processed;
+}
+
+// Hàm gọi khi bấm nút "AI Format"
+function runAutoFormat() {
+    let txt = editor.value();
+    if (!txt) return showToast("⚠️ Chưa có nội dung!");
+    
+    let processed = processText(txt);
+    editor.value(processed);
+    showToast("✨ Đã Format: Tách đoạn & In đậm tên!");
+}
+
+// --- 3. HỆ THỐNG ĐĂNG NHẬP (AUTH) ---
 function login() {
     let pass = prompt("🔑 Mật mã:");
     if (pass === SECRET_PASS) {
-        unlockInterface();
+        document.getElementById('lock-screen').style.display = 'none';
+        initAdminMusic();
     } else if (pass) {
         alert("SAI MẬT MÃ!");
     }
 }
 
-function unlockInterface() {
-    document.getElementById('lock-screen').style.display = 'none';
-    // Thử load nhạc, nếu lỗi cũng không sao, vẫn vào được admin
-    try {
-        initAdminMusic();
-    } catch (e) {
-        console.warn("Không tải được nhạc nền:", e);
-    }
-}
-
-// --- 3. QUẢN LÝ DATABASE (CHUYỂN ĐỔI TRUYỆN/WIKI) ---
+// --- 4. QUẢN LÝ DATABASE (CHUYỂN ĐỔI) ---
 function switchDatabase() {
     currentDB = document.getElementById('dbSelector').value;
     resetEditor();
     
-    // Nếu đang ở tab Danh Sách thì tải lại ngay
+    // Nếu đang ở tab List thì load lại ngay
     if (document.getElementById('view-list').classList.contains('active')) {
         loadChapterList();
     }
     
-    // Đổi placeholder cho hợp ngữ cảnh
+    // Đổi placeholder tiêu đề
     const titleInput = document.getElementById('chapTitle');
     if (currentDB === 'main') {
         titleInput.placeholder = "Tiêu đề chương (VD: Chương 1)...";
@@ -97,27 +144,24 @@ function switchDatabase() {
     showToast(`📂 Đã chuyển sang: ${currentDB.toUpperCase()}`);
 }
 
+// Helper lấy config file/folder
 function getDbConfig() {
     if (currentDB === 'main') {
         return { json: 'data.json', folder: 'chapters' };
     } else {
-        // Ví dụ: data_wiki.json và thư mục wiki/
+        // VD: data_wiki.json và folder wiki/
         return { json: `data_${currentDB}.json`, folder: currentDB };
     }
 }
 
-// --- 4. GIAO DIỆN & TIỆN ÍCH (UI UTILS) ---
+// --- 5. GIAO DIỆN & TIỆN ÍCH (UI UTILS) ---
 function switchView(viewId) {
-    // Ẩn tất cả các view
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-    // Hiện view được chọn
     document.getElementById('view-' + viewId).classList.add('active');
     
-    // Highlight sidebar
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     if(event && event.currentTarget) event.currentTarget.classList.add('active');
-
-    // Load dữ liệu tương ứng
+    
     if(viewId === 'list') loadChapterList();
     if(viewId === 'music') loadMusicList();
     if(viewId === 'achievements') loadAchievements();
@@ -151,23 +195,14 @@ function saveConfig() {
     showToast("💾 Đã lưu cấu hình");
 }
 
-// --- 5. CHỨC NĂNG EDITOR ---
-function runAutoFormat() {
-    let txt = editor.value();
-    editor.value(txt.replace(/^\[(.*?)\]:\s*(.*)$/gm, '**[$1]:** $2').replace(/\((.*?)\)/g, '*($1)*'));
-    showToast("✨ Đã Format lại thủ công");
-}
-
+// --- 6. SNIPPETS & STATS ---
 function toggleSnippets() { 
-    const menu = document.getElementById('snippet-menu');
-    menu.classList.toggle('show'); 
+    document.getElementById('snippet-menu').classList.toggle('show'); 
 }
-
-// Đóng menu khi click ra ngoài
 window.addEventListener('click', (e) => { 
-    if (!e.target.matches('.btn-outline')) {
-        const menu = document.getElementById('snippet-menu');
-        if(menu) menu.classList.remove('show');
+    if (!e.target.matches('.btn-outline')) { 
+        const m = document.getElementById('snippet-menu'); 
+        if(m) m.classList.remove('show'); 
     } 
 });
 
@@ -198,10 +233,10 @@ function updateStats() {
     }
 }
 
-// --- 6. GITHUB API HELPER ---
+// --- 7. API HELPER (GITHUB) ---
 async function githubRequest(path, body, method='PUT') {
     const token = document.getElementById('token').value;
-    if(!token) throw new Error("Vui lòng nhập GitHub Token!");
+    if(!token) throw new Error("Nhập GitHub Token!");
     
     return fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {
         method: method, 
@@ -237,7 +272,7 @@ async function handleImgUpload() {
     });
 }
 
-// --- 7. QUẢN LÝ CHƯƠNG & BÀI VIẾT ---
+// --- 8. QUẢN LÝ DANH SÁCH (LIST) ---
 async function loadChapterList() {
     const c = document.getElementById('list-container');
     const t = document.getElementById('token').value;
@@ -252,7 +287,7 @@ async function loadChapterList() {
         if(!res.ok) {
             window.chaptersCache = [];
             window.jsonSha = null;
-            c.innerHTML = `Chưa có dữ liệu cho <b>${currentDB}</b>. Hãy tạo bài đầu tiên!`;
+            c.innerHTML = `Chưa có dữ liệu cho <b>${currentDB}</b>.<br>Hãy tạo bài đầu tiên!`;
             return;
         }
         
@@ -275,6 +310,7 @@ async function loadChapterList() {
     } catch(e) { c.innerHTML = "Lỗi tải danh sách: " + e.message; }
 }
 
+// --- 9. XUẤT BẢN (PUBLISH) ---
 async function publishChapter() {
     const title = document.getElementById('chapTitle').value;
     const content = editor.value();
@@ -286,7 +322,7 @@ async function publishChapter() {
     const { json, folder } = getDbConfig();
 
     try {
-        // Lấy danh sách hiện tại để có SHA mới nhất
+        // 1. Lấy danh sách hiện tại (để chắc chắn có SHA mới nhất)
         let chapters = [];
         let listSha = null;
         try {
@@ -298,13 +334,14 @@ async function publishChapter() {
             }
         } catch(e) {}
 
+        // 2. Chuẩn bị File
         const idx = document.getElementById('edit-index').value;
         const ts = document.getElementById('scheduleTime').value ? new Date(document.getElementById('scheduleTime').value).getTime() : Date.now();
         
         let path, sha = null;
         
         if(idx !== "") {
-            // Sửa bài cũ
+            // Edit Mode
             path = chapters[idx].file;
             try {
                 const fInfo = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${path}`, {headers:{Authorization:`token ${token}`}});
@@ -313,26 +350,26 @@ async function publishChapter() {
             chapters[idx].title = title; 
             chapters[idx].timestamp = ts;
         } else {
-            // Tạo bài mới (Lưu vào đúng thư mục: wiki/, tech/...)
+            // New Mode
             path = `${folder}/${Date.now()}.md`;
             chapters.push({id: `${folder}_${Date.now()}`, title: title, file: path, timestamp: ts});
         }
 
-        // Upload File MD
+        // 3. Upload File MD
         await githubRequest(path, {
             message: `Upd ${title} in ${currentDB}`, 
             content: btoa(unescape(encodeURIComponent(content))), 
             sha: sha
         });
         
-        // Upload JSON List
+        // 4. Upload List JSON
         await githubRequest(json, {
             message: `Upd List ${currentDB}`, 
             content: btoa(unescape(encodeURIComponent(JSON.stringify(chapters, null, 2)))), 
             sha: listSha
         });
         
-        // Thông báo Discord (Chỉ khi là truyện chính)
+        // 5. Notify (Chỉ thông báo nếu là Truyện Chính)
         const wh = document.getElementById('webhook').value;
         if(wh && !idx && currentDB === 'main') {
             fetch(wh, {
@@ -380,7 +417,7 @@ async function deleteChapter(i) {
             await githubRequest(item.file, {message:`Del ${item.title}`, sha: fData.sha}, 'DELETE');
         }
         
-        // 2. Cập nhật list
+        // 2. Cập nhật list (Fix lỗi double read stream)
         const lRes = await fetch(`https://api.github.com/repos/${CONFIG.adminUser}/${CONFIG.repoName}/contents/${json}?t=${Date.now()}`, {headers:{Authorization:`token ${t}`}});
         const lData = await lRes.json();
         
@@ -404,7 +441,7 @@ function resetEditor() {
     document.getElementById('publishBtn').innerText = "🚀 ĐĂNG BÀI";
 }
 
-// --- 8. MUSIC & UTILS ---
+// --- 10. MUSIC & UTILS ---
 function translateLogic() {
     let t = document.getElementById('humanLogic').value.toLowerCase();
     const map = {'giờ':'env.hour','đọc':'env.readCount','lớn hơn':'>','nhỏ hơn':'<','bằng':'==','và':'&&'};
@@ -434,7 +471,7 @@ function nextAdminMusic() {
     bgm.play(); 
 }
 
-// --- 9. ACHIEVEMENTS ---
+// --- 11. ACHIEVEMENTS ---
 async function loadAchievements() { 
     const c=document.getElementById('ach-list-container'); c.innerHTML="Loading..."; 
     const t=document.getElementById('token').value; 
