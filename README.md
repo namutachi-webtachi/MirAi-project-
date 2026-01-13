@@ -17,3 +17,4 @@ Thế giới nội tâm vốn khép kín của cậu bắt đầu xáo động m
 Câu chuyện sẽ theo chân Minh trong hành trình tìm cách thể hiện tình cảm, mà không biết rằng những lựa chọn và cảm xúc mãnh liệt này cũng chính là điểm khởi đầu cho một hành trình sẽ thử thách và định hình lại toàn bộ bản chất cũng như tâm lý cậu
  
  
+ 
