@@ -1,20 +1,65 @@
-# MirAi-project-
-Về tác giả UwU 
- 
+# MirAi Project 🚀
 
-NamuTachi là một sinh viên kỹ thuật học trường H giấu tên thích được viết truyện riêng của mình 
+**Một web truyện Sci-fi được xây dựng từ đầu với trải nghiệm đọc cao cấp, không quảng cáo. Được tạo ra bởi một sinh viên kỹ thuật "khổ dâm".**
+
+---
+
+### ✨ Live Demo
+
+**Trải nghiệm trực tiếp câu chuyện và sản phẩm tại:**
+**[https://namutachi-webtachi.github.io/MirAi-project-/](https://namutachi-webtachi.github.io/MirAi-project-/)**
+
+![Demo MirAi Project](https://raw.githubusercontent.com/Namutachi/MirAi-project-/main/assets/tên_file_video.webm)
+
+---
+
+### 📖 Về Câu Chuyện: MirAi
+
+MirAi là một câu chuyện lãng mạn, tâm lý trong bối cảnh khoa học viễn tưởng, xoay quanh **Minh**, một sinh viên tự ti và hành trình bước ra khỏi vỏ bọc của mình vì tình yêu với **Vy**. Nhưng những lựa chọn của cậu lại vô tình khởi đầu cho một chuỗi sự kiện lớn hơn rất nhiều...
+
+---
+
+### 🛠️ Về Project: Tại Sao Lại "Khổ Dâm"?
+
+Mình bắt đầu project này vì 3 lý do:
+1.  **Cay cú vì quảng cáo** trên các nền tảng khác.
+2.  Muốn xây dựng một **vũ trụ truyện (lore/databook)** hoàn chỉnh mà không làm loãng truyện chính.
+3.  **Ngứa nghề!** Muốn thử thách bản thân tự xây dựng một sản phẩm từ A-Z.
+
+Project này được xây dựng trên **Github Pages** cho miễn phí, và có sự hỗ trợ của **Google AI Studio** trong giai đoạn đầu để dựng sườn. Toàn bộ logic, tính năng, và việc "dọn bug" đều do mình tự xử.
+
+---
+
+### 🌟 Các Tính Năng "Chất Lượng Sống"
+
+Đây không chỉ là một trang đọc truyện, đây là một "trải nghiệm":
+*   **Ad-Free 100%:** Không gì có thể làm phiền cảm xúc của bạn.
+*   **Dark Mode & Giao diện kính mờ (Glassmorphism):** Đọc đêm không mỏi mắt.
+*   **DJ Station 🎵:** Nghe nhạc Lofi trực tiếp trong khi đọc.
+*   **Lưu Vết Đọc (Auto-Scroll Memory):** F5 hay tắt tab? Web sẽ tự đưa bạn về đúng vị trí đọc dở.
+*   **Hệ thống Wiki/Databook:** Khám phá sâu hơn về thế giới, nhân vật, công nghệ.
+*   **PWA Support:** Cài đặt web ra màn hình chính như một ứng dụng thực thụ.
+
+---
+
+### 👑 The Command Center (Admin Panel)
+
+Điều mình tự hào nhất không phải là web đọc, mà là trang admin tự code. Nó là một CMS mini với những tính năng điên rồ:
 
 
-Về tác phẩm 
+*   **Studio soạn thảo** với KPI, hẹn giờ, auto format.
+*   **Quản lý đa-database** cho truyện chính và các mục Databook.
+*   **AI Logic Lab** để tạo điều kiện cho hệ thống Thành tựu.
+*   Và nhiều thứ khác...
 
+---
 
-MirAi là light novel do NamuTachi viết có sử dụng AI giống như một editor chỉnh sửa bản chỉnh sửa được theo dõi chặt chẽ bởi tác giả, mong mọi người ủng hộ tác phẩm   
+### 🤝 Đóng Góp
 
-Đây là câu truyện xoay quanh Minh, một sinh viên đại học luôn vật lộn với sự tự ti và chứng khó giao tiếp xã hội.  
+Đây là dự án cá nhân, nên mình rất hoan nghênh mọi sự đóng góp.
+*   Nếu bạn thích project này, hãy cho mình một ⭐ **Star** nhé!
+*   Nếu bạn phát hiện bug, hãy tạo một **Issue**.
+*   Nếu bạn muốn góp ý về truyện, hãy tham gia **Discord** của chúng mình.
 
-Thế giới nội tâm vốn khép kín của cậu bắt đầu xáo động mạnh mẽ khi cậu đem lòng thầm yêu Vy. Mối tình đơn phương này trở thành động lực lớn nhất, thôi thúc Minh bước ra khỏi vùng an toàn của mình.  
-
-Câu chuyện sẽ theo chân Minh trong hành trình tìm cách thể hiện tình cảm, mà không biết rằng những lựa chọn và cảm xúc mãnh liệt này cũng chính là điểm khởi đầu cho một hành trình sẽ thử thách và định hình lại toàn bộ bản chất cũng như tâm lý cậu
- 
- 
+Cảm ơn bạn đã ghé thăm!
  
