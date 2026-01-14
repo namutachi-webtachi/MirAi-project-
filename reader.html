@@ -13,6 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
+    <div id="exit-focus-btn" onclick="toggleFocusMode()">❌ Thoát Tập Trung (ESC)</div>
     <div id="progress-bar"></div>
     <div id="loading">Đang tải truyện...</div>
 
@@ -24,6 +25,7 @@
                 <button class="btn" onclick="toggleSettings()">⚙️ Cài đặt</button>
                 <!-- Popup cài đặt -->
                 <div id="settings-panel" class="settings-panel">
+                    <button class="btn btn-outline" onclick="toggleFocusMode()" title="Chế độ tập trung">👁️ Focus</button>
                     <p style="margin: 0 0 10px 0; font-weight: bold;">Cỡ chữ:</p>
                     <button class="btn" onclick="changeFontSize('down')">A-</button>
                     <button class="btn" onclick="changeFontSize('up')">A+</button>
