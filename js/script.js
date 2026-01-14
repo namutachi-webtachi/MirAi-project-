@@ -351,3 +351,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         initReaderPage();
     }
 });
+// --- FOCUS MODE LOGIC ---
+function toggleFocusMode() {
+    document.body.classList.toggle('focus-mode');
+    
+    // Thông báo cho ngầu
+    if (document.body.classList.contains('focus-mode')) {
+        showToast("👁️ Đã bật Focus Mode. Bấm ESC để thoát.");
+    }
+}
+
+// Phím tắt ESC để thoát
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('focus-mode')) {
+        toggleFocusMode();
+    }
+});
+
+// Hàm showToast (Nếu bro chưa có trong script.js thì thêm vào, lấy từ admin.js sang cũng được)
+function showToast(msg) {
+    // Tạo toast nhanh nếu chưa có
+    let t = document.getElementById('toast-msg');
+    if (!t) {
+        t = document.createElement('div');
+        t.id = 'toast-msg';
+        Object.assign(t.style, {
+            position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
+            background: 'rgba(0,0,0,0.8)', color: 'white', padding: '10px 20px',
+            borderRadius: '20px', zIndex: '10002', display: 'none', transition: '0.3s'
+        });
+        document.body.appendChild(t);
+    }
+    t.innerText = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+}
