@@ -125,6 +125,46 @@ async function initReaderPage() {
     loadGiscus();
     hideLoading();
     applyUserSettings();
+    
+    // --- 🔥 TÍNH NĂNG: LƯU VẾT ĐỌC (AUTO-SCROLL MEMORY) ---
+    
+    // 1. Tạo Key duy nhất cho chương này (VD: mirai_pos_chapters_1)
+    const scrollKey = `mirai_pos_${dbPrefix}_${chapterId}`;
+
+    // 2. Hàm khôi phục vị trí (Chạy sau khi render xong)
+    setTimeout(() => {
+        const savedPos = localStorage.getItem(scrollKey);
+        if (savedPos && parseInt(savedPos) > 0) {
+            window.scrollTo({
+                top: parseInt(savedPos),
+                behavior: 'smooth'
+            });
+            
+            // (Optional) Hiện thông báo nhỏ cho ngầu
+            const toast = document.createElement('div');
+            toast.innerText = "📍 Đã quay lại vị trí cũ";
+            Object.assign(toast.style, {
+                position: 'fixed', bottom: '80px', right: '20px',
+                background: 'rgba(0,0,0,0.7)', color: '#fff',
+                padding: '8px 12px', borderRadius: '20px', fontSize: '0.8rem',
+                zIndex: '10000', animation: 'fadeIn 0.5s'
+            });
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    }, 500); // Delay 0.5s để chờ ảnh/text load xong layout
+
+    // 3. Hàm lưu vị trí (Dùng Debounce để không spam bộ nhớ)
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            // Chỉ lưu nếu cuộn quá 100px (tránh lưu lúc mới vào trang)
+            if (window.scrollY > 100) {
+                localStorage.setItem(scrollKey, window.scrollY);
+            }
+        }, 500); // Chỉ lưu sau khi ngừng cuộn 0.5s
+    });
 }
 
 // --- 5. HỆ THỐNG ÂM NHẠC (CODE GỐC ĐẦY ĐỦ) ---
