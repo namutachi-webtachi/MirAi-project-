@@ -423,3 +423,91 @@ input:focus, textarea:focus {
     padding: 0 !important;
     font-family: inherit;
 }
+/* =========================================
+   FOCUS MODE (CHẾ ĐỘ TẬP TRUNG - V2)
+   ========================================= */
+
+/* 1. Thiết lập nền tối cho toàn trang */
+body.focus-mode {
+    background-image: none !important; /* Tắt ảnh nền */
+    background-color: #121212 !important; /* Nền than chì tối */
+    color: #b0b3b8 !important; /* Chữ xám sáng dịu mắt */
+    overflow-x: hidden;
+}
+
+/* 2. Ẩn hoàn toàn những thứ không cần thiết */
+body.focus-mode header, 
+body.focus-mode footer,
+body.focus-mode #bgm-player,
+body.focus-mode #bookmark-link,
+body.focus-mode .chapter-list, 
+body.focus-mode .search-box {
+    display: none !important;
+}
+
+/* 3. Tinh chỉnh khung đọc (Loại bỏ viền kính) */
+body.focus-mode .glass-box {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    max-width: 750px; /* Thu hẹp lại chuẩn sách */
+    margin: 0 auto;
+}
+
+/* 4. Xử lý Thanh Công Cụ (Reader Controls) - QUAN TRỌNG */
+body.focus-mode .reader-controls {
+    opacity: 0.1; /* Mờ tịt đi để không làm phiền */
+    transition: opacity 0.3s ease; /* Hiệu ứng chuyển mượt */
+    margin-bottom: 40px;
+}
+
+/* Khi di chuột vào thì hiện rõ lên */
+body.focus-mode .reader-controls:hover,
+body.focus-mode .settings-panel.active { 
+    opacity: 1; 
+}
+
+/* 5. Tinh chỉnh chữ trong truyện */
+body.focus-mode #content-area {
+    font-size: 1.3rem; /* Chữ to hơn chút cho dễ đọc */
+    line-height: 2;    /* Dãn dòng thoáng hơn */
+    color: inherit;
+}
+
+/* 6. Nút Thoát Nổi (Dự phòng) */
+#exit-focus-btn {
+    position: fixed; top: 20px; right: 20px;
+    background: rgba(255,255,255,0.1); 
+    color: #fff; padding: 8px 15px; 
+    border-radius: 20px; cursor: pointer; 
+    z-index: 10001; display: none; 
+    font-size: 0.8rem; border: 1px solid #333;
+}
+body.focus-mode #exit-focus-btn { display: block; }
+body.focus-mode #exit-focus-btn:hover { background: var(--primary); border-color: var(--primary); }
+body.focus-mode .reader-controls:first-of-type {
+    opacity: 0.1;
+    transition: 0.3s;
+}
+body.focus-mode .reader-controls:first-of-type:hover {
+    opacity: 1;
+}
+
+/* 2. Nút Chuyển Chương (Ở dưới đáy): LUÔN HIỆN RÕ (Không làm mờ) */
+body.focus-mode .reader-controls:last-of-type {
+    opacity: 1 !important;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px dashed #333; /* Thêm cái đường kẻ cho tách biệt */
+}
+
+/* 3. Phần Bình Luận: LUÔN HIỆN RÕ */
+body.focus-mode #comments {
+    display: block !important;
+    opacity: 1 !important;
+    margin-top: 30px;
+    background: rgba(255, 255, 255, 0.05); /* Nền nhẹ cho dễ đọc comment */
+    padding: 20px;
+    border-radius: 10px;
+}
