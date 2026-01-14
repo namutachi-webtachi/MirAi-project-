@@ -18,27 +18,45 @@
     <div id="loading">Đang tải truyện...</div>
 
     <div class="container">
-        <!-- Toolbar -->
-        <div class="glass-box reader-controls" style="position: sticky; top: 10px; z-index: 99;">
-            <a href="index.html" class="btn btn-outline">⬅ Trang chủ</a>
-            <div>
-                <button class="btn" onclick="toggleSettings()">⚙️ Cài đặt</button>
-                <!-- Popup cài đặt -->
-                <div id="settings-panel" class="settings-panel">
-                    <button class="btn btn-outline" onclick="toggleFocusMode()" title="Chế độ tập trung">👁️ Focus</button>
-                    <p style="margin: 0 0 10px 0; font-weight: bold;">Cỡ chữ:</p>
-                    <button class="btn" onclick="changeFontSize('down')">A-</button>
-                    <button class="btn" onclick="changeFontSize('up')">A+</button>
-                    <p style="margin: 10px 0 10px 0; font-weight: bold;">Font chữ:</p>
-                    <div style="display: flex; gap: 5px;">
+           
+<!-- Toolbar -->
+<div class="glass-box reader-controls" style="position: sticky; top: 10px; z-index: 99;">
+    <!-- Bên trái: Nút Home -->
+    <a href="index.html" class="btn btn-outline">⬅ Trang chủ</a>
+
+    <!-- Bên phải: Các nút chức năng -->
+    <div style="display: flex; gap: 10px;">
+        <!-- 1. Nút Focus (Đưa ra ngoài cho tiện bấm) -->
+        <button class="btn btn-outline" onclick="toggleFocusMode()" title="Chế độ tập trung">
+            👁️ Focus
+        </button>
+
+        <!-- 2. Nút Cài đặt & Popup -->
+        <div style="position: relative;">
+            <button class="btn" onclick="toggleSettings()">⚙️ Cài đặt</button>
+            
+            <!-- Popup Cài đặt (Đã bỏ nút Focus thừa ở trong này đi) -->
+            <div id="settings-panel" class="settings-panel">
+                <p style="margin: 0 0 10px 0; font-weight: bold;">Cỡ chữ:</p>
+                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                    <button class="btn" style="flex:1" onclick="changeFontSize('down')">A-</button>
+                    <button class="btn" style="flex:1" onclick="changeFontSize('up')">A+</button>
+                </div>
+                
+                <p style="margin: 10px 0 10px 0; font-weight: bold;">Font chữ:</p>
+                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
                     <button class="btn btn-outline" onclick="changeFont('sans-serif')" style="flex: 1;">Hiện đại</button>
                     <button class="btn btn-outline" onclick="changeFont('serif')" style="flex: 1;">Cổ điển</button>
-                    </div>
-                    <hr>
-                    <button class="btn" onclick="toggleTheme()" style="width: 100%">Đổi chế độ Sáng/Tối</button>
                 </div>
+                
+                <hr style="border-color: var(--border); margin: 10px 0;">
+                <button class="btn" onclick="toggleTheme()" style="width: 100%">Đổi chế độ Sáng/Tối</button>
             </div>
         </div>
+    </div>
+</div>
+
+  
 
         <!-- Nội dung -->
         <div class="glass-box">
