@@ -1,5 +1,18 @@
 # MirAi Project 🚀
 
+---
+
+### 🏆 Hall of Fame 
+
+*Project này được xây dựng và hoàn thiện hơn mỗi ngày nhờ vào những góp ý vô giá từ cộng đồng. Xin gửi lời cảm ơn chân thành đến những "kiến trúc sư" đầu tiên:*
+
+*   **@manually (from voz.vn):** Cảm ơn "viên gạch" tâm huyết về UI "màu mè", là nguồn cảm hứng trực tiếp cho sự ra đời của tính năng **"Focus Mode"**, giúp trải nghiệm đọc được tập trung hơn.
+*   **@DankeNguyen369 (from voz.vn):** Cảm ơn vì đã là người đầu tiên thắp lên vì sao ⭐ cho project này!
+
+*(Danh sách này sẽ còn dài thêm nữa...)*
+
+---
+
 > **[ENGLISH BELOW]** 👇
 
 **Một web truyện Sci-fi được xây dựng từ đầu với trải nghiệm đọc cao cấp, không quảng cáo. Được tạo ra bởi một sinh viên kỹ thuật "khổ dâm".**
