@@ -9,7 +9,7 @@
 **Trải nghiệm trực tiếp câu chuyện và sản phẩm tại:**
 **[https://namutachi-webtachi.github.io/MirAi-project-/](https://namutachi-webtachi.github.io/MirAi-project-/)**
 
-![Demo MirAi Project](https://raw.githubusercontent.com/Namutachi/MirAi-project-/main/assets/tên_file_video.webm)
+![Demo MirAi Project](https://raw.githubusercontent.com/namutachi-webtachi/MirAi-project-/main/images/demo_final.webm)
 
 ---
 
