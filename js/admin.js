@@ -34,18 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
         minHeight: "500px",
         maxHeight: "85vh",
     });
-
-    // 1.3. Fix lỗi Auto-Scroll (Tự cuộn khi gõ xuống cuối)
-    editor.codemirror.on("cursorActivity", () => {
-        const cursor = editor.codemirror.getCursor();
-        const scrollInfo = editor.codemirror.getScrollInfo();
-        const lineCoords = editor.codemirror.charCoords(cursor, "local");
-        // Nếu con trỏ cách đáy < 50px thì cuộn xuống
-        if (lineCoords.bottom > scrollInfo.clientHeight - 50) {
-            editor.codemirror.scrollTo(null, lineCoords.bottom - scrollInfo.clientHeight + 100);
-        }
-    });
-
     // 1.4. Hook thống kê từ vựng (KPI)
     setTimeout(() => { 
         if(editor) { 
